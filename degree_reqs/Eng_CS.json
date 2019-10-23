@@ -1,0 +1,25 @@
+{
+  "engineering": [
+    "MATH 1910",
+    "MATH 1920"
+  ],
+  "core": [
+    "CS 1110",
+    "CS 2110",
+    "CS 3110"
+  ],
+  "subs": {
+    "CS 1110": [
+      "CS 1112"
+    ],
+    "CS 2800": [
+      "CS 2802"
+    ]
+  },
+  "catagories": {
+    "ENGRD": 3,
+    "CS 4000+": 9,
+    "CS Technical": 9,
+    "CS Ext Spec": 9
+  }
+}
