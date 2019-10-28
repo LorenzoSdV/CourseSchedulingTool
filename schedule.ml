@@ -1,12 +1,28 @@
-
-type course = {
-
+type sem_status = Past | Present | Future
+type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
+type reqs = {
+  temp: int;
 }
 
-type = semester {
+type course = {
+  name: string;
+  credits: int;
+  mutable grade: grade;
+  degree: string;
+  (* subject/category *)
+}
 
-  }
+type semester = {
+  courses: course list;
+  tot_credits: int;
+  mutable sem_status: sem_status;
+  sem_gpa: float;
+}
 
 type schedule = {
-  semesters: 
+  semesters: semester list;
+  curr_gpa: float;
+  mutable exp_grad: int;
+  mutable major: string;
+
 }
