@@ -13,14 +13,14 @@ type course = {
 }
 
 type semester = {
-  courses: course list;
+  (*make mutable?*)courses: course list;
   tot_credits: int;
   mutable sem_status: sem_status;
   sem_gpa: float;
 }
 
 type schedule = {
-  semesters: semester list;
+  (*make mutable?*)semesters: semester list;
   curr_gpa: float;
   mutable exp_grad: int;
   mutable major: string;
