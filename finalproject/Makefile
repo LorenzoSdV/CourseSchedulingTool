@@ -1,4 +1,4 @@
-MODULES=dictionary dictionarySet listDictionary engine listEngine authors
+MODULES=schedule prompt parser authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
@@ -16,7 +16,8 @@ test:
 	BISECT_COVERAGE=YES $(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST) -runner sequential
 
 check:
-	bash checkenv.sh && bash checktypes.sh
+	bash checkenv.sh
+	# NOTE: This only checks environment! Not type-checking built in here.
 	
 finalcheck: check
 	bash checkzip.sh
