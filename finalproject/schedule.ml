@@ -1,9 +1,7 @@
 type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
 
-type sem_id = 
-  | Spring of int
-  | Fall of int
+type sem_id = Spring of int | Fall of int
 
 type reqs = {
   temp: int;
@@ -30,5 +28,10 @@ type schedule = {
   mutable curr_gpa: float;
   mutable exp_grad: int;
   mutable major: string;
-
 }
+
+
+let string_of_sem sem =
+  match sem.id with
+  | Spring yr -> "SP" ^ (string_of_int yr)
+  | Fall yr -> "FA" ^ (string_of_int yr)

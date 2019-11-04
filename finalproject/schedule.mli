@@ -61,3 +61,7 @@ val remove_sem : semester -> schedule -> schedule
 (** [get_schedule] returns the current schedule with all the smeesters and 
     courses. *)
 val get_schedule : schedule
+
+(** [string_of_sem s] is the string representation of semester [s]. String
+    representations are like FA20 or SP18, etc. *)
+val string_of_sem : semester -> string
