@@ -4,3 +4,5 @@ open Schedule
     course with name [nm] during semester [sem] gotten from Class
     Roster website. *)
 val get_course_info : string -> sem_id -> course
+
+val string_of_url : string -> string

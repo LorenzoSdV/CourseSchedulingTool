@@ -50,6 +50,15 @@ else
   environment=bad
 fi
 
+OCURL_INSTALLED="$(opam list -i | grep 'ocurl' | cut -c1-5 2>&1)"
+if [[ $OCURL_INSTALLED == "ocurl" ]]; then
+  echo "Ocurl installation detected. Good."
+else
+  echo "Ocurl package is NOT installed! Chris needs this."
+  echo "Please run \"opam install ocurl\"."
+  environment=bad
+fi
+
 if [[ $environment == good ]]; then
   cat <<EOF
 ===========================================================

@@ -1,4 +1,6 @@
 #directory "_build";;
 #require "str";;
+#require "curl";;
 #load_rec "schedule.cmo";;
 #load_rec "prompt.cmo";;
+#load_rec "parser.cmo";;

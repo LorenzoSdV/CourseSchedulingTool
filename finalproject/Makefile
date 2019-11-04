@@ -1,4 +1,4 @@
-MODULES=schedule prompt parser authors
+MODULES=parser authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
@@ -18,6 +18,7 @@ test:
 check:
 	bash checkenv.sh
 	# NOTE: This only checks environment! Not type-checking built in here.
+	# We need to re-write Xtra Stuff/checktypes.ml for that...
 	
 finalcheck: check
 	bash checkzip.sh
