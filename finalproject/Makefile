@@ -1,4 +1,4 @@
-MODULES=parser authors
+MODULES=schedule prompt parser authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
