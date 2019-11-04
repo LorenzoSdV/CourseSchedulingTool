@@ -1,1 +1,25 @@
-.vscode/
+# assignment
+doc.public
+doc.private
+search_src.zip
+report
+
+# ocaml
+*.cmo
+*.cma
+*.cmi
+*.out
+*.cmx
+*.native
+*.byte
+_build
+
+# temporary files
+*.swp
+*~
+\#*\#
+.DS_Store
+
+#VS Code settings
+.vscode
+

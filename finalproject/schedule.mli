@@ -2,7 +2,7 @@
     semester, a present one, or a future semester. *)
 type sem_status = Past | Present | Future
 
-(** The type reepresenting the grade of a course. *)
+(** The type representing the grade of a course. *)
 type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
 
 (** The type representing the prereqs or coreqs of a course. *)
@@ -55,4 +55,6 @@ val add_sem : semester -> schedule -> schedule
     Raises: [Failure] if semester doesn't exists in the schedule. *)
 val remove_sem : semester -> schedule -> schedule
 
-(** get_sem? get_schedule? *)
+(** [get_schedule] returns the current schedule with all the smeesters and 
+    courses. *)
+val get_schedule : schedule
