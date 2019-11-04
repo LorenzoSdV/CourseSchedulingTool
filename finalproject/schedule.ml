@@ -13,7 +13,7 @@ type course = {
   name: string;
   credits: int;
   mutable grade: grade;
-  degree: string;
+  mutable degree: string;
   (* subject/category *)
 }
 
