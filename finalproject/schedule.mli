@@ -9,7 +9,7 @@ type sem_id = Spring of int | Fall of int
 type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
 
 (** The type representing the prereqs or coreqs of a course. *)
-type recs 
+type reqs 
 
 (** Type representing a course *)
 type course

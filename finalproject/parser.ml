@@ -1,7 +1,7 @@
 open Schedule
-
+(*
 let get_course_info name sem =
-  failwith "unip"
+  failwith "unip"*)
 
 (** Returns body of URL as string *)
 let string_of_url url = 
@@ -16,7 +16,7 @@ let string_of_url url =
 let course_html name sem =
   let course = String.split_on_char ' ' name in
   let url = "https://classes.cornell.edu/browse/roster/" ^ 
-            string_of_sem sem ^ "/class/" ^ List.hd course ^ "/" ^ 
+            (string_of_sem sem) ^ "/class/" ^ List.hd course ^ "/" ^ 
             List.hd (List.tl course) in
   string_of_url url
 

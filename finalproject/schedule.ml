@@ -30,6 +30,33 @@ type schedule = {
   mutable major: string;
 }
 
+exception UnknownCourse of string
+exception UnknownSemester
+
+
+let create_course name cred gr deg = 
+  failwith "unimp"
+
+let add_course c sem = 
+  failwith "unimp"
+
+let remove_course c sem =
+  failwith "unimp"
+
+let get_course name sem = 
+  failwith "unimp"
+
+let create_sem courses creds stat gpa =
+  failwith "unimp"
+
+let add_sem sem sch =
+  failwith "unimp"
+
+let remove_sem sem sch = 
+  failwith "unimp"
+
+let get_schedule =
+  failwith "unimp"
 
 let string_of_sem sem =
   match sem.id with
