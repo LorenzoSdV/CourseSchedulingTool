@@ -20,23 +20,29 @@ type semester
 (** Type representing a whole schedule *)
 type schedule
 
+(** Exception raised when a course is to be added to a schedule with an 
+    invalid number of credits. *)
+exception InvalidCredits
+
 exception UnknownCourse of string
 
 exception UnknownSemester
 
-(** [create_course name cred gr deg] creates a new course with name [name], 
+(** [create_course name cred gr deg] is a new course type with name [name], 
     number of credits [cred], grade [gr], and degree category [deg]. *)
 val create_course : string -> int -> grade -> string -> course
 
-(** [add_course c sem] adds course [c] to the list of courses in a semester
-    [sem] if it is not already in there. 
+(** [add_course sch c semid] is the schedule with course [c] added to semester
+    with id [sem_id].
     Raises: [Failure] if course already exists in the semester. *)
-val add_course : course -> semester -> semester
+val add_course : schedule -> course -> semester -> schedule
 
-(** [remove_course c sem] removes course [c] from the list of courses in a 
-    semester [sem] if it exists. 
-    Raises: [Failure] if course does not exist in the semester. *)
-val remove_course : course -> semester -> semester
+(** [add_course sch c semid] is the schedule with course [c] removed
+    from semester id [semid].
+    Raises: [Failure] if course not in the semester. *)
+val remove_course : schedule -> course -> semester -> schedule
+
+
 
 (** [get_course name sem] returns the information about the course with name
     [name] if it exists in the semester.
@@ -62,6 +68,10 @@ val remove_sem : semester -> schedule -> schedule
     courses. *)
 val get_schedule : schedule
 
-(** [string_of_sem s] is the string representation of semester [s]. String
+(** [string_of_sem s] is the string representation of semester id [s]. String
     representations are like FA20 or SP18, etc. *)
-val string_of_sem : semester -> string
+val string_of_sem : sem_id -> string
+
+(** [to_list sch] is the list of all courses contained in each semester in 
+    [sch] *)
+val to_list : schedule -> course list
