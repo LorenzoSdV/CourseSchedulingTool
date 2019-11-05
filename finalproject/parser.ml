@@ -20,6 +20,10 @@ let course_html name sem =
             List.hd (List.tl course) in
   string_of_url url
 
-
+(** Returns # of credits for course. Returns -1 on error*)
 let get_credits html =
   let reg = Str.regexp_string "<span class=\"credit-val\">" in
+  try
+    int_of_string (String.sub html (Str.search_forward reg html 0) 1)
+  with
+    _ -> -1
