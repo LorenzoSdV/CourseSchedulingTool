@@ -71,3 +71,7 @@ val get_schedule : schedule
 (** [string_of_sem s] is the string representation of semester id [s]. String
     representations are like FA20 or SP18, etc. *)
 val string_of_sem : sem_id -> string
+
+(** [to_list sch] is the list of all courses contained in each semester in 
+    [sch] *)
+val to_list : schedule -> course list
