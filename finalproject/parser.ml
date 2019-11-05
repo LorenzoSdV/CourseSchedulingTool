@@ -2,13 +2,16 @@ open Schedule
 
 (** Returns body of URL as string *)
 let string_of_url url = 
-  let connection = Curl.init () and result = ref "" in
-  Curl.set_writefunction connection
-    (fun x -> result := !result ^ x; String.length x);
-  Curl.set_url connection url;
-  Curl.perform connection;
-  Curl.global_cleanup ();
-  !result
+  try
+    let connection = Curl.init () and result = ref "" in
+    Curl.set_writefunction connection
+      (fun x -> result := !result ^ x; String.length x);
+    Curl.set_url connection url;
+    Curl.perform connection;
+    Curl.global_cleanup ();
+    !result
+  with
+    _ -> failwith "URL to string error"
 
 let course_html name sem =
   let course = String.split_on_char ' ' name in

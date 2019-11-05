@@ -5,6 +5,5 @@ open Schedule
     Roster website. *)
 val get_course_info : string -> sem_id -> course
 
-val get_credits : string -> int
-
+(** [string_of_url url] is the source HTML at URL [url]. *)
 val string_of_url : string -> string
