@@ -19,7 +19,7 @@ type semester = {
   mutable id: sem_id;
   mutable courses: course list;
   mutable tot_credits: int;
-  mutable sem_status: sem_status;
+  (*mutable sem_status: sem_status;*)
   mutable sem_gpa: float;
 }
 
@@ -30,18 +30,39 @@ type schedule = {
   mutable major: string;
 }
 
+
+exception InvalidCredits
 exception UnknownCourse of string
 exception UnknownSemester
 
+let to_list sch =
+  let rec fold sems acc = 
+    match sems with
+    | [] -> acc
+    | {courses=x} :: t -> fold t (x @ acc)
+  in
+  fold sch.semesters []
 
 let create_course name cred gr deg = 
-  failwith "unimp"
+  {
+    name = name;
+    credits = cred;
+    grade = gr;
+    degree = deg;
+  }
 
-let add_course c sem = 
-  failwith "unimp"
+let add_course sch c semid = 
+  try
+    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+    sem.courses <- (c :: sem.courses);
+    sch
+  with
+    Not_found -> raise UnknownSemester
 
-let remove_course c sem =
-  failwith "unimp"
+let remove_course sch c =
+  let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+  sem.courses <- (c :: sem.courses);
+  sch
 
 let get_course name sem = 
   failwith "unimp"
@@ -58,7 +79,7 @@ let remove_sem sem sch =
 let get_schedule =
   failwith "unimp"
 
-let string_of_sem sem =
-  match sem.id with
+let string_of_sem semid =
+  match semid with
   | Spring yr -> "SP" ^ (string_of_int yr)
   | Fall yr -> "FA" ^ (string_of_int yr)
