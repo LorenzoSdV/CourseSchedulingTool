@@ -1,10 +1,10 @@
-MODULES=schedule parser authors
+MODULES=parser schedule authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind -plugin-tag 'package(bisect_ppx-ocamlbuild)'
-PKGS=unix,oUnit,str,qcheck,ocurl
+PKGS=unix,oUnit,str,qcheck,curl
 
 default: build
 	utop
