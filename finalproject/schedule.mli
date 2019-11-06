@@ -51,7 +51,7 @@ val remove_course : schedule -> course -> sem_id -> schedule
 (** [get_course name sem] returns the information about the course with name
     [name] if it exists in the semester.
     Raises: [Failure] if course does not exist in the semester. *)
-val get_course : string -> semester -> course
+val get_course : schedule -> string -> sem_id -> course
 
 (** [create_sem courses creds stat gpa] creates a new semester with course
     list [courses], number of credits [creds], semester status [stat], and 
