@@ -2,9 +2,9 @@ open Schedule
 open ClassRoster
 
 type command =
-  | Add of string list
-  | Edit of string list
-  | Remove of string list
+  | Add of schedule
+  | Edit of schedule
+  | Remove of schedule
   | Open of string 
   | Close of string
 
@@ -32,9 +32,10 @@ let sem_id_parse sem_id =
   else if Str.string_match (Str.regexp "^FA[0-9]{2}$") sem_id 0 
   then Fall (int_of_string (String.sub sem_id 2 2)) else raise Malformed
 
+(** [add_others sch str_lst] parses [str_lst] in [sch] for the Add command. *)
 let add_others sch str_lst =
   match str_lst with
-  | [] -> raise Empty
+  | [] -> raise Malformed
   | course_name::grade::degree::sem_id::[] -> 
     add_course sch 
       (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
@@ -42,18 +43,19 @@ let add_others sch str_lst =
     add_course sch (create_course course_name (int_of_string credits) (gradify grade) degree) (sem_id_parse sem_id)
   | _ -> raise Malformed
 
-let edit_others str_lst sch =
+(** [edit_others sch str_lst] parses [str_lst] in [sch] for the Edit command. *)
+let edit_others sch str_lst =
   match str_lst with
-  | [] -> raise Empty
-  | course_name::field::[] -> edit_course sch course_name field
+  | [] -> raise Malformed
+  | course_name::field::new_val::[] -> edit_course sch course_name field new_val
   | _ -> raise Malformed 
 
 let parse_command cmd_str sch = 
 
-  let first_match_helper first others =
+  let match_helper first others =
     match first with
-    | "add" -> Add add_others (others sch)
-    | "edit" -> Edit edit_others (others sch)
+    | "add" -> Add (add_others (sch others))
+    | "edit" -> Edit (edit_others (sch others))
     | "remove" -> Remove others
     | _ -> raise Malformed
   in
