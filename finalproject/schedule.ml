@@ -130,10 +130,10 @@ let edit_course sch c attr new_val =
   | Not_found -> raise (UnknownCourse c)
   | _ -> raise (Failure "Not a valid course attribute to edit!")
 
-let remove_course sch c semid =
+let remove_course sch c =
   try
-    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
-    sem.courses <- (List.filter (fun crs -> crs <> c) sem.courses);
+    let sem = List.find (fun sem -> List.mem c (List.map (fun course -> course.name) sem.courses)) sch.semesters in
+    sem.courses <- (List.filter (fun crs -> crs.name <> c) sem.courses);
     sch
   with
     Not_found -> raise UnknownSemester
@@ -148,26 +148,29 @@ let get_course sch name semid =
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
 
-let create_sem semid courses =
+let create_sem semid =
   {
     id = semid;
-    courses = courses;
-    tot_credits = credits courses;
-    sem_gpa = gpa courses
+    courses = [];
+    tot_credits = 0;
+    sem_gpa = 0.
   }
 
 let add_sem sch sem =
   if (List.mem sem.id (sem_ids sch)) then
     raise (Failure "Tried to add semester that already exists!")
-  else
-    sch.semesters <- sem :: sch.semesters; sch
+  else begin
+    sch.semesters <- sem :: sch.semesters; 
+    sch.commul_gpa <- gpa (to_list sch);
+    sch end
 
-let remove_sem semid sch = 
+let remove_sem sch semid = 
   if (not (List.mem semid (sem_ids sch))) then
     raise UnknownSemester
-  else
+  else begin
     sch.semesters <- 
-      (List.filter (fun sem -> sem.id <> semid) sch.semesters); sch
+      (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
+    sch end
 
 let string_of_sem semid =
   match semid with
