@@ -67,8 +67,12 @@ let remove_course sch c semid =
   with
     Not_found -> raise UnknownSemester
 
-let get_course name sem = 
-  failwith "unimp"
+let get_course sch name semid = 
+  try
+    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+    List.find (fun c -> c.name = name) sem.courses
+  with
+    Not_found -> raise (UnknownCourse name)
 
 let create_sem courses creds stat gpa =
   failwith "unimp"
