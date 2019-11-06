@@ -11,7 +11,7 @@ let string_of_url url nm =
     Curl.global_cleanup ();
     !result
   with
-    _ -> raise (UnknownCourse nm)
+    _ -> raise (Failure "Error retreiving course information")
 
 let course_html name sem =
   let course = String.split_on_char ' ' name in
@@ -26,27 +26,19 @@ let parse_credits html =
   try
     int_of_string (String.sub html ((Str.search_forward reg html 0) + 25) 1)
   with
-    _ -> -1
+    _ -> raise (Failure "Error getting credits from Class Roster")
 
-let get_course_info name sem : Schedule.course option =
+let get_course_creds name sem =
+  let n_upper = String.uppercase_ascii name in
   let reg = Str.regexp "^[A-Z]{1,5} [0-9]{4}$" in
-  if (Str.string_match reg name 0) then
-    let credits = parse_credits (course_html name sem) in
-    Some (create_course name credits Incomplete "")
+  if (Str.string_match reg n_upper 0) then
+    parse_credits (course_html n_upper sem)
   else
-    None
-
-let get_course_creds name sem : int option =
-  let reg = Str.regexp "^[A-Z]{1,5} [0-9]{4}$" in
-  if (Str.string_match reg name 0) then
-    let credits = parse_credits (course_html name sem) in
-    Some credits
-  else
-    None
+    raise (UnknownCourse name)
 
 let valid_course name sem credits =
   try
-    if (get_course_creds name sem = Some credits) then true
+    if (get_course_creds name sem = credits) then true
     else raise InvalidCredits;
   with
     _ -> raise (UnknownCourse name)

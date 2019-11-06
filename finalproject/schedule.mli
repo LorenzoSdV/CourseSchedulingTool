@@ -32,6 +32,14 @@ exception UnknownCourse of string
     semester. *)
 exception UnknownSemester
 
+(** [gradify s] is the grade representation of [s] where is some grade value 
+    represented as a string.
+    Requires: [s] is a valid srting rep of a grade, like: 
+    "A+" or "b" or "unsat" or "w". 
+    Raises: [Failure "Unkown Grade"] if [s] is not a valid grade 
+    representation. *)
+val gradify: string -> grade
+
 (** [create_course name cred gr deg] is a new course type with name [name], 
     number of credits [cred], grade [gr], and degree category [deg]. *)
 val create_course : string -> int -> grade -> string -> course
@@ -40,6 +48,14 @@ val create_course : string -> int -> grade -> string -> course
     with id [sem_id].
     Raises: [Failure] if course already exists in the semester. *)
 val add_course : schedule -> course -> sem_id -> schedule
+
+(** [edit_course sch c attr new_val] is the schedule that results from chaning 
+    the course field [attr] to [new_val] for course with name [c] in 
+    schedule [sch]. 
+    Raises: [Failure] with various error messages if [attr] is not a valid field
+    of course record, or [new_val] is not valid. 
+    Raises: [UnkownCourse c] if course is not in [sch]. *)
+val edit_course : schedule -> string -> string -> string -> schedule
 
 (** [add_course sch c semid] is the schedule with course [c] removed
     from semester id [semid]. If course [c] is not in semester [semid] then
