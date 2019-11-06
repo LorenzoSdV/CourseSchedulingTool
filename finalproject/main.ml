@@ -37,8 +37,8 @@ let main () =
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()
-  | "quit" -> Stdlib.exit 0
   | "" -> prompt Schedule.new_schedule
+  | "quit" -> Stdlib.exit 0
   | file_name -> load file_name
 
 (* Start running the user prompt: *)
