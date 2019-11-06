@@ -5,18 +5,6 @@ exception Empty
 
 exception Malformed
 
-let gradify str =
-  let str_upper = String.uppercase_ascii str in
-  if Str.string_match (Str.regexp "^[A-DF][\\+-]?$") str_upper 0 then
-    Letter str_upper
-  else
-    match str_upper with
-    | "INCOMPLETE" -> Incomplete
-    | "W" | "WITHDRAWN" -> Withdrawn
-    | "SAT" | "S" -> Sat
-    | "UNSAT" | "U" -> Unsat
-    | _ -> raise (Failure "Invalid grade entry")
-
 (** [sem_id_parse sem_id] parses [sem_id] if is a valid semester type.
     Raises: Malformed when [sem_id] is not valid. *)
 let sem_id_parse sem_id =
@@ -35,9 +23,9 @@ let add_others sch str_lst =
     add_sem sch (create_sem (sem_id_parse (String.capitalize_ascii sem_id)))
   | "course"::course_name::grade::degree::sem_id::[] -> 
     add_course sch 
-      (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
+      (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (Schedule.gradify grade) degree) (sem_id_parse sem_id)
   | "course"::course_name::credits::grade::degree::sem_id::[] -> 
-    add_course sch (create_course course_name (int_of_string credits) (gradify grade) degree) (sem_id_parse sem_id)
+    add_course sch (create_course course_name (int_of_string credits) (Schedule.gradify grade) degree) (sem_id_parse sem_id)
   | _ -> sch
 
 (** [edit_others sch str_lst] parses [str_lst] in [sch] for the Edit command. *)

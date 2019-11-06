@@ -32,6 +32,14 @@ exception UnknownCourse of string
     semester. *)
 exception UnknownSemester
 
+(** [gradify s] is the grade representation of [s] where is some grade value 
+    represented as a string.
+    Requires: [s] is a valid string rep of a grade, like: 
+    "A+" or "b" or "unsat" or "w". 
+    Raises: [Failure "Unknown Grade"] if [s] is not a valid grade 
+    representation. *)
+val gradify: string -> grade
+
 (** [create_course name cred gr deg] is a new course type with name [name], 
     number of credits [cred], grade [gr], and degree category [deg]. *)
 val create_course : string -> int -> grade -> string -> course

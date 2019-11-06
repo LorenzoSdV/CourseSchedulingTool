@@ -6,14 +6,6 @@ exception Empty
 (** Raised when a malformed command is encountered. *)
 exception Malformed
 
-(** [gradify s] is the grade representation of [s] where is some grade value 
-    represented as a string.
-    Requires: [s] is a valid string rep of a grade, like: 
-    "A+" or "b" or "unsat" or "w". 
-    Raises: [Failure "Unknown Grade"] if [s] is not a valid grade 
-    representation. *)
-val gradify: string -> grade
-
 (** [parse_command cmd_str sch] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 
     of non-space characters) of [str] becomes the verb. The rest of the words,
