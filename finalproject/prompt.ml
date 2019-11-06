@@ -1,4 +1,5 @@
 open Schedule
+open Parser
 
 type command =
   | Add of string list
@@ -15,6 +16,18 @@ exception Empty
 
 exception Malformed
 
+let gradify str =
+  let str_upper = String.uppercase_ascii str in
+  if Str.string_match (Str.regexp "^[A-DF]{1}[\+-]?$") str_upper 0 then
+    Letter str_upper
+  else
+    match str_upper with
+    | "INCOMPLETE" -> Incomplete
+    | "W" | "WITHDRAWN" -> Withdrawn
+    | "SAT" | "S" -> Sat
+    | "UNSAT" | "U" -> Unsat
+    | _ -> raise (Failure "Invalid grade entry")
+
 (** [sem_id_parse sem_id] parses [sem_id] if is a valid semester type.
     Raises: Malformed when [sem_id] is not valid. *)
 let sem_id_parse sem_id =
@@ -27,7 +40,7 @@ let add_others sch str_lst =
   match str_lst with
   | [] -> raise Empty
   | course_name::grade::degree::sem_id::[] -> 
-    add_course sch (create_course course_name (get_course_info course_name sem_id) grade degree) (sem_id_parse sem_id)
+    add_course sch (create_course course_name (get_course_info course_name sem_id) (gradify grade) degree) (sem_id_parse sem_id)
   | course_name::credits::grade::degree::sem_id::[] -> 
     add_course sch (create_course course_name (int_of_string credits) grade degree) sem_id
   | _ -> raise Malformed

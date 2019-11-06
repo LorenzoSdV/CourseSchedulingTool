@@ -53,6 +53,8 @@ let grade_map gr =
   | Letter "F" -> 0.0
   | _ -> -1.0
 
+<<<<<<< HEAD
+=======
 let gradify str =
   let str_upper = String.uppercase_ascii str in
   if Str.string_match (Str.regexp "^[A-DF]{1}[\\+-]?$") str_upper 0 then
@@ -65,6 +67,7 @@ let gradify str =
     | "UNSAT" | "U" -> Unsat
     | _ -> raise (Failure "Invalid Grade entry")
 
+>>>>>>> 2639724cdb987716fb2efb424175d4051d602670
 let gpa courses =
   let rec fold_credits courses acc =
     match courses with
@@ -122,7 +125,7 @@ let edit_course sch c attr new_val =
     | "credits" ->
       course.credits <- int_of_string new_val; sch
     | "grade" -> 
-      course.grade <- gradify new_val; sch
+      course.grade <- new_val; sch
     | "degree" -> 
       course.degree <- new_val; sch
     | _ -> raise (Failure "Not a valid course attribute to edit!")
