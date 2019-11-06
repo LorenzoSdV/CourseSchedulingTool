@@ -117,6 +117,9 @@ let get_course sch name semid =
   with
     Not_found -> raise (UnknownCourse name)
 
+let sem_ids sch =
+  List.rev_map (fun sem -> sem.id) sch.semesters
+
 let create_sem semid courses =
   {
     id = semid;
@@ -126,10 +129,17 @@ let create_sem semid courses =
   }
 
 let add_sem sem sch =
-  failwith "unimp"
+  if (List.mem sem.id (sem_ids sch)) then
+    raise (Failure "Tried to add semester that already exists!")
+  else
+    sch.semesters <- sem :: sch.semesters; sch
 
-let remove_sem sem sch = 
-  failwith "unimp"
+let remove_sem semid sch = 
+  if (not (List.mem semid (sem_ids sch))) then
+    raise UnknownSemester
+  else
+    sch.semesters <- 
+      (List.filter (fun sem -> sem.id <> semid) sch.semesters); sch
 
 let string_of_sem semid =
   match semid with

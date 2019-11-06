@@ -63,18 +63,16 @@ val credits : course list -> int
     [semid]. Automatically calculates GPA and # credits.*)
 val create_sem : sem_id -> course list -> semester
 
-
-
-(** [add_sem sem sch] is the schedule [sch] with semester [sem] added to its
+(** [add_sem sch sem] is the schedule [sch] with semester [sem] added to its
     list of semesters, and GPA updated.
     Raises: [Failure] if semester with the same idalready exists in the 
     schedule. *)
 val add_sem : schedule -> semester -> schedule
 
-(** [remove_sem sem sch] is [sch] with the semester [sem] removed from list of 
+(** [remove_sem sch sem] is [sch] with the semester [sem] removed from list of 
     semesters. Updates GPA accordingly.
     Raises: [UnkownSemester] if semester doesn't exists in the [sch]. *)
-val remove_sem : semester -> schedule -> schedule
+val remove_sem : sem_id -> schedule -> schedule
 
 (** [string_of_sem s] is the string representation of semester id [s]. String
     representations are like FA20 or SP18, etc. *)
