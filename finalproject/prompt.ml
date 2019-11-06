@@ -1,13 +1,6 @@
 open Schedule
 open ClassRoster
 
-type command =
-  | Add of schedule
-  | Edit of schedule
-  | Remove of schedule
-  | Open of string 
-  | Close of string
-
 exception Empty
 
 exception Malformed
@@ -36,6 +29,7 @@ let sem_id_parse sem_id =
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise Malformed
+  | "semester"::sem_id -> add_sem sch (create_sem)
   | course_name::grade::degree::sem_id::[] -> 
     add_course sch 
       (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
@@ -50,13 +44,22 @@ let edit_others sch str_lst =
   | course_name::field::new_val::[] -> edit_course sch course_name field new_val
   | _ -> raise Malformed 
 
-let parse_command cmd_str sch = 
+(** [remove_others sch str_lst] parses [str_lst] in [sch] for the Remove 
+    command. *)
+let remove_others sch str_lst =
+  match str_lst with
+  | [] -> raise Malformed
+  | "semester"::sem_id -> remove_sem sch (sem_id_parse sem_id)
+  | course_name::[] -> remove_course sch course_name
+  | _ -> raise Malformed
+
+let parse_command sch cmd_str = 
 
   let match_helper first others =
     match first with
-    | "add" -> Add (add_others (sch others))
-    | "edit" -> Edit (edit_others (sch others))
-    | "remove" -> Remove others
+    | "add" -> (add_others sch others)
+    | "edit" -> (edit_others sch others)
+    | "remove" -> (remove_others sch others)
     | _ -> raise Malformed
   in
 

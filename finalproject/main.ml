@@ -1,4 +1,5 @@
 open Schedule
+open Prompt
 
 (** [prompt sch] is the prompt where the user can enter a command to interact
     with current schedule [sch]. *)
@@ -9,16 +10,16 @@ let rec prompt sch =
   | "quit" -> Stdlib.exit 0
   | string_cmd -> 
     try
-      execute sch ((* Call parse function here! *)string_cmd)
+      parse_command sch string_cmd
     with
       _ -> exception_handler sch
 
-(** [execute sch cmd] handles executing the user's command from prompt 
+(* (** [execute sch cmd] handles executing the user's command from prompt 
     [prompt sch] and either quitting if desired or creating a new [prompt] 
     after action carried out. *)
-and execute sch cmd = 
-  (*... this is where your prompt functionality is called upon!*)
-  prompt sch
+   and execute sch cmd = 
+   (*... this is where your prompt functionality is called upon!*)
+   prompt sch *)
 
 (** [exception_handler sch] handles any exceptions raised during a call to
     [execute adv st cmd]. Gives the user a nice message. *)
