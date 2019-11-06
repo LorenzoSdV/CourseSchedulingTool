@@ -49,7 +49,7 @@ val remove_course : schedule -> course -> sem_id -> schedule
 (** [get_course sch name semid] returns the course record with name [name]
     found in semester with id [semid] in [sch].
     Raises: [UnkownCourse name] if course does not exist in the semester. *)
-val get_course : schedule -> string -> sem_id -> schedule
+val get_course : schedule -> string -> sem_id -> course
 
 (** [gpa courses] is the GPA of all the courses in [courses] that have been
     given a letter grade. *)

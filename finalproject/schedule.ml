@@ -128,7 +128,7 @@ let create_sem semid courses =
     sem_gpa = gpa courses
   }
 
-let add_sem sem sch =
+let add_sem sch sem =
   if (List.mem sem.id (sem_ids sch)) then
     raise (Failure "Tried to add semester that already exists!")
   else
