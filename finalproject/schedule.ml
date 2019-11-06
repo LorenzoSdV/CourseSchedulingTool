@@ -25,7 +25,7 @@ type semester = {
 
 type schedule = {
   mutable semesters: semester list;
-  mutable curr_gpa: float;
+  mutable commul_gpa: float;
   mutable exp_grad: int;
   mutable major: string;
 }
@@ -52,6 +52,31 @@ let grade_map gr =
   | Letter "F" -> 0.0
   | _ -> -1.0
 
+let gpa courses =
+  let rec fold_credits courses acc =
+    match courses with
+    | [] -> acc
+    | { credits = c; grade = g } :: t -> 
+      if (grade_map g > 0.) then fold_credits t (acc + c)
+      else fold_credits t acc
+  in
+  let rec fold_gps courses acc =
+    match courses with
+    | [] -> acc
+    | { credits = c; grade = g } :: t -> 
+      if (grade_map g >= 0.) then 
+        fold_gps t (acc +. ((float_of_int c) *. grade_map g))
+      else fold_gps t acc
+  in
+  (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
+
+let credits courses =
+  let rec fold courses acc =
+    match courses with
+    | [] -> acc
+    | { credits = c } :: t -> fold t (acc + c)
+  in fold courses 0
+
 let to_list sch =
   let rec fold sems acc = 
     match sems with
@@ -72,7 +97,8 @@ let add_course sch c semid =
   try
     let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
     sem.courses <- (c :: sem.courses);
-    sch
+    sem.sem_gpa <- gpa sem.courses;
+    { sch with commul_gpa = gpa (to_list sch) }
   with
     Not_found -> raise UnknownSemester
 
@@ -91,31 +117,6 @@ let get_course sch name semid =
   with
     Not_found -> raise (UnknownCourse name)
 
-let gpa courses =
-  let rec fold_credits courses acc =
-    match courses with
-    | [] -> acc
-    | { credits = c; grade = g } :: t -> 
-      if (grade_map g > 0.) then fold_credits t (acc + c)
-      else fold_credits t acc
-  in
-  let rec fold_gps courses acc =
-    match courses with
-    | [] -> acc
-    | { credits = c; grade = g } :: t -> 
-      if (grade_map g > 0.) then 
-        fold_gps t (acc +. ((float_of_int c) *. grade_map g))
-      else fold_gps t acc
-  in
-  (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
-
-let credits courses =
-  let rec fold courses acc =
-    match courses with
-    | [] -> acc
-    | { credits = c } :: t -> fold t (acc + c)
-  in fold courses 0
-
 let create_sem semid courses =
   {
     id = semid;
@@ -128,9 +129,6 @@ let add_sem sem sch =
   failwith "unimp"
 
 let remove_sem sem sch = 
-  failwith "unimp"
-
-let get_schedule =
   failwith "unimp"
 
 let string_of_sem semid =

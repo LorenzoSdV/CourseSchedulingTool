@@ -59,26 +59,22 @@ val gpa : course list -> float
     [courses]. *)
 val credits : course list -> int
 
-(** [create_sem courses creds stat gpa] creates a new semester with course
-    list [courses], number of credits [creds], semester status [stat], and 
-    semester gpa [gpa]. *)
-val create_sem : course list -> int -> sem_status -> float -> semester
+(** [create_sem courses semid] is a semester with courses [courses] and id
+    [semid]. Automatically calculates GPA and # credits.*)
+val create_sem : sem_id -> course list -> semester
 
 
 
-(** [add_sem sem sch] adds semester [sem] to the list of semesters in a 
-    schedule [sch] if it is not already in there.
-    Raises: [Failure] if semester already exists in the schedule. *)
-val add_sem : semester -> schedule -> schedule
+(** [add_sem sem sch] is the schedule [sch] with semester [sem] added to its
+    list of semesters, and GPA updated.
+    Raises: [Failure] if semester with the same idalready exists in the 
+    schedule. *)
+val add_sem : schedule -> semester -> schedule
 
-(** [remove_sem sem sch] removes semester [sem] from the list of semesters in 
-    a schedule [sch] if it exists.
-    Raises: [Failure] if semester doesn't exists in the schedule. *)
+(** [remove_sem sem sch] is [sch] with the semester [sem] removed from list of 
+    semesters. Updates GPA accordingly.
+    Raises: [UnkownSemester] if semester doesn't exists in the [sch]. *)
 val remove_sem : semester -> schedule -> schedule
-
-(** [get_schedule] returns the current schedule with all the smeesters and 
-    courses. *)
-val get_schedule : schedule
 
 (** [string_of_sem s] is the string representation of semester id [s]. String
     representations are like FA20 or SP18, etc. *)
