@@ -23,12 +23,12 @@ let sem_id_parse sem_id =
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
-  | "semester"::sem_id::[] ->
+  | "sem"::sem_id::[] ->
     add_sem sch (create_sem (sem_id_parse (String.capitalize_ascii sem_id)))
-  | "course"::course_name::grade::degree::sem_id::[] -> 
+  | course_name::grade::degree::sem_id::[] -> 
     add_course sch 
       (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (Schedule.gradify grade) degree) (sem_id_parse sem_id)
-  | "course"::course_name::credits::grade::degree::sem_id::[] -> 
+  | course_name::credits::grade::degree::sem_id::[] -> 
     add_course sch (create_course course_name (int_of_string credits) (Schedule.gradify grade) degree) (sem_id_parse sem_id)
   | _ -> sch
 
@@ -44,9 +44,9 @@ let edit_others sch str_lst =
 let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
-  | "semester"::sem_id::[] -> 
+  | "sem"::sem_id::[] -> 
     remove_sem sch (sem_id_parse (String.uppercase_ascii sem_id))
-  | "course"::course_name::[] -> remove_course sch course_name
+  | course_name::[] -> remove_course sch course_name
   | _ -> raise Malformed
 
 let parse_command sch cmd_str = 
