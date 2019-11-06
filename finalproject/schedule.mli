@@ -56,7 +56,7 @@ val get_course : schedule -> string -> sem_id -> course
 val gpa : course list -> float
 
 (** [credits courses] is the sum of all the credits of each course in 
-    [courses]. *)
+    [courses], regardless of grade type. *)
 val credits : course list -> int
 
 (** [create_sem courses semid] is a semester with courses [courses] and id
