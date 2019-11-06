@@ -1,3 +1,4 @@
+open Schedule
 
 (** The type [command] represents a player command that is decomposed
     into a verb and possibly an object phrase. *)
@@ -13,6 +14,14 @@ exception Empty
 
 (** Raised when a malformed command is encountered. *)
 exception Malformed
+
+(** [gradify s] is the grade representation of [s] where is some grade value 
+    represented as a string.
+    Requires: [s] is a valid srting rep of a grade, like: 
+    "A+" or "b" or "unsat" or "w". 
+    Raises: [Failure "Unkown Grade"] if [s] is not a valid grade 
+    representation. *)
+val gradify: string -> grade
 
 (** [parse_command str] parses a user's input into a [command], as follows. 
     The first
