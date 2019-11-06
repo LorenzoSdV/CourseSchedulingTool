@@ -8,15 +8,12 @@ let rec prompt sch =
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
+  | "" -> prompt sch
   | string_cmd -> 
-    prompt (parse_command sch string_cmd)
-
-(* (** [execute sch cmd] handles executing the user's command from prompt 
-    [prompt sch] and either quitting if desired or creating a new [prompt] 
-    after action carried out. *)
-   and execute sch cmd = 
-   (*... this is where your prompt functionality is called upon!*)
-   prompt sch *)
+    try
+      prompt (parse_command sch string_cmd)
+    with
+      _ -> exception_handler sch
 
 (** [exception_handler sch] handles any exceptions raised during a call to
     [execute adv st cmd]. Gives the user a nice message. *)

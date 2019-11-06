@@ -38,7 +38,7 @@ let add_others sch str_lst =
       (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
   | "course"::course_name::credits::grade::degree::sem_id::[] -> 
     add_course sch (create_course course_name (int_of_string credits) (gradify grade) degree) (sem_id_parse sem_id)
-  | _ -> raise Malformed
+  | _ -> sch
 
 (** [edit_others sch str_lst] parses [str_lst] in [sch] for the Edit command. *)
 let edit_others sch str_lst =

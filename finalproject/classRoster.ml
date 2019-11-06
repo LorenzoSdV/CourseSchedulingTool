@@ -15,7 +15,7 @@ let string_of_url url nm =
 
 (** ADD COMMENT *)
 let course_html name sem =
-  let course = String.split_on_char ' ' name in
+  let course = String.split_on_char '-' name in
   let url = "https://classes.cornell.edu/browse/roster/" ^ 
             (string_of_sem sem) ^ "/class/" ^ List.hd course ^ "/" ^ 
             List.hd (List.tl course) in
@@ -31,11 +31,11 @@ let parse_credits html =
 
 let get_course_creds name sem =
   let n_upper = String.uppercase_ascii name in
-  let reg = Str.regexp "^[A-Z]{1,5} [0-9]{4}$" in
+  let reg = Str.regexp "^[A-Z]{1,5}[0-9]{4}$" in
   if (Str.string_match reg n_upper 0) then
     parse_credits (course_html n_upper sem)
   else
-    raise (UnknownCourse name)
+    parse_credits (course_html n_upper sem)
 
 let valid_course name sem credits =
   try

@@ -189,14 +189,18 @@ let new_schedule =
 let name sch =
   sch.desc
 
+let schedule_name sch nm =
+  sch.desc <- nm; sch
+
 let print_sem sem =
   print_string ": [ ";
   List.fold_right 
     (fun course _ -> print_string ((course.name) ^ ", ")) 
     sem.courses ();
-  print_endline " ]"
+  print_endline (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa))
 
 let print_schedule sch =
   List.fold_right 
     (fun sem _ -> print_string (string_of_sem sem.id); print_sem sem) 
-    sch.semesters ()
+    sch.semesters ();
+  print_endline ("Commulative GPA: " ^ (string_of_float sch.commul_gpa))
