@@ -1,22 +1,21 @@
-open Prompt
+open Schedule
 
 (** [prompt sch] is the prompt where the user can enter a command to interact
     with current schedule [sch]. *)
 let rec prompt sch =
-  ANSITerminal.(print_string [green] "\nSchedule: ");
-  print_endline (name sch);
-  print_string  "\n> ";
+  ANSITerminal.(print_string [green] ("\n" ^ (name sch) ^ ": "));
   match read_line () with
   | exception End_of_file -> ()
+  | "quit" -> Stdlib.exit 0
   | string_cmd -> 
     try
       execute sch ((* Call parse function here! *)string_cmd)
     with
       _ -> exception_handler sch
 
-(** [execute adv st cmd] handles executing the user's command from prompt 
-    [prompt adv st] and either quitting if desired or creating a new [prompt] 
-    action carried out. *)
+(** [execute sch cmd] handles executing the user's command from prompt 
+    [prompt sch] and either quitting if desired or creating a new [prompt] 
+    after action carried out. *)
 and execute sch cmd = 
   (*... this is where your prompt functionality is called upon!*)
   prompt sch
@@ -43,7 +42,7 @@ let main () =
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()
-  | "quit" -> ()
+  | "quit" -> Stdlib.exit 0
   | "" -> prompt Schedule.new_schedule
   | file_name -> load file_name
 
