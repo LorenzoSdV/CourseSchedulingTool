@@ -9,7 +9,7 @@ type reqs = {
 
 type course = {
   name: string;
-  credits: int;
+  mutable credits: int;
   mutable grade: grade;
   mutable degree: string;
   (* subject/category *)
@@ -51,6 +51,18 @@ let grade_map gr =
   | Letter "D-" -> 0.7
   | Letter "F" -> 0.0
   | _ -> -1.0
+
+let gradify str =
+  let str_upper = String.uppercase_ascii str in
+  if Str.string_match (Str.regexp "^[A-DF]{1}[\+-]?$") str_upper 0 then
+    Letter str_upper
+  else
+    match str_upper with
+    | "INCOMPLETE" -> Incomplete
+    | "W" | "WITHDRAWN" -> Withdrawn
+    | "SAT" | "S" -> Sat
+    | "UNSAT" | "U" -> Unsat
+    | _ -> raise (Failure "Invalid Grade entry")
 
 let gpa courses =
   let rec fold_credits courses acc =
@@ -101,6 +113,21 @@ let add_course sch c semid =
     { sch with commul_gpa = gpa (to_list sch) }
   with
     Not_found -> raise UnknownSemester
+
+let edit_course sch c attr new_val =
+  try
+    let course = List.find (fun course -> course.name = c) (to_list sch) in
+    match attr with
+    | "credits" ->
+      course.credits <- int_of_string new_val; sch
+    | "grade" -> 
+      course.grade <- gradify new_val; sch
+    | "degree" -> 
+      course.degree <- new_val; sch
+    | _ -> raise (Failure "Not a valid course attribute to edit!")
+  with
+  | Not_found -> raise (UnknownCourse c)
+  | _ -> raise (Failure "Not a valid course attribute to edit!")
 
 let remove_course sch c semid =
   try
