@@ -17,9 +17,15 @@ exception Malformed
 
 (** [gradify s] is the grade representation of [s] where is some grade value 
     represented as a string.
+<<<<<<< HEAD
     Requires: [s] is a valid string rep of a grade, like: 
     "A+" or "b" or "unsat" or "w". 
     Raises: [Failure "Unknown Grade"] if [s] is not a valid grade 
+=======
+    Requires: [s] is a valid srting rep of a grade, like: 
+    "A+" or "b" or "unsat" or "w". 
+    Raises: [Failure "Unkown Grade"] if [s] is not a valid grade 
+>>>>>>> 2639724cdb987716fb2efb424175d4051d602670
     representation. *)
 val gradify: string -> grade
 

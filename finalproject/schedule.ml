@@ -24,6 +24,7 @@ type semester = {
 }
 
 type schedule = {
+  mutable name: string;
   mutable semesters: semester list;
   mutable commul_gpa: float;
   mutable exp_grad: int;
@@ -52,6 +53,21 @@ let grade_map gr =
   | Letter "F" -> 0.0
   | _ -> -1.0
 
+<<<<<<< HEAD
+=======
+let gradify str =
+  let str_upper = String.uppercase_ascii str in
+  if Str.string_match (Str.regexp "^[A-DF]{1}[\\+-]?$") str_upper 0 then
+    Letter str_upper
+  else
+    match str_upper with
+    | "INCOMPLETE" -> Incomplete
+    | "W" | "WITHDRAWN" -> Withdrawn
+    | "SAT" | "S" -> Sat
+    | "UNSAT" | "U" -> Unsat
+    | _ -> raise (Failure "Invalid Grade entry")
+
+>>>>>>> 2639724cdb987716fb2efb424175d4051d602670
 let gpa courses =
   let rec fold_credits courses acc =
     match courses with

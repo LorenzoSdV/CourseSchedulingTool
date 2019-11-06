@@ -13,6 +13,7 @@ let string_of_url url nm =
   with
     _ -> raise (Failure "Error retreiving course information")
 
+(** ADD COMMENT *)
 let course_html name sem =
   let course = String.split_on_char ' ' name in
   let url = "https://classes.cornell.edu/browse/roster/" ^ 
