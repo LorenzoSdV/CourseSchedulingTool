@@ -53,6 +53,18 @@ let grade_map gr =
   | Letter "F" -> 0.0
   | _ -> -1.0
 
+let gradify str =
+  let str_upper = String.uppercase_ascii str in
+  if Str.string_match (Str.regexp "^[A-DF]{1}[\\+-]?$") str_upper 0 then
+    Letter str_upper
+  else
+    match str_upper with
+    | "INCOMPLETE" -> Incomplete
+    | "W" | "WITHDRAWN" -> Withdrawn
+    | "SAT" | "S" -> Sat
+    | "UNSAT" | "U" -> Unsat
+    | _ -> raise (Failure "Invalid grade entry")
+
 let gpa courses =
   let rec fold_credits courses acc =
     match courses with
@@ -110,7 +122,7 @@ let edit_course sch c attr new_val =
     | "credits" ->
       course.credits <- int_of_string new_val; sch
     | "grade" -> 
-      course.grade <- Prompt.gradify new_val; sch
+      course.grade <- gradify new_val; sch
     | "degree" -> 
       course.degree <- new_val; sch
     | _ -> raise (Failure "Not a valid course attribute to edit!")
@@ -164,7 +176,7 @@ let string_of_sem semid =
 
 let new_schedule =
   {
-    desc = "SCHEDULE";
+    desc = "SCHEDULE 1";
     semesters = [];
     commul_gpa = 0.;
     exp_grad = 0;
