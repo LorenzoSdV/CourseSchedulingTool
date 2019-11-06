@@ -1,16 +1,12 @@
 open Schedule
-open Parser
+open ClassRoster
 
 type command =
   | Add of string list
   | Edit of string list
   | Remove of string list
-  | Open of string (* only course/schedule not semester. right after they create a course,
-                      prompt to add it to a schedule*)
+  | Open of string 
   | Close of string
-
-(* Add course with just the name will do online parsing from class roster *)
-
 
 exception Empty
 
@@ -40,9 +36,10 @@ let add_others sch str_lst =
   match str_lst with
   | [] -> raise Empty
   | course_name::grade::degree::sem_id::[] -> 
-    add_course sch (create_course course_name (get_course_info course_name sem_id) (gradify grade) degree) (sem_id_parse sem_id)
+    add_course sch 
+      (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
   | course_name::credits::grade::degree::sem_id::[] -> 
-    add_course sch (create_course course_name (int_of_string credits) grade degree) sem_id
+    add_course sch (create_course course_name (int_of_string credits) (gradify grade) degree) (sem_id_parse sem_id)
   | _ -> raise Malformed
 
 let edit_others str_lst sch =
