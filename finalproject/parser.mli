@@ -12,7 +12,7 @@ val get_course_info : string -> sem_id -> course option
 val get_course_creds : string -> sem_id -> int option
 
 (** [string_of_url url] is the source HTML at URL [url]. *)
-val string_of_url : string -> string
+val string_of_url : string -> string -> string
 
 (** [valid_course name sem credits] is *)
-let valid_course name sem credits
+val valid_course : string -> sem_id -> int -> bool

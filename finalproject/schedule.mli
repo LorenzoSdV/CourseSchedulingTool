@@ -20,12 +20,16 @@ type semester
 (** Type representing a whole schedule *)
 type schedule
 
-(** Exception raised when a course is to be added to a schedule with an 
+(** [InvalidCredits] raised when a course is to be added to a schedule with an 
     invalid number of credits. *)
 exception InvalidCredits
 
+(** [UnknownCourse nm] raised when course with name [nm] passed as a real course
+    but isn't recognized as such. *)
 exception UnknownCourse of string
 
+(** [UnknownSemester] raised when function attempts to work with non-existent
+    semester. *)
 exception UnknownSemester
 
 (** [create_course name cred gr deg] is a new course type with name [name], 
@@ -35,12 +39,12 @@ val create_course : string -> int -> grade -> string -> course
 (** [add_course sch c semid] is the schedule with course [c] added to semester
     with id [sem_id].
     Raises: [Failure] if course already exists in the semester. *)
-val add_course : schedule -> course -> semester -> schedule
+val add_course : schedule -> course -> sem_id -> schedule
 
 (** [add_course sch c semid] is the schedule with course [c] removed
-    from semester id [semid].
-    Raises: [Failure] if course not in the semester. *)
-val remove_course : schedule -> course -> semester -> schedule
+    from semester id [semid]. If course [c] is not in semester [semid] then
+    [add_course sch c semid] is [sch] *)
+val remove_course : schedule -> course -> sem_id -> schedule
 
 
 

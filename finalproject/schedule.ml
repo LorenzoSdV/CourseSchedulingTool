@@ -59,10 +59,13 @@ let add_course sch c semid =
   with
     Not_found -> raise UnknownSemester
 
-let remove_course sch c =
-  let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
-  sem.courses <- (c :: sem.courses);
-  sch
+let remove_course sch c semid =
+  try
+    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+    sem.courses <- (List.filter (fun crs -> crs <> c) sem.courses);
+    sch
+  with
+    Not_found -> raise UnknownSemester
 
 let get_course name sem = 
   failwith "unimp"

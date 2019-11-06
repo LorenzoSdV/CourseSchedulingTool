@@ -46,7 +46,7 @@ let get_course_creds name sem : int option =
 
 let valid_course name sem credits =
   try
-    if (get_course_creds name sem = credits) then true
+    if (get_course_creds name sem = Some credits) then true
     else raise InvalidCredits;
   with
     _ -> raise (UnknownCourse name)
