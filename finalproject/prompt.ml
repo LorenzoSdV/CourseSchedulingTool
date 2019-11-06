@@ -29,7 +29,7 @@ let sem_id_parse sem_id =
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise Malformed
-  | "semester"::sem_id -> add_sem sch (create_sem)
+  | "semester"::sem_id::[] -> add_sem sch (create_sem (sem_id_parse sem_id))
   | course_name::grade::degree::sem_id::[] -> 
     add_course sch 
       (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
@@ -49,7 +49,7 @@ let edit_others sch str_lst =
 let remove_others sch str_lst =
   match str_lst with
   | [] -> raise Malformed
-  | "semester"::sem_id -> remove_sem sch (sem_id_parse sem_id)
+  | "semester"::sem_id::[] -> remove_sem sch (sem_id_parse sem_id)
   | course_name::[] -> remove_course sch course_name
   | _ -> raise Malformed
 

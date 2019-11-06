@@ -10,7 +10,7 @@ let rec prompt sch =
   | "quit" -> Stdlib.exit 0
   | string_cmd -> 
     try
-      parse_command sch string_cmd
+      prompt (parse_command sch string_cmd)
     with
       _ -> exception_handler sch
 
