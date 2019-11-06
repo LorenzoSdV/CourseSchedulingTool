@@ -12,7 +12,7 @@ report
 *.cmx
 *.native
 *.byte
-_build
+*_build*/
 
 # temporary files
 *.swp
