@@ -145,3 +145,11 @@ let string_of_sem semid =
   match semid with
   | Spring yr -> "SP" ^ (string_of_int yr)
   | Fall yr -> "FA" ^ (string_of_int yr)
+
+let new_schedule =
+  {
+    semesters = [];
+    commul_gpa = 0.;
+    exp_grad = 0;
+    major = ""
+  }
