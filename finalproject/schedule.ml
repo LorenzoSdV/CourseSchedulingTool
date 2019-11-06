@@ -24,7 +24,7 @@ type semester = {
 }
 
 type schedule = {
-  mutable name: string;
+  mutable desc: string;
   mutable semesters: semester list;
   mutable commul_gpa: float;
   mutable exp_grad: int;
@@ -176,8 +176,12 @@ let string_of_sem semid =
 
 let new_schedule =
   {
+    desc = "SCHEDULE";
     semesters = [];
     commul_gpa = 0.;
     exp_grad = 0;
     major = ""
   }
+
+let name sch =
+  sch.desc
