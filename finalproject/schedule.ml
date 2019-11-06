@@ -188,3 +188,15 @@ let new_schedule =
 
 let name sch =
   sch.desc
+
+let print_sem sem =
+  print_string ": [ ";
+  List.fold_right 
+    (fun course _ -> print_string ((course.name) ^ ", ")) 
+    sem.courses ();
+  print_endline " ]"
+
+let print_schedule sch =
+  List.fold_right 
+    (fun sem _ -> print_string (string_of_sem sem.id); print_sem sem) 
+    sch.semesters ()

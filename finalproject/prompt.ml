@@ -7,7 +7,7 @@ exception Malformed
 
 let gradify str =
   let str_upper = String.uppercase_ascii str in
-  if Str.string_match (Str.regexp "^[A-DF]{1}[\\+-]?$") str_upper 0 then
+  if Str.string_match (Str.regexp "^[A-DF][\\+-]?$") str_upper 0 then
     Letter str_upper
   else
     match str_upper with
@@ -20,20 +20,23 @@ let gradify str =
 (** [sem_id_parse sem_id] parses [sem_id] if is a valid semester type.
     Raises: Malformed when [sem_id] is not valid. *)
 let sem_id_parse sem_id =
-  if Str.string_match (Str.regexp "^SP[0-9]{2}$") sem_id 0 
-  then Spring (int_of_string (String.sub sem_id 2 2))
-  else if Str.string_match (Str.regexp "^FA[0-9]{2}$") sem_id 0 
-  then Fall (int_of_string (String.sub sem_id 2 2)) else raise Malformed
+  if Str.string_match (Str.regexp "^SP[0-9][0-9]$") sem_id 0 then
+    Spring (int_of_string (String.sub sem_id 2 2))
+  else if Str.string_match (Str.regexp "^FA[0-9][0-9]$") sem_id 0 then 
+    Fall (int_of_string (String.sub sem_id 2 2)) 
+  else 
+    raise Malformed
 
 (** [add_others sch str_lst] parses [str_lst] in [sch] for the Add command. *)
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise Malformed
-  | "semester"::sem_id::[] -> add_sem sch (create_sem (sem_id_parse sem_id))
-  | course_name::grade::degree::sem_id::[] -> 
+  | "semester"::sem_id::[] ->
+    add_sem sch (create_sem (sem_id_parse (String.capitalize_ascii sem_id)))
+  | "course"::course_name::grade::degree::sem_id::[] -> 
     add_course sch 
       (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (gradify grade) degree) (sem_id_parse sem_id)
-  | course_name::credits::grade::degree::sem_id::[] -> 
+  | "course"::course_name::credits::grade::degree::sem_id::[] -> 
     add_course sch (create_course course_name (int_of_string credits) (gradify grade) degree) (sem_id_parse sem_id)
   | _ -> raise Malformed
 
@@ -49,8 +52,9 @@ let edit_others sch str_lst =
 let remove_others sch str_lst =
   match str_lst with
   | [] -> raise Malformed
-  | "semester"::sem_id::[] -> remove_sem sch (sem_id_parse sem_id)
-  | course_name::[] -> remove_course sch course_name
+  | "semester"::sem_id::[] -> 
+    remove_sem sch (sem_id_parse (String.uppercase_ascii sem_id))
+  | "course"::course_name::[] -> remove_course sch course_name
   | _ -> raise Malformed
 
 let parse_command sch cmd_str = 
@@ -64,8 +68,9 @@ let parse_command sch cmd_str =
   in
 
   let split_cmd = String.split_on_char ' ' cmd_str in
-  match (split_cmd) with 
+  match split_cmd with 
   | [] -> raise Empty
+  | "print"::[] -> (print_schedule sch); sch
   | fst::[] -> raise Malformed
   | fst::others -> match_helper fst others
 

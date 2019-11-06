@@ -9,10 +9,7 @@ let rec prompt sch =
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
   | string_cmd -> 
-    try
-      prompt (parse_command sch string_cmd)
-    with
-      _ -> exception_handler sch
+    prompt (parse_command sch string_cmd)
 
 (* (** [execute sch cmd] handles executing the user's command from prompt 
     [prompt sch] and either quitting if desired or creating a new [prompt] 

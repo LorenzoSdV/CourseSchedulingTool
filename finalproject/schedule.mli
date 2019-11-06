@@ -93,5 +93,7 @@ val to_list : schedule -> course list
 (** [new_schedule] is a new empty schedule with no courses or semesters. *)
 val new_schedule : schedule
 
+val print_schedule : schedule -> unit
+
 (** [name sch] is the user-defined name of schedule [sch]. *)
 val name : schedule -> string

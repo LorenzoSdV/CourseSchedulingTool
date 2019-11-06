@@ -19,7 +19,7 @@ test:
 check:
 	bash checkenv.sh
 
-run: build check
+run: build
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
 	
 finalcheck: check
