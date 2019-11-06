@@ -17,7 +17,7 @@ exception Malformed
 
 let edit_others str_lst =
   match str_lst with
-  | class_name::[] when 
+  | class_name::field::[] when  
 
       let parse_command cmd_str = 
 
