@@ -1,10 +1,22 @@
 open Schedule
 
-(** Raised when an empty command is parsed. *)
+(** Raised when command is missing verb as the first word. *)
 exception Empty
 
-(** Raised when a malformed command is encountered. *)
+(** Raised when an invalid verb is encountered. *)
 exception Malformed
+
+(** Raised when a command has an invalid sem_id. *)
+exception MalformedSemId
+
+(** Raised when an Add command has invalid words *)
+exception MalformedAdd
+
+(** Raised when an Edit command has invalid words *)
+exception MalformedEdit
+
+(** Raised when an Remove command has invalid words *)
+exception MalformedRemove
 
 (** [parse_command cmd_str sch] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 
