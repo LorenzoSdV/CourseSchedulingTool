@@ -24,7 +24,7 @@ type semester = {
 }
 
 type schedule = {
-  mutable name: string;
+  mutable desc: string;
   mutable semesters: semester list;
   mutable commul_gpa: float;
   mutable exp_grad: int;
@@ -110,7 +110,7 @@ let edit_course sch c attr new_val =
     | "credits" ->
       course.credits <- int_of_string new_val; sch
     | "grade" -> 
-      course.grade <- new_val; sch
+      course.grade <- Prompt.gradify new_val; sch
     | "degree" -> 
       course.degree <- new_val; sch
     | _ -> raise (Failure "Not a valid course attribute to edit!")
@@ -164,8 +164,12 @@ let string_of_sem semid =
 
 let new_schedule =
   {
+    desc = "SCHEDULE";
     semesters = [];
     commul_gpa = 0.;
     exp_grad = 0;
     major = ""
   }
+
+let name sch =
+  sch.desc
