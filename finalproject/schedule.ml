@@ -59,7 +59,7 @@ let gradify str =
     Letter str_upper
   else
     match str_upper with
-    | "INCOMPLETE" -> Incomplete
+    | "INCOMPLETE" | "INC" -> Incomplete
     | "W" | "WITHDRAWN" -> Withdrawn
     | "SAT" | "S" -> Sat
     | "UNSAT" | "U" -> Unsat
@@ -203,4 +203,5 @@ let print_schedule sch =
   List.fold_right 
     (fun sem _ -> print_string (string_of_sem sem.id); print_sem sem) 
     sch.semesters ();
-  print_endline ("Commulative GPA: " ^ (string_of_float sch.commul_gpa))
+  print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
+  print_endline ("Total Credits: " ^ (string_of_int (credits (to_list sch))))
