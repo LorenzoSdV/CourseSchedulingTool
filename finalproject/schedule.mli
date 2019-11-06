@@ -46,17 +46,25 @@ val add_course : schedule -> course -> sem_id -> schedule
     [add_course sch c semid] is [sch] *)
 val remove_course : schedule -> course -> sem_id -> schedule
 
+(** [get_course sch name semid] returns the course record with name [name]
+    found in semester with id [semid] in [sch].
+    Raises: [UnkownCourse name] if course does not exist in the semester. *)
+val get_course : schedule -> string -> sem_id -> schedule
 
+(** [gpa courses] is the GPA of all the courses in [courses] that have been
+    given a letter grade. *)
+val gpa : course list -> float
 
-(** [get_course name sem] returns the information about the course with name
-    [name] if it exists in the semester.
-    Raises: [Failure] if course does not exist in the semester. *)
-val get_course : string -> semester -> course
+(** [credits courses] is the sum of all the credits of each course in 
+    [courses]. *)
+val credits : course list -> int
 
 (** [create_sem courses creds stat gpa] creates a new semester with course
     list [courses], number of credits [creds], semester status [stat], and 
     semester gpa [gpa]. *)
 val create_sem : course list -> int -> sem_status -> float -> semester
+
+
 
 (** [add_sem sem sch] adds semester [sem] to the list of semesters in a 
     schedule [sch] if it is not already in there.
