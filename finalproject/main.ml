@@ -1,10 +1,11 @@
 open Schedule
 open Prompt
+open ClassRoster
 
 (** [prompt sch] is the prompt where the user can enter a command to interact
     with current schedule [sch]. *)
 let rec prompt sch =
-  ANSITerminal.(print_string [green] ("\n" ^ (name sch) ^ ": "));
+  ANSITerminal.(print_string [green] ("\n" ^ (get_name sch) ^ ": "));
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
@@ -13,14 +14,34 @@ let rec prompt sch =
     try
       prompt (parse_command sch string_cmd)
     with
-      _ -> exception_handler sch
+    | UnknownCourse msg -> 
+      exceptions sch ("Invalid or Unkown Course: " ^ msg)
+    | UnknownSemester msg -> 
+      exceptions sch ("Invalid or Unkown Semester: " ^ msg)
+    | UnkownGrade msg -> 
+      exceptions sch ("Invalid or Unkown Grade Value: " ^ msg)
+    | DuplicateCourse msg -> 
+      exceptions sch ("Duplicate Course Already Exists: " ^ msg)
+    | DuplicateSemester msg -> 
+      exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
+    | InvalidURL -> 
+      exceptions sch "Error Retreiving Course Info from Online"
+    | MalformedSemId -> 
+      exceptions sch "Improperly Formatted (Unrecognized) Semester Entry"
+    | MalformedAdd ->
+      exceptions sch ("Usage: add [course|sem] <name> [<credits> <grade>" ^ 
+                      " <category> <semester>]")
+    | MalformedEdit ->
+      exceptions sch "Usage: edit [course|sem|schedule] <attribute> <new_value)"
+    | MalformedRemove ->
+      exceptions sch "Usage: remove [course|sem] <name>"
+    | Malformed | _ -> exceptions sch "Unrecognized Command Entry!"
 
-(** [exception_handler sch] handles any exceptions raised during a call to
+(** [exceptions sch] handles any exceptions raised during a call to
     [execute adv st cmd]. Gives the user a nice message. *)
-and exception_handler sch = 
-  ANSITerminal.(print_string [red]
-                  ("This is an illegal command or invalid syntax; 
-                  please try again!\n")); 
+and exceptions sch err = 
+  ANSITerminal.(print_string [red] "Invalid\n"); 
+  print_endline err;
   prompt sch
 
 (** Loads a file and makes a schedule out of it *)

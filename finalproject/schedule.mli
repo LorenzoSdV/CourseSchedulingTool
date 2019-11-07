@@ -9,6 +9,7 @@ type sem_id = Spring of int | Fall of int
 type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
 
 (** The type representing the prereqs or coreqs of a course. *)
+(* WILL BE IMPLEMENTED IN SPRINT 2 *)
 type reqs 
 
 (** Type representing a course *)
@@ -20,17 +21,29 @@ type semester
 (** Type representing a whole schedule *)
 type schedule
 
-(** [InvalidCredits] raised when a course is to be added to a schedule with an 
+(*(** [InvalidCredits] raised when a course is to be added to a schedule with an 
     invalid number of credits. *)
-exception InvalidCredits
+  exception InvalidCredits*)
 
 (** [UnknownCourse nm] raised when course with name [nm] passed as a real course
     but isn't recognized as such. *)
 exception UnknownCourse of string
 
-(** [UnknownSemester] raised when function attempts to work with non-existent
-    semester. *)
-exception UnknownSemester
+(** [UnknownSemester sem] raised when function attempts to work with 
+    non-existent semester. *)
+exception UnknownSemester of string
+
+(** [UnknownGrade grd] raised when function attempts to work with invalid 
+    string representation of a grade. *)
+exception UnkownGrade of string
+
+(** [DuplicateCourse nm] raised when course with name [nm] is added to a
+    semester where a course with same name already exists. *)
+exception DuplicateCourse of string
+
+(** [DuplicateSemester sem] raised when semester with string-id [sem] is added 
+    to a schedule where a semester with the same id already exists. *)
+exception DuplicateSemester of string
 
 (** [gradify s] is the grade representation of [s] where is some grade value 
     represented as a string.
@@ -90,9 +103,12 @@ val add_sem : schedule -> semester -> schedule
     Raises: [UnkownSemester] if semester doesn't exists in the [sch]. *)
 val remove_sem : schedule -> sem_id -> schedule
 
-(** [string_of_sem s] is the string representation of semester id [s]. String
+(** [string_of_semid s] is the string representation of semester id [s]. String
     representations are like FA20 or SP18, etc. *)
-val string_of_sem : sem_id -> string
+val string_of_semid : sem_id -> string
+
+(** [sem_ids s] is the list of semester ids from each semester in schedule [s]*)
+val sem_ids : schedule -> sem_id list
 
 (** [to_list sch] is the list of all courses contained in each semester in 
     [sch] *)
@@ -101,7 +117,12 @@ val to_list : schedule -> course list
 (** [new_schedule] is a new empty schedule with no courses or semesters. *)
 val new_schedule : schedule
 
+(** COMMENT *)
 val print_schedule : schedule -> unit
 
-(** [name sch] is the user-defined name of schedule [sch]. *)
-val name : schedule -> string
+(** [get_name sch] is the user-defined name of schedule [sch]. *)
+val get_name : schedule -> string
+
+(** [edit_name sch nm] is the shcedule that results from changing the name of 
+    [sch] to [nm]. *)
+val edit_name : schedule -> string -> schedule
