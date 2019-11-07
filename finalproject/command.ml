@@ -36,6 +36,7 @@ let add_others sch str_lst =
 let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
+  | "schedule"::name::new_val::[] -> edit_name sch new_val
   | course_name::field::new_val::[] -> edit_course sch course_name field new_val
   | _ -> raise MalformedEdit
 

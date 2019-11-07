@@ -19,7 +19,7 @@ Then, you can start our program by running "make run". Press Enter/return at the
 
 To create a new semester:
 ```
-add semester FA19
+add sem FA19
 ```
 
 Add a new course:

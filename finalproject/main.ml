@@ -1,5 +1,5 @@
 open Schedule
-open Prompt
+open Command
 open ClassRoster
 
 (** [prompt sch] is the prompt where the user can enter a command to interact
@@ -9,7 +9,8 @@ let rec prompt sch =
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
-  | "" -> prompt sch
+  | "" -> print_endline "Valid Commands: add | edit | remove | print | quit";
+    prompt sch
   | string_cmd -> 
     try
       prompt (parse_command sch string_cmd)
@@ -29,8 +30,8 @@ let rec prompt sch =
     | MalformedSemId -> 
       exceptions sch "Improperly Formatted (Unrecognized) Semester Entry"
     | MalformedAdd ->
-      exceptions sch ("Usage: add [course|sem] <name> [<credits> <grade>" ^ 
-                      " <category> <semester>]")
+      exceptions sch ("Usage: add [<course_name>|sem <sem_id>] [<credits> " ^ 
+                      "<grade> <category> <semester>]")
     | MalformedEdit ->
       exceptions sch "Usage: edit [course|sem|schedule] <attribute> <new_value)"
     | MalformedRemove ->
