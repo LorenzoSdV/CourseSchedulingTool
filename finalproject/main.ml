@@ -1,26 +1,49 @@
 open Schedule
-open Prompt
+open Command
+open ClassRoster
 
-(** [prompt sch] is the prompt where the user can enter a command to interact
-    with current schedule [sch]. *)
+(** [prompt sch] is the user's interface with our system. This function handles 
+    execution of user commands pertaining to [sch]. Also handles any exceptions 
+    raised during the execution of any commands. *)
 let rec prompt sch =
-  ANSITerminal.(print_string [green] ("\n" ^ (name sch) ^ ": "));
+  ANSITerminal.(print_string [green] ("\n" ^ (get_name sch) ^ ": "));
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
-  | "" -> prompt sch
+  | "" -> print_endline "Valid Commands: add | edit | remove | print | quit";
+    prompt sch
   | string_cmd -> 
     try
       prompt (parse_command sch string_cmd)
     with
-      _ -> exception_handler sch
+    | UnknownCourse msg -> 
+      exceptions sch ("Invalid or Unkown Course: " ^ msg)
+    | UnknownSemester msg -> 
+      exceptions sch ("Invalid or Unkown Semester: " ^ msg)
+    | UnkownGrade msg -> 
+      exceptions sch ("Invalid or Unkown Grade Value: " ^ msg)
+    | DuplicateCourse msg -> 
+      exceptions sch ("Duplicate Course Already Exists: " ^ msg)
+    | DuplicateSemester msg -> 
+      exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
+    | InvalidURL -> 
+      exceptions sch "Error Retreiving Course Info from Online"
+    | MalformedSemId -> 
+      exceptions sch "Improperly Formatted (Unrecognized) Semester Entry"
+    | MalformedAdd ->
+      exceptions sch ("Usage: add [<course_name>|sem <sem_id>] [<credits> " ^ 
+                      "<grade> <category> <semester>]")
+    | MalformedEdit ->
+      exceptions sch "Usage: edit [course|sem|schedule] <attribute> <new_value)"
+    | MalformedRemove ->
+      exceptions sch "Usage: remove [course|sem] <name>"
+    | Malformed | _ -> exceptions sch "Unrecognized Command Entry!"
 
-(** [exception_handler sch] handles any exceptions raised during a call to
-    [execute adv st cmd]. Gives the user a nice message. *)
-and exception_handler sch = 
-  ANSITerminal.(print_string [red]
-                  ("This is an illegal command or invalid syntax; 
-                  please try again!\n")); 
+(** [exceptions sch err] prints the promper error message [err] and reloads
+    the prompt for the user. *)
+and exceptions sch err = 
+  ANSITerminal.(print_string [red] "Invalid\n"); 
+  print_endline err;
   prompt sch
 
 (** Loads a file and makes a schedule out of it *)
@@ -37,9 +60,9 @@ let main () =
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()
-  | "quit" -> Stdlib.exit 0
   | "" -> prompt Schedule.new_schedule
+  | "quit" -> Stdlib.exit 0
   | file_name -> load file_name
 
-(* Start running the user prompt: *)
+(* Starts system *)
 let () = main ()

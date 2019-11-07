@@ -31,10 +31,12 @@ type schedule = {
   mutable major: string;
 }
 
-
-exception InvalidCredits
 exception UnknownCourse of string
-exception UnknownSemester
+exception UnknownSemester of string
+exception UnkownGrade of string
+exception DuplicateCourse of string
+exception DuplicateSemester of string
+exception InvalidCredits of string
 
 let grade_map gr = 
   match gr with
@@ -51,11 +53,11 @@ let grade_map gr =
   | Letter "D" -> 1.0
   | Letter "D-" -> 0.7
   | Letter "F" -> 0.0
-  | _ -> -1.0
+  | _ -> failwith "Impossible Failure"
 
 let gradify str =
   let str_upper = String.uppercase_ascii str in
-  if Str.string_match (Str.regexp "^[A-DF]{1}[\\+-]?$") str_upper 0 then
+  if Str.string_match (Str.regexp "^[A-D][\\+-]?$\\|^F$") str_upper 0 then
     Letter str_upper
   else
     match str_upper with
@@ -63,7 +65,7 @@ let gradify str =
     | "W" | "WITHDRAWN" -> Withdrawn
     | "SAT" | "S" -> Sat
     | "UNSAT" | "U" -> Unsat
-    | _ -> raise (Failure "Invalid grade entry")
+    | _ -> raise (UnkownGrade str)
 
 let gpa courses =
   let rec fold_credits courses acc =
@@ -98,13 +100,24 @@ let to_list sch =
   in
   fold sch.semesters []
 
+let string_of_semid semid =
+  match semid with
+  | Spring yr -> "SP" ^ (string_of_int yr)
+  | Fall yr -> "FA" ^ (string_of_int yr)
+
 let create_course name cred gr deg = 
-  {
-    name = name;
-    credits = cred;
-    grade = gr;
-    degree = deg;
-  }
+  if cred < 0 then 
+    raise (InvalidCredits "Too few credits")
+  else if not (Str.string_match 
+                 (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") name 0) then
+    raise (UnknownCourse ("Invalud Course name - " ^ name))
+  else
+    {
+      name = name;
+      credits = cred;
+      grade = gr;
+      degree = deg;
+    }
 
 let add_course sch c semid = 
   try
@@ -113,11 +126,11 @@ let add_course sch c semid =
     sem.sem_gpa <- gpa sem.courses;
     { sch with commul_gpa = gpa (to_list sch) }
   with
-    Not_found -> raise UnknownSemester
+    Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-let edit_course sch c attr new_val =
+let edit_course sch cname attr new_val =
   try
-    let course = List.find (fun course -> course.name = c) (to_list sch) in
+    let course = List.find (fun course -> course.name = cname) (to_list sch) in
     match attr with
     | "credits" ->
       course.credits <- int_of_string new_val; sch
@@ -125,18 +138,22 @@ let edit_course sch c attr new_val =
       course.grade <- gradify new_val; sch
     | "degree" -> 
       course.degree <- new_val; sch
-    | _ -> raise (Failure "Not a valid course attribute to edit!")
+    | _ -> raise (Failure "Invalid course attribute")
   with
-  | Not_found -> raise (UnknownCourse c)
-  | _ -> raise (Failure "Not a valid course attribute to edit!")
+    Not_found -> raise (UnknownCourse cname)
 
-let remove_course sch c =
+let remove_course sch cname =
   try
-    let sem = List.find (fun sem -> List.mem c (List.map (fun course -> course.name) sem.courses)) sch.semesters in
-    sem.courses <- (List.filter (fun crs -> crs.name <> c) sem.courses);
+    let sem = List.find 
+        (fun smstr -> List.mem cname 
+            (List.rev_map 
+               (fun course -> course.name) smstr.courses)) 
+        sch.semesters 
+    in
+    sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
     sch
   with
-    Not_found -> raise UnknownSemester
+    Not_found -> raise (UnknownCourse cname)
 
 let get_course sch name semid = 
   try
@@ -158,7 +175,7 @@ let create_sem semid =
 
 let add_sem sch sem =
   if (List.mem sem.id (sem_ids sch)) then
-    raise (Failure "Tried to add semester that already exists!")
+    raise (DuplicateSemester (string_of_semid sem.id))
   else begin
     sch.semesters <- sem :: sch.semesters; 
     sch.commul_gpa <- gpa (to_list sch);
@@ -166,16 +183,12 @@ let add_sem sch sem =
 
 let remove_sem sch semid = 
   if (not (List.mem semid (sem_ids sch))) then
-    raise UnknownSemester
+    raise (UnknownSemester (string_of_semid semid))
   else begin
     sch.semesters <- 
       (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
+    sch.commul_gpa <- gpa (to_list sch);
     sch end
-
-let string_of_sem semid =
-  match semid with
-  | Spring yr -> "SP" ^ (string_of_int yr)
-  | Fall yr -> "FA" ^ (string_of_int yr)
 
 let new_schedule =
   {
@@ -186,10 +199,10 @@ let new_schedule =
     major = ""
   }
 
-let name sch =
+let get_name sch =
   sch.desc
 
-let schedule_name sch nm =
+let edit_name sch nm =
   sch.desc <- nm; sch
 
 let print_sem sem =
@@ -201,7 +214,7 @@ let print_sem sem =
 
 let print_schedule sch =
   List.fold_right 
-    (fun sem _ -> print_string (string_of_sem sem.id); print_sem sem) 
+    (fun sem _ -> print_string (string_of_semid sem.id); print_sem sem) 
     sch.semesters ();
   print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
   print_endline ("Total Credits: " ^ (string_of_int (credits (to_list sch))))

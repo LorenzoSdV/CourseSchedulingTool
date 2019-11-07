@@ -1,4 +1,4 @@
-MODULES=prompt schedule classRoster main authors
+MODULES=schedule classRoster command main authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
