@@ -92,13 +92,21 @@ let credits courses =
     | { credits = c } :: t -> fold t (acc + c)
   in fold courses 0
 
-let to_list sch =
+let to_list_courses sch =
   let rec fold sems acc = 
     match sems with
     | [] -> acc
     | {courses=x} :: t -> fold t (x @ acc)
   in
   fold sch.semesters []
+
+let to_list_course_names sch = 
+  let rec fold_more courses acc =
+    match courses with
+    | [] -> acc
+    | fst::others -> fold_more others (fst.name::acc)
+  in fold_more (to_list_courses sch) []
+
 
 let string_of_semid semid =
   match semid with
@@ -107,7 +115,7 @@ let string_of_semid semid =
 
 let create_course name cred gr deg = 
   if cred < 0 then 
-    raise (InvalidCredits "Too few credits")
+    raise (InvalidCredits "Credits have to be greater than or equal to zero.")
   else if not (Str.string_match 
                  (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") name 0) then
     raise (UnknownCourse ("Invalud Course name - " ^ name))
@@ -120,17 +128,21 @@ let create_course name cred gr deg =
     }
 
 let add_course sch c semid = 
-  try
-    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
-    sem.courses <- (c :: sem.courses);
-    sem.sem_gpa <- gpa sem.courses;
-    { sch with commul_gpa = gpa (to_list sch) }
-  with
-    Not_found -> raise (UnknownSemester (string_of_semid semid))
-
+  if (List.mem c.name (to_list_course_names sch)) then
+    raise (DuplicateCourse c.name)
+  else 
+    begin
+      try
+        let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+        sem.courses <- (c :: sem.courses);
+        sem.sem_gpa <- gpa sem.courses;
+        { sch with commul_gpa = gpa (to_list_courses sch) }
+      with
+        Not_found -> raise (UnknownSemester (string_of_semid semid))
+    end
 let edit_course sch cname attr new_val =
   try
-    let course = List.find (fun course -> course.name = cname) (to_list sch) in
+    let course = List.find (fun course -> course.name = cname) (to_list_courses sch) in
     match attr with
     | "credits" ->
       course.credits <- int_of_string new_val; sch
@@ -178,7 +190,7 @@ let add_sem sch sem =
     raise (DuplicateSemester (string_of_semid sem.id))
   else begin
     sch.semesters <- sem :: sch.semesters; 
-    sch.commul_gpa <- gpa (to_list sch);
+    sch.commul_gpa <- gpa (to_list_courses sch);
     sch end
 
 let remove_sem sch semid = 
@@ -187,7 +199,7 @@ let remove_sem sch semid =
   else begin
     sch.semesters <- 
       (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
-    sch.commul_gpa <- gpa (to_list sch);
+    sch.commul_gpa <- gpa (to_list_courses sch);
     sch end
 
 let new_schedule =
@@ -217,4 +229,4 @@ let print_schedule sch =
     (fun sem _ -> print_string (string_of_semid sem.id); print_sem sem) 
     sch.semesters ();
   print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
-  print_endline ("Total Credits: " ^ (string_of_int (credits (to_list sch))))
+  print_endline ("Total Credits: " ^ (string_of_int (credits (to_list_courses sch))))

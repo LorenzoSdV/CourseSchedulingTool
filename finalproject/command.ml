@@ -28,7 +28,7 @@ let add_others sch str_lst =
     add_sem sch (create_sem (sem_id_parse sem_id))
   | course_name::grade::degree::sem_id::[] -> 
     let curr_credits = get_course_creds course_name (sem_id_parse sem_id) in
-    let curr_course = create_course course_name curr_credits (gradify grade) degree in
+    let curr_course = create_course (String.uppercase_ascii course_name) curr_credits (gradify grade) degree in
     add_course sch curr_course (sem_id_parse sem_id)
   | course_name::credits::grade::degree::sem_id::[] -> 
     let curr_credits = int_of_string credits in
@@ -40,8 +40,9 @@ let add_others sch str_lst =
 let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
-  | "schedule"::name::new_val::[] -> edit_name sch new_val
-  | course_name::field::new_val::[] -> edit_course sch course_name field new_val
+  | "name"::new_val::[] -> edit_name sch new_val
+  | course_name::field::new_val::[] -> 
+    edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
 (** [remove_others sch str_lst] parses [str_lst] in [sch] for the Remove 
@@ -51,7 +52,7 @@ let remove_others sch str_lst =
   | [] -> raise MalformedRemove
   | "sem"::sem_id::[] -> 
     remove_sem sch (sem_id_parse sem_id)
-  | course_name::[] -> remove_course sch course_name
+  | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
 let parse_command sch cmd_str = 

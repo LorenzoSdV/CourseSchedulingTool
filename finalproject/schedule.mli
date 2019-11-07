@@ -110,9 +110,9 @@ val string_of_semid : sem_id -> string
 (** [sem_ids s] is the list of semester ids from each semester in schedule [s]*)
 val sem_ids : schedule -> sem_id list
 
-(** [to_list sch] is the list of all courses contained in each semester in 
+(** [to_list_courses sch] is the list of all courses contained in each semester in 
     [sch] *)
-val to_list : schedule -> course list
+val to_list_courses : schedule -> course list
 
 (** [new_schedule] is a new empty schedule with no courses or semesters. *)
 val new_schedule : schedule
