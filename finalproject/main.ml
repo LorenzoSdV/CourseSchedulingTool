@@ -2,8 +2,9 @@ open Schedule
 open Command
 open ClassRoster
 
-(** [prompt sch] is the prompt where the user can enter a command to interact
-    with current schedule [sch]. *)
+(** [prompt sch] is the user's interface with our system. This function handles 
+    execution of user commands pertaining to [sch]. Also handles any exceptions 
+    raised during the execution of any commands. *)
 let rec prompt sch =
   ANSITerminal.(print_string [green] ("\n" ^ (get_name sch) ^ ": "));
   match read_line () with
@@ -38,8 +39,8 @@ let rec prompt sch =
       exceptions sch "Usage: remove [course|sem] <name>"
     | Malformed | _ -> exceptions sch "Unrecognized Command Entry!"
 
-(** [exceptions sch] handles any exceptions raised during a call to
-    [execute adv st cmd]. Gives the user a nice message. *)
+(** [exceptions sch err] prints the promper error message [err] and reloads
+    the prompt for the user. *)
 and exceptions sch err = 
   ANSITerminal.(print_string [red] "Invalid\n"); 
   print_endline err;
@@ -63,5 +64,5 @@ let main () =
   | "quit" -> Stdlib.exit 0
   | file_name -> load file_name
 
-(* Start running the user prompt: *)
+(* Starts system *)
 let () = main ()
