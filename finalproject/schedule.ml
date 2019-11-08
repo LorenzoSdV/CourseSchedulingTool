@@ -105,6 +105,16 @@ let string_of_semid semid =
   | Spring yr -> "SP" ^ (string_of_int yr)
   | Fall yr -> "FA" ^ (string_of_int yr)
 
+(** [sem_compare s1 s2] returns a negative number if [s1] comes before [s2], 
+    0 if theyre the same semester, and a positive number if [s1] comes after
+    [s2]. *)
+let sem_compare s1 s2 =
+  match s1.id,s2.id with
+  | Fall y1 , Fall y2
+  | Spring y1 , Spring y2 -> Stdlib.compare y1 y2
+  | Fall y1 , Spring y2 -> if y1 = y2 then 1 else Stdlib.compare y1 y2
+  | Spring y1 , Fall y2 -> if y1 = y2 then -1 else Stdlib.compare y1 y2
+
 let create_course name cred gr deg = 
   if cred < 0 then 
     raise (InvalidCredits "Too few credits")
@@ -122,9 +132,13 @@ let create_course name cred gr deg =
 let add_course sch c semid = 
   try
     let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
-    sem.courses <- (c :: sem.courses);
-    sem.sem_gpa <- gpa sem.courses;
-    { sch with commul_gpa = gpa (to_list sch) }
+    if List.mem c.name (List.map (fun c -> c.name) (to_list sch)) then
+      raise (DuplicateCourse (c.name ^ " already in schedule."))
+    else begin
+      sem.courses <- (c :: sem.courses);
+      sem.sem_gpa <- gpa sem.courses;
+      { sch with commul_gpa = gpa (to_list sch) }
+    end
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
@@ -177,7 +191,7 @@ let add_sem sch sem =
   if (List.mem sem.id (sem_ids sch)) then
     raise (DuplicateSemester (string_of_semid sem.id))
   else begin
-    sch.semesters <- sem :: sch.semesters; 
+    sch.semesters <- List.sort sem_compare (sem :: sch.semesters);
     sch.commul_gpa <- gpa (to_list sch);
     sch end
 
@@ -213,8 +227,12 @@ let print_sem sem =
   print_endline (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa))
 
 let print_schedule sch =
-  List.fold_right 
-    (fun sem _ -> print_string (string_of_semid sem.id); print_sem sem) 
-    sch.semesters ();
-  print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
-  print_endline ("Total Credits: " ^ (string_of_int (credits (to_list sch))))
+  if sch.semesters = [] then 
+    print_endline "No semesters in current schedule. Try running 'add sem'"
+  else begin
+    List.fold_left 
+      (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
+      () sch.semesters;
+    print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
+    print_endline ("Total Credits: " ^ (string_of_int (credits (to_list sch))))
+  end

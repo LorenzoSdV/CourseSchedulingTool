@@ -10,7 +10,9 @@ let rec prompt sch =
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
-  | "" -> print_endline "Valid Commands: add | edit | remove | print | quit";
+  | "clear" -> ignore (Sys.command "clear"); prompt sch
+  | "" -> 
+    print_endline "Valid Commands: add | edit | remove | print | quit | clear";
     prompt sch
   | string_cmd -> 
     try
@@ -36,8 +38,11 @@ let rec prompt sch =
     | MalformedEdit ->
       exceptions sch "Usage: edit [course|sem|schedule] <attribute> <new_value)"
     | MalformedRemove ->
-      exceptions sch "Usage: remove [course|sem] <name>"
-    | Malformed | _ -> exceptions sch "Unrecognized Command Entry!"
+      exceptions sch "Usage: remove [<course_name>|sem] <sem_id>"
+    | Malformed | _ -> 
+      exceptions sch 
+        ("Unrecognized Command Entry!\n" ^ 
+         "Valid Commands: add | edit | remove | print | quit | clear")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
@@ -48,15 +53,15 @@ and exceptions sch err =
 
 (** Loads a file and makes a schedule out of it *)
 let load f =
-  print_endline "This feature will be implemented in the second sprint. 
-  Now creating a new schedule.\n";
+  print_endline ("This feature will be implemented in the second sprint. " ^ 
+                 "Now creating a new schedule.\n");
   prompt Schedule.new_schedule
 
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
-  print_endline "Please enter path to schedule you want to load, or leave 
-  blank to create new schedule.\n";
+  print_endline ("Please enter path to schedule you want to load, or leave " ^
+                 "blank to create new schedule.\n");
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()

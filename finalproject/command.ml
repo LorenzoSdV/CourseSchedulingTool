@@ -27,9 +27,16 @@ let add_others sch str_lst =
     add_sem sch (create_sem (sem_id_parse (String.capitalize_ascii sem_id)))
   | course_name::grade::degree::sem_id::[] -> 
     add_course sch 
-      (create_course course_name (get_course_creds course_name (sem_id_parse sem_id)) (Schedule.gradify grade) degree) (sem_id_parse sem_id)
+      (create_course course_name 
+         (get_course_creds course_name 
+            (sem_id_parse sem_id)) 
+         (Schedule.gradify grade) degree) 
+      (sem_id_parse sem_id)
   | course_name::credits::grade::degree::sem_id::[] -> 
-    add_course sch (create_course course_name (int_of_string credits) (Schedule.gradify grade) degree) (sem_id_parse sem_id)
+    add_course sch (create_course course_name 
+                      (int_of_string credits) 
+                      (Schedule.gradify grade) degree) 
+      (sem_id_parse sem_id)
   | _ -> raise MalformedAdd
 
 (** [edit_others sch str_lst] parses [str_lst] in [sch] for the Edit command. *)
