@@ -12,9 +12,10 @@ exception MalformedRemove
 (** [sem_id_parse sem_id] parses [sem_id] if is a valid semester type.
     Raises: Malformed when [sem_id] is not valid. *)
 let sem_id_parse sem_id =
-  if Str.string_match (Str.regexp "^SP[0-9][0-9]$") sem_id 0 then
+  let uppercase_id = String.uppercase_ascii sem_id in
+  if Str.string_match (Str.regexp "^SP[0-9][0-9]$") uppercase_id 0 then
     Spring (int_of_string (String.sub sem_id 2 2))
-  else if Str.string_match (Str.regexp "^FA[0-9][0-9]$") sem_id 0 then 
+  else if Str.string_match (Str.regexp "^FA[0-9][0-9]$") uppercase_id 0 then 
     Fall (int_of_string (String.sub sem_id 2 2)) 
   else 
     raise MalformedSemId
@@ -24,7 +25,7 @@ let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
   | "sem"::sem_id::[] ->
-    add_sem sch (create_sem (sem_id_parse (String.capitalize_ascii sem_id)))
+    add_sem sch (create_sem (sem_id_parse sem_id))
   | course_name::grade::degree::sem_id::[] -> 
     add_course sch 
       (create_course course_name 
@@ -43,8 +44,9 @@ let add_others sch str_lst =
 let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
-  | "schedule"::name::new_val::[] -> edit_name sch new_val
-  | course_name::field::new_val::[] -> edit_course sch course_name field new_val
+  | "name"::new_val::[] -> edit_name sch new_val
+  | course_name::field::new_val::[] -> 
+    edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
 (** [remove_others sch str_lst] parses [str_lst] in [sch] for the Remove 
@@ -53,8 +55,8 @@ let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
   | "sem"::sem_id::[] -> 
-    remove_sem sch (sem_id_parse (String.uppercase_ascii sem_id))
-  | course_name::[] -> remove_course sch course_name
+    remove_sem sch (sem_id_parse sem_id)
+  | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
 let parse_command sch cmd_str = 

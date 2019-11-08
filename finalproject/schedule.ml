@@ -117,7 +117,7 @@ let sem_compare s1 s2 =
 
 let create_course name cred gr deg = 
   if cred < 0 then 
-    raise (InvalidCredits "Too few credits")
+    raise (InvalidCredits "Credits have to be greater than or equal to zero.")
   else if not (Str.string_match 
                  (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") name 0) then
     raise (UnknownCourse ("Invalud Course name - " ^ name))
