@@ -27,14 +27,16 @@ let add_others sch str_lst =
   | "sem"::sem_id::[] ->
     add_sem sch (create_sem (sem_id_parse sem_id))
   | course_name::grade::degree::sem_id::[] -> 
+    let name = String.uppercase_ascii course_name in
     add_course sch 
-      (create_course course_name 
-         (get_course_creds course_name 
+      (create_course name 
+         (get_course_creds name
             (sem_id_parse sem_id)) 
          (Schedule.gradify grade) degree) 
       (sem_id_parse sem_id)
   | course_name::credits::grade::degree::sem_id::[] -> 
-    add_course sch (create_course course_name 
+    let name = String.uppercase_ascii course_name in
+    add_course sch (create_course name 
                       (int_of_string credits) 
                       (Schedule.gradify grade) degree) 
       (sem_id_parse sem_id)
