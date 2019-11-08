@@ -1,7 +1,7 @@
 # assignment
 doc.public
 doc.private
-search_src.zip
+*.zip
 report
 
 # ocaml
