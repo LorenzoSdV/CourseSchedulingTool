@@ -13,6 +13,7 @@ let rec prompt sch =
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "" -> 
     print_endline "Valid Commands: add | edit | remove | print | quit | clear";
+    print_endline "Enter a command to view usage instructions.";
     prompt sch
   | string_cmd -> 
     try

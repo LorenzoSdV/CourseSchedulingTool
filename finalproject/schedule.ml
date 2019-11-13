@@ -224,7 +224,8 @@ let print_sem sem =
   List.fold_right 
     (fun course _ -> print_string ((course.name) ^ ", ")) 
     sem.courses ();
-  print_endline (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa))
+  print_endline (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa));
+  print_endline ""
 
 let print_schedule sch =
   if sch.semesters = [] then 
