@@ -51,6 +51,12 @@ let edit_others sch str_lst =
     edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
+let rem_others_helper sch cname courses = 
+  match courses with 
+  | [] -> raise MalformedRemove
+  | sem :: [] -> remove_course sch (String.uppercase_ascii cname) sem
+  | _ -> raise MalformedRemove
+
 (** [remove_others sch str_lst] parses [str_lst] in [sch] for the Remove 
     command. *)
 let remove_others sch str_lst =
@@ -58,7 +64,7 @@ let remove_others sch str_lst =
   | [] -> raise MalformedRemove
   | "sem"::sem_id::[] -> 
     remove_sem sch (sem_id_parse sem_id)
-  | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
+  | course_name :: sem_id :: [] -> remove_course sch (String.uppercase_ascii course_name) (sem_id_parse sem_id)
   | _ -> raise MalformedRemove
 
 let parse_command sch cmd_str = 

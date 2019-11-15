@@ -35,7 +35,7 @@ exception UnknownSemester of string
 
 (** [UnknownGrade grd] raised when function attempts to work with invalid 
     string representation of a grade. *)
-exception UnkownGrade of string
+exception UnknownGrade of string
 
 (** [DuplicateCourse nm] raised when course with name [nm] is added to a
     semester where a course with same name already exists. *)
@@ -73,12 +73,22 @@ val edit_course : schedule -> string -> string -> string -> schedule
 (** [add_course sch c semid] is the schedule with course name [c] removed
     from semester id [semid]. If course [c] is not in semester [semid] then
     [add_course sch c semid] is [sch] *)
-val remove_course : schedule -> string -> schedule
+val remove_course : schedule -> string -> sem_id -> schedule
 
-(** [get_course sch name semid] returns the course record with name [name]
-    found in semester with id [semid] in [sch].
-    Raises: [UnkownCourse name] if course does not exist in the semester. *)
+(** [get_course sch name courses] returns the course record with name [name]
+    found in [courses] in [sch].
+    Raises: [UnknownCourse name] if course does not exist in the semester. *)
 val get_course : schedule -> string -> sem_id -> course
+
+
+(** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
+    in schedule [sch]. 
+    Raises: [UnknownSemester sem_id] if no such semester exists. *)
+val get_sem : schedule -> semester list -> sem_id -> semester
+
+(** [get_sem_courses sem] returns a list of all the courses in the semester
+    [sem]. *)
+val get_sem_courses : semester -> course list
 
 (** [gpa courses] is the GPA of all the courses in [courses] that have been
     given a letter grade. *)

@@ -33,7 +33,7 @@ type schedule = {
 
 exception UnknownCourse of string
 exception UnknownSemester of string
-exception UnkownGrade of string
+exception UnknownGrade of string
 exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
@@ -65,7 +65,7 @@ let gradify str =
     | "W" | "WITHDRAWN" -> Withdrawn
     | "SAT" | "S" -> Sat
     | "UNSAT" | "U" -> Unsat
-    | _ -> raise (UnkownGrade str)
+    | _ -> raise (UnknownGrade str)
 
 let gpa courses =
   let rec fold_credits courses acc =
@@ -120,7 +120,7 @@ let create_course name cred gr deg =
     raise (InvalidCredits "Credits have to be greater than or equal to zero.")
   else if not (Str.string_match 
                  (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") name 0) then
-    raise (UnknownCourse ("Invalud Course name - " ^ name))
+    raise (UnknownCourse ("Invalid Course name - " ^ name))
   else
     {
       name = name;
@@ -128,6 +128,28 @@ let create_course name cred gr deg =
       grade = gr;
       degree = deg;
     }
+
+let get_course sch name semid = 
+  try
+    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+    List.find (fun c -> c.name = name) sem.courses
+  with
+    Not_found -> raise (UnknownCourse name)
+
+(**let rec get_course sch name courses = 
+   match courses with 
+   | [] -> raise (UnknownCourse name)
+   | h :: t -> if h.name = name then h else get_course sch name t*)
+
+let rec get_sem sch sems semid = 
+  match sems with 
+  | [] -> raise (UnknownSemester (string_of_semid semid))
+  | h :: t -> if h.id = semid then h else get_sem sch t semid
+
+let get_sem_courses sem =
+  sem.courses 
+
+
 
 let add_course sch c semid = 
   try
@@ -137,44 +159,68 @@ let add_course sch c semid =
     else begin
       sem.courses <- (c :: sem.courses);
       sem.sem_gpa <- gpa sem.courses;
+      sem.tot_credits <- sem.tot_credits + c.credits;
       { sch with commul_gpa = gpa (to_list sch) }
     end
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
+let rec get_sem_from_course sch semesters course = 
+  match semesters with 
+  | [] -> raise (UnknownCourse course.name)
+  | h :: t -> if get_course sch course.name h.id = course then h else
+      get_sem_from_course sch t course
+
+let edit_course_creds course = 
+  true
+
 let edit_course sch cname attr new_val =
   try
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
+    let sem  = get_sem_from_course sch sch.semesters course in 
+    let old_creds = course.credits in 
     match attr with
     | "credits" ->
-      course.credits <- int_of_string new_val; sch
+      let () = course.credits <- int_of_string new_val in 
+      let new_creds = course.credits in 
+      sem.tot_credits <- sem.tot_credits + (new_creds - old_creds); sch
     | "grade" -> 
-      course.grade <- gradify new_val; sch
+      let () = course.grade <- gradify new_val in 
+      let () = sem.sem_gpa <- gpa sem.courses in 
+      sch.commul_gpa <- gpa (to_list sch); sch
     | "degree" -> 
       course.degree <- new_val; sch
     | _ -> raise (Failure "Invalid course attribute")
   with
     Not_found -> raise (UnknownCourse cname)
 
-let remove_course sch cname =
+let remove_course sch cname semid =
   try
+    let sem = get_sem sch sch.semesters semid in 
+    let c = get_course sch cname semid in 
+    let () = sem.tot_credits <- sem.tot_credits - c.credits in 
+    let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in 
+    let () = sem.sem_gpa <- gpa sem.courses in 
+    sch.commul_gpa <- gpa (to_list sch); sch
+  with 
+    Not_found -> raise (UnknownCourse cname)
+
+(**let remove_course sch cname semid =
+   try begin
     let sem = List.find 
         (fun smstr -> List.mem cname 
             (List.rev_map 
                (fun course -> course.name) smstr.courses)) 
         sch.semesters 
     in
-    sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
+    let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in
+    let c = get_course sch cname sem.id in 
+    print_endline ("creds = " ^ string_of_int c.credits);
+    sem.tot_credits <- sem.tot_credits - c.credits;
     sch
-  with
-    Not_found -> raise (UnknownCourse cname)
-
-let get_course sch name semid = 
-  try
-    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
-    List.find (fun c -> c.name = name) sem.courses
-  with
-    Not_found -> raise (UnknownCourse name)
+   end
+   with
+    Not_found -> raise (UnknownCourse cname)*)
 
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
@@ -224,7 +270,8 @@ let print_sem sem =
   List.fold_right 
     (fun course _ -> print_string ((course.name) ^ ", ")) 
     sem.courses ();
-  print_endline (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa));
+  print_string (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa));
+  print_endline (" | Semester Credits: " ^ string_of_int sem.tot_credits);
   print_endline ""
 
 let print_schedule sch =

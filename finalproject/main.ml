@@ -20,11 +20,11 @@ let rec prompt sch =
       prompt (parse_command sch string_cmd)
     with
     | UnknownCourse msg -> 
-      exceptions sch ("Invalid or Unkown Course: " ^ msg)
+      exceptions sch ("Invalid or Unknown Course: " ^ msg)
     | UnknownSemester msg -> 
-      exceptions sch ("Invalid or Unkown Semester: " ^ msg)
-    | UnkownGrade msg -> 
-      exceptions sch ("Invalid or Unkown Grade Value: " ^ msg)
+      exceptions sch ("Invalid or Unknown Semester: " ^ msg)
+    | UnknownGrade msg -> 
+      exceptions sch ("Invalid or Unknown Grade Value: " ^ msg)
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
