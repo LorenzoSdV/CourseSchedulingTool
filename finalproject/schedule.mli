@@ -86,6 +86,9 @@ val get_course : schedule -> string -> sem_id -> course
     Raises: [UnknownSemester sem_id] if no such semester exists. *)
 val get_sem : schedule -> semester list -> sem_id -> semester
 
+(** [get_sems sch] returns the semesters in [sch]. *)
+val get_sems : schedule -> semester list
+
 (** [get_sem_courses sem] returns a list of all the courses in the semester
     [sem]. *)
 val get_sem_courses : semester -> course list
@@ -94,9 +97,9 @@ val get_sem_courses : semester -> course list
     given a letter grade. *)
 val gpa : course list -> float
 
-(** [credits courses] is the sum of all the credits of each course in 
+(** [get_credits courses] is the sum of all the credits of each course in 
     [courses], regardless of grade type. *)
-val credits : course list -> int
+val get_credits : course list -> int
 
 (** [create_sem courses semid] is a semester with courses [courses] and id
     [semid]. Automatically calculates GPA and # credits.*)

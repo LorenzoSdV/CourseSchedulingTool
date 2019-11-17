@@ -85,7 +85,7 @@ let gpa courses =
   in
   (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
 
-let credits courses =
+let get_credits courses =
   let rec fold courses acc =
     match courses with
     | [] -> acc
@@ -146,10 +146,11 @@ let rec get_sem sch sems semid =
   | [] -> raise (UnknownSemester (string_of_semid semid))
   | h :: t -> if h.id = semid then h else get_sem sch t semid
 
+let get_sems sch = 
+  sch.semesters
+
 let get_sem_courses sem =
   sem.courses 
-
-
 
 let add_course sch c semid = 
   try
@@ -178,6 +179,7 @@ let edit_course sch cname attr new_val =
   try
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
     let sem  = get_sem_from_course sch sch.semesters course in 
+    print_endline (string_of_semid sem.id);
     let old_creds = course.credits in 
     match attr with
     | "credits" ->
@@ -282,5 +284,5 @@ let print_schedule sch =
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
       () sch.semesters;
     print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
-    print_endline ("Total Credits: " ^ (string_of_int (credits (to_list sch))))
+    print_endline ("Total Credits: " ^ (string_of_int (get_credits (to_list sch))))
   end
