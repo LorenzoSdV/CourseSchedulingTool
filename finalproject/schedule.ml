@@ -136,11 +136,6 @@ let get_course sch name semid =
   with
     Not_found -> raise (UnknownCourse name)
 
-(**let rec get_course sch name courses = 
-   match courses with 
-   | [] -> raise (UnknownCourse name)
-   | h :: t -> if h.name = name then h else get_course sch name t*)
-
 let rec get_sem sch sems semid = 
   match sems with 
   | [] -> raise (UnknownSemester (string_of_semid semid))
@@ -207,23 +202,6 @@ let remove_course sch cname semid =
   with 
     Not_found -> raise (UnknownCourse cname)
 
-(**let remove_course sch cname semid =
-   try begin
-    let sem = List.find 
-        (fun smstr -> List.mem cname 
-            (List.rev_map 
-               (fun course -> course.name) smstr.courses)) 
-        sch.semesters 
-    in
-    let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in
-    let c = get_course sch cname sem.id in 
-    print_endline ("creds = " ^ string_of_int c.credits);
-    sem.tot_credits <- sem.tot_credits - c.credits;
-    sch
-   end
-   with
-    Not_found -> raise (UnknownCourse cname)*)
-
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
 
@@ -278,7 +256,7 @@ let print_sem sem =
 
 let print_schedule sch =
   if sch.semesters = [] then 
-    print_endline "No semesters in current schedule. Try running 'add sem'"
+    ANSITerminal.(print_string [red] "No semesters in current schedule. Try running 'add sem'\n")
   else begin
     List.fold_left 
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
