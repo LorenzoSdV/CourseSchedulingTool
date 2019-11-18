@@ -9,7 +9,7 @@ type sem_id = Spring of int | Fall of int
 type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
 
 (** The type representing the prereqs or coreqs of a course. *)
-(* WILL BE IMPLEMENTED IN SPRINT 2 *)
+(* WILL BE IMPLEMENTED IN SPRINT 3 *)
 type reqs 
 
 (** Type representing a course *)
@@ -80,6 +80,8 @@ val remove_course : schedule -> string -> sem_id -> schedule
     Raises: [UnknownCourse name] if course does not exist in the semester. *)
 val get_course : schedule -> string -> sem_id -> course
 
+(** [course_name c] is the name of course [c] *)
+val course_name : course -> string
 
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
@@ -139,3 +141,11 @@ val get_name : schedule -> string
 (** [edit_name sch nm] is the shcedule that results from changing the name of 
     [sch] to [nm]. *)
 val edit_name : schedule -> string -> schedule
+
+
+
+module HTML : sig
+
+  val export_schedule : schedule -> string -> unit
+
+end
