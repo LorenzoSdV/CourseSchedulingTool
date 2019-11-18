@@ -78,7 +78,7 @@ val remove_course : schedule -> string -> sem_id -> schedule
 (** [get_course sch name courses] returns the course record with name [name]
     found in [courses] in [sch].
     Raises: [UnknownCourse name] if course does not exist in the semester. *)
-val get_course : schedule -> string -> sem_id -> course
+val get_course : schedule -> string -> course
 
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
