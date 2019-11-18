@@ -169,11 +169,12 @@ let add_course sch c semid =
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-let rec get_sem_from_course sch semesters course = 
-  match semesters with 
+let rec get_sem_from_course sems course = 
+  match sems with 
   | [] -> raise (UnknownCourse course.name)
-  | h :: t -> if get_course sch course.name h.id = course then h else
-      get_sem_from_course sch t course
+  | h :: t -> 
+    if List.mem course h.courses then h
+    else get_sem_from_course t course
 
 let edit_course_creds course = 
   true
@@ -181,7 +182,7 @@ let edit_course_creds course =
 let edit_course sch cname attr new_val =
   try
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
-    let sem  = get_sem_from_course sch sch.semesters course in 
+    let sem  = get_sem_from_course sch.semesters course in 
     print_endline (string_of_semid sem.id);
     match attr with
     | "credits" ->
