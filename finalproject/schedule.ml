@@ -307,11 +307,11 @@ module HTML = struct
   let template =
     let rec input_file acc chan = 
       try
-        input_file (acc ^ (input_line chan)) chan
+        input_file (acc ^ ((input_line chan) ^ "\n")) chan
       with
         End_of_file -> acc
     in
-    input_file "" (open_in "../temp.html")
+    input_file "" (open_in "temp.html")
 
   let html_of_course c =
     "<td>" ^ 
@@ -345,7 +345,7 @@ module HTML = struct
     close_out chan
 
   let export_schedule sch fl = 
-    let reg = Str.regexp {|^<\\?sch>$|} in
+    let reg = Str.regexp "<\\?sch>" in
     Str.replace_first reg (html_of_schedule sch) template |> save fl
 
 end

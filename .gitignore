@@ -23,3 +23,5 @@ report
 #VS Code settings
 *.vscode*/
 
+# Testing Files
+test.html
