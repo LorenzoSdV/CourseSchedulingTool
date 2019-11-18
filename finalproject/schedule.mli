@@ -80,9 +80,6 @@ val remove_course : schedule -> string -> sem_id -> schedule
     Raises: [UnknownCourse name] if course does not exist in the semester. *)
 val get_course : schedule -> string -> sem_id -> course
 
-(** [course_name c] is the name of course [c] *)
-val course_name : course -> string
-
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
     Raises: [UnknownSemester sem_id] if no such semester exists. *)
@@ -146,6 +143,8 @@ val edit_name : schedule -> string -> schedule
 
 module HTML : sig
 
+  (** [export_schedule sch fl] takes schedule [sch] and exports it in visual 
+      HTML representation to HTML file given by path [fl] *)
   val export_schedule : schedule -> string -> unit
 
 end
