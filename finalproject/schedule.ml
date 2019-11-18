@@ -167,8 +167,8 @@ let add_course sch c semid =
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-let rec get_sem_from_course sch semesters course = 
-  match semesters with 
+let rec get_sem_from_course sch sems course = 
+  match sems with 
   | [] -> raise (UnknownCourse course.name)
   | h :: t -> if get_course sch course.name (to_list sch) = course then h else
       get_sem_from_course sch t course
@@ -181,15 +181,15 @@ let edit_course sch cname attr new_val =
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
     let sem  = get_sem_from_course sch sch.semesters course in 
     print_endline (string_of_semid sem.id);
-    let old_creds = course.credits in 
     match attr with
     | "credits" ->
-      let () = course.credits <- int_of_string new_val in 
-      let new_creds = course.credits in 
-      sem.tot_credits <- sem.tot_credits + (new_creds - old_creds); sch
+      course.credits <- int_of_string new_val;
+      sem.tot_credits <- get_credits sem.courses;
+      sem.sem_gpa <- gpa sem.courses;
+      sch.commul_gpa <- gpa (to_list sch); sch
     | "grade" -> 
-      let () = course.grade <- gradify new_val in 
-      let () = sem.sem_gpa <- gpa sem.courses in 
+      course.grade <- gradify new_val;
+      sem.sem_gpa <- gpa sem.courses;
       sch.commul_gpa <- gpa (to_list sch); sch
     | "degree" -> 
       course.degree <- new_val; sch
@@ -199,11 +199,11 @@ let edit_course sch cname attr new_val =
 
 let remove_course sch cname semid =
   try
-    let sem = get_sem sch sch.semesters semid in 
-    let c = get_course sch cname (to_list sch) in 
-    let () = sem.tot_credits <- sem.tot_credits - c.credits in 
-    let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in 
-    let () = sem.sem_gpa <- gpa sem.courses in 
+    let course = get_course sch cname (to_list sch) in
+    let sem = get_sem_from_course sch sch.semesters course in
+    sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
+    sem.tot_credits <- get_credits sem.courses;
+    sem.sem_gpa <- gpa sem.courses;
     sch.commul_gpa <- gpa (to_list sch); sch
   with 
     Not_found -> raise (UnknownCourse cname)
