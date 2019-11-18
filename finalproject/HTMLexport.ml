@@ -1,8 +1,12 @@
-(* Will work on tonight! *)
 
 let template =
-  let chan = open_in "../temp.html" in
-    Std.input_list chan
+  let rec input_file acc chan = 
+    try
+      input_file (acc ^ (input_line chan)) chan
+    with
+      End_of_file -> acc
+  in
+  input_file "" (open_in "../temp.html")
 
 let html_of_course c =
   "<td>" ^ 
