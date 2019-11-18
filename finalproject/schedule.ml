@@ -183,15 +183,15 @@ let edit_course sch cname attr new_val =
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
     let sem  = get_sem_from_course sch sch.semesters course in 
     print_endline (string_of_semid sem.id);
-    let old_creds = course.credits in 
     match attr with
     | "credits" ->
-      let () = course.credits <- int_of_string new_val in 
-      let new_creds = course.credits in 
-      sem.tot_credits <- sem.tot_credits + (new_creds - old_creds); sch
+      course.credits <- int_of_string new_val;
+      sem.tot_credits <- get_credits sem.courses;
+      sem.sem_gpa <- gpa sem.courses;
+      sch.commul_gpa <- gpa (to_list sch); sch
     | "grade" -> 
-      let () = course.grade <- gradify new_val in 
-      let () = sem.sem_gpa <- gpa sem.courses in 
+      course.grade <- gradify new_val;
+      sem.sem_gpa <- gpa sem.courses;
       sch.commul_gpa <- gpa (to_list sch); sch
     | "degree" -> 
       course.degree <- new_val; sch
