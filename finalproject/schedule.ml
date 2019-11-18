@@ -137,12 +137,10 @@ let create_course name cred gr deg =
       degree = deg;
     }
 
-let get_course sch name semid = 
-  try
-    let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
-    List.find (fun c -> c.name = name) sem.courses
-  with
-    Not_found -> raise (UnknownCourse name)
+let rec get_course sch name courses = 
+  match courses with 
+  | [] -> raise (UnknownCourse name)
+  | h :: t -> if h.name = name then h else get_course sch name t
 
 let rec get_sem sch sems semid = 
   match sems with 
@@ -172,7 +170,7 @@ let add_course sch c semid =
 let rec get_sem_from_course sch semesters course = 
   match semesters with 
   | [] -> raise (UnknownCourse course.name)
-  | h :: t -> if get_course sch course.name h.id = course then h else
+  | h :: t -> if get_course sch course.name (to_list sch) = course then h else
       get_sem_from_course sch t course
 
 let edit_course_creds course = 
@@ -202,7 +200,7 @@ let edit_course sch cname attr new_val =
 let remove_course sch cname semid =
   try
     let sem = get_sem sch sch.semesters semid in 
-    let c = get_course sch cname semid in 
+    let c = get_course sch cname (to_list sch) in 
     let () = sem.tot_credits <- sem.tot_credits - c.credits in 
     let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in 
     let () = sem.sem_gpa <- gpa sem.courses in 
