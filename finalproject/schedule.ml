@@ -105,6 +105,14 @@ let string_of_semid semid =
   | Spring yr -> "SP" ^ (string_of_int yr)
   | Fall yr -> "FA" ^ (string_of_int yr)
 
+let string_of_grade gr =
+  match gr with
+  | Sat -> "Satisfactory"
+  | Unsat -> "Unsatisfactory"
+  | Withdrawn -> "Withdrawn"
+  | Incomplete -> "Incomplete"
+  | Letter l -> l
+
 (** [sem_compare s1 s2] returns a negative number if [s1] comes before [s2], 
     0 if theyre the same semester, and a positive number if [s1] comes after
     [s2]. *)
@@ -135,6 +143,12 @@ let get_course sch name semid =
     List.find (fun c -> c.name = name) sem.courses
   with
     Not_found -> raise (UnknownCourse name)
+
+let course_name course = course.name
+
+let course_credits course = course.credits
+
+let course_grade course = course.grade
 
 (**let rec get_course sch name courses = 
    match courses with 
@@ -286,3 +300,52 @@ let print_schedule sch =
     print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
     print_endline ("Total Credits: " ^ (string_of_int (get_credits (to_list sch))))
   end
+
+
+module HTML = struct
+
+  let template =
+    let rec input_file acc chan = 
+      try
+        input_file (acc ^ (input_line chan)) chan
+      with
+        End_of_file -> acc
+    in
+    input_file "" (open_in "../temp.html")
+
+  let html_of_course c =
+    "<td>" ^ 
+    "<p><strong>" ^ (c.name) ^ "</strong></p>\n" ^ 
+    "<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
+    "<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
+    "</td>"
+
+  let html_of_sem sem =
+    match sem.courses with
+    | [] -> "<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
+    | _ -> begin
+        "<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td>\n" ^
+        "<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ "</strong></p></td>\n" ^ 
+        (List.fold_left (fun acc course -> acc ^ (html_of_course course)) "" sem.courses) ^ 
+        "</tr>\n" end
+
+  let html_of_schedule sch =
+    match (get_sems sch) with
+    | [] -> "<p>Schedule is empty!</p>\n"
+    | _ -> begin
+      "<h1>Schedule: <strong>" ^ sch.desc ^ "</strong></h1>\n" ^ 
+      "<h2>Cumulative GPA: <strong>" ^ (string_of_float sch.commul_gpa) ^ "</strong></h2>\n" ^ 
+      "<table>\n" ^ 
+      (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
+      "</table>\n" end
+
+  let save filename text = 
+    let chan = open_out filename in
+    output_string chan text;
+    close_out chan
+
+  let export_schedule sch fl = 
+    let reg = Str.regexp {|^<\\?sch>$|} in
+    Str.replace_first reg (html_of_schedule sch) template |> save fl
+
+end

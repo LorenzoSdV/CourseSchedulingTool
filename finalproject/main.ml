@@ -10,6 +10,7 @@ let rec prompt sch =
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
+  | "export" -> Schedule.HTML.export_schedule 
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "" -> 
     print_endline "Valid Commands: add | edit | remove | print | quit | clear";
