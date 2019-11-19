@@ -14,8 +14,8 @@ let sp_sem = create_sem (Spring 2020)
 let sch5 = add_sem sch sp_sem
 let sch6 = add_course sch5 cs4820 (Spring 2020)
 let sch7 = add_course sch6 phys2213 (Spring 2020)
-let sch8 = remove_course sch7 "CS3110" (Fall 2019)
-let sch9 = edit_course sch8 "PHYS2213" "credits" "3"
+(* let sch8 = remove_course sch7 "CS3110" (Fall 2019) *)
+let sch9 = edit_course sch7 "PHYS2213" "credits" "3"
 let sch10 = edit_course sch9 "CS2800" "credits" "4"
 
 let make_sch_creds_tests
