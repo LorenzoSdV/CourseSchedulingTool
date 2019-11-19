@@ -58,8 +58,7 @@ and exceptions sch err =
 
 (** Loads a file and makes a schedule out of it *)
 let load f =
-  let json = Yojson.Basic.from_file f in 
-  let _dummy = parse_json json in ()
+  let _json = parse_json (Yojson.Basic.from_file f) in ()
 
 let main () =
   ANSITerminal.(print_string [red]
