@@ -148,3 +148,15 @@ module HTML : sig
   val export_schedule : schedule -> string -> unit
 
 end
+
+module JSON : sig 
+
+  (** [make_json sch] takes schedule [sch] and exports it into a JSON file
+      that can save the current schedule. *)
+  val make_json : schedule -> unit
+
+  (** [parse_json json] takes a JSON file and parses it to create a schedule
+      so a user can use a saved schedule. *)
+  val parse_json : string -> schedule
+
+end
