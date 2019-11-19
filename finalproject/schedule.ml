@@ -279,7 +279,7 @@ let print_sem sem =
 
 let print_schedule sch =
   if sch.semesters = [] then 
-    ANSITerminal.(print_string [red] "No semesters in current schedule. Try running 'add sem'\n")
+    ANSITerminal.(print_string [red] "No semesters in current schedule. Try running 'add <semester>'\n")
   else begin
     List.fold_left 
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
