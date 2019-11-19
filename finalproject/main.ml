@@ -21,24 +21,26 @@ let rec prompt sch =
       prompt (parse_command sch string_cmd)
     with
     | UnknownCourse msg -> 
-      exceptions sch ("Invalid or Unknown Course: " ^ msg)
+      exceptions sch ("Invalid/Unknown Course: " ^ msg)
     | UnknownSemester msg -> 
-      exceptions sch ("Invalid or Unknown Semester: " ^ msg)
+      exceptions sch ("Invalid/Unknown Semester: " ^ msg)
     | UnknownGrade msg -> 
-      exceptions sch ("Invalid or Unknown Grade Value: " ^ msg)
+      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg)
     | DuplicateCourse msg -> 
-      exceptions sch ("Duplicate Course Already Exists: " ^ msg)
+      exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
-      exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
+      exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
     | InvalidURL -> 
-      exceptions sch "Error Retreiving Course Info from Online"
+      exceptions sch "Error Retrieving Course Info from Online"
     | MalformedSemId -> 
-      exceptions sch "Improperly Formatted (Unrecognized) Semester Entry"
+      exceptions sch ("Incorrect Semester Entry Format: " ^
+                      "use 'fa18' for fall 2018 and 'sp22' for spring 2022")
     | MalformedAdd ->
-      exceptions sch ("Usage: add [<course_name>|sem <sem_id>] [<credits> " ^ 
-                      "<grade> <category> <semester>]")
+      exceptions sch ("Usage: add [<course_name> [(optional: <credits>) <grade>"
+                      ^ " <category> <semester>] | <semester>]")
     | MalformedEdit ->
-      exceptions sch "Usage: edit [course|sem|schedule] <attribute> <new_value)"
+      exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
+                      "name <new_name>]")
     | MalformedRemove ->
       exceptions sch "Usage: remove [<course_name> | <semester>]"
     | Malformed | _ -> 
