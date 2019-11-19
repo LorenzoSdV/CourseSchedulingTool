@@ -73,7 +73,7 @@ val edit_course : schedule -> string -> string -> string -> schedule
 (** [add_course sch c semid] is the schedule with course name [c] removed
     from semester id [semid]. If course [c] is not in semester [semid] then
     [add_course sch c semid] is [sch] *)
-val remove_course : schedule -> string -> sem_id -> schedule
+val remove_course : schedule -> string -> schedule
 
 (** [get_course sch name courses] returns the course record with name [name]
     found in [courses] in [sch].

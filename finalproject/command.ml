@@ -9,7 +9,12 @@ exception MalformedAdd
 exception MalformedEdit
 exception MalformedRemove
 
-(** [sem_id_parse sem_id] parses [sem_id] if is a valid semester type.
+
+let is_valid_coursename str =
+  if (Str.string_match (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") str 0) 
+  then true else false 
+
+(** [sem_id_parse sem_id] parses [sem_id] if it is a valid semester type.
     Raises: Malformed when [sem_id] is not valid. *)
 let sem_id_parse sem_id =
   let uppercase_id = String.uppercase_ascii sem_id in
@@ -24,8 +29,7 @@ let sem_id_parse sem_id =
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
-  | "sem"::sem_id::[] ->
-    add_sem sch (create_sem (sem_id_parse sem_id))
+  | sem_id::[] -> add_sem sch (create_sem (sem_id_parse sem_id))
   | course_name::grade::degree::sem_id::[] -> 
     let name = String.uppercase_ascii course_name in
     add_course sch 
@@ -51,20 +55,20 @@ let edit_others sch str_lst =
     edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
-let rem_others_helper sch cname courses = 
-  match courses with 
-  | [] -> raise MalformedRemove
-  | sem :: [] -> remove_course sch (String.uppercase_ascii cname) sem
-  | _ -> raise MalformedRemove
+(* let rem_others_helper sch cname courses = 
+   match courses with 
+   | [] -> raise MalformedRemove
+   | sem::[] -> remove_course sch (String.uppercase_ascii cname) sem
+   | _ -> raise MalformedRemove *)
 
 (** [remove_others sch str_lst] parses [str_lst] in [sch] for the Remove 
     command. *)
 let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
-  | "sem"::sem_id::[] -> 
+  | sem_id::[] when is_valid_coursename sem_id = false -> 
     remove_sem sch (sem_id_parse sem_id)
-  | course_name :: sem_id :: [] -> remove_course sch (String.uppercase_ascii course_name) (sem_id_parse sem_id)
+  | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
 let parse_command sch cmd_str = 

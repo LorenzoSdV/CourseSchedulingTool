@@ -197,7 +197,7 @@ let edit_course sch cname attr new_val =
   with
     Not_found -> raise (UnknownCourse cname)
 
-let remove_course sch cname semid =
+let remove_course sch cname =
   try
     let course = get_course sch cname (to_list sch) in
     let sem = get_sem_from_course sch sch.semesters course in
@@ -208,22 +208,22 @@ let remove_course sch cname semid =
   with 
     Not_found -> raise (UnknownCourse cname)
 
-(**let remove_course sch cname semid =
+(* let remove_course sch cname semid =
    try begin
-   let sem = List.find 
-    (fun smstr -> List.mem cname 
-        (List.rev_map 
-           (fun course -> course.name) smstr.courses)) 
-    sch.semesters 
-   in
-   let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in
-   let c = get_course sch cname sem.id in 
-   print_endline ("creds = " ^ string_of_int c.credits);
-   sem.tot_credits <- sem.tot_credits - c.credits;
-   sch
+    let sem = List.find 
+        (fun smstr -> List.mem cname 
+            (List.rev_map 
+               (fun course -> course.name) smstr.courses)) 
+        sch.semesters 
+    in
+    let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in
+    let c = get_course sch cname sem.id in 
+    print_endline ("creds = " ^ string_of_int c.credits);
+    sem.tot_credits <- sem.tot_credits - c.credits;
+    sch
    end
    with
-   Not_found -> raise (UnknownCourse cname)*)
+    Not_found -> raise (UnknownCourse cname) *)
 
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters

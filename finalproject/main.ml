@@ -40,7 +40,7 @@ let rec prompt sch =
     | MalformedEdit ->
       exceptions sch "Usage: edit [course|sem|schedule] <attribute> <new_value)"
     | MalformedRemove ->
-      exceptions sch "Usage: remove [<course_name>|sem] <sem_id>"
+      exceptions sch "Usage: remove [<course_name> | <semester>]"
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 

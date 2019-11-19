@@ -14,8 +14,8 @@ let sp_sem = create_sem (Spring 2020)
 let sch5 = add_sem sch sp_sem
 let sch6 = add_course sch5 cs4820 (Spring 2020)
 let sch7 = add_course sch6 phys2213 (Spring 2020)
-(* let sch8 = remove_course sch7 "CS3110" (Fall 2019) *)
-let sch9 = edit_course sch7 "PHYS2213" "credits" "3"
+let sch8 = remove_course sch7 "CS3110"
+let sch9 = edit_course sch8 "PHYS2213" "credits" "3"
 let sch10 = edit_course sch9 "CS2800" "credits" "4"
 
 let make_sch_creds_tests
@@ -35,7 +35,7 @@ let make_sem_creds_tests
 
 let tests = [
   (** Schedule tests *)
-  make_sch_creds_tests "total credits with no classes" sch10 11;
+  make_sch_creds_tests "total credits of sch10" sch10 11;
   (*make_sch_creds_tests "total credits with one semester, added classes" sch4 7;
     make_sch_creds_tests "total credits with two semesters, added classes" sch7 15;
     make_sch_creds_tests "total credits with removed class" sch8 11;
