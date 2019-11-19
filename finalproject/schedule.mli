@@ -157,6 +157,6 @@ module JSON : sig
 
   (** [parse_json json] takes a JSON file and parses it to create a schedule
       so a user can use a saved schedule. *)
-  val parse_json : string -> schedule
+  val parse_json : Yojson.Basic.t -> schedule
 
 end

@@ -1,6 +1,7 @@
 open Schedule
 open Command
 open ClassRoster
+open JSON
 
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
@@ -57,9 +58,8 @@ and exceptions sch err =
 
 (** Loads a file and makes a schedule out of it *)
 let load f =
-  print_endline ("This feature will be implemented in the second sprint. " ^ 
-                 "Now creating a new schedule.\n");
-  prompt Schedule.new_schedule
+  let json = Yojson.Basic.from_file f in 
+  let _dummy = parse_json json in ()
 
 let main () =
   ANSITerminal.(print_string [red]
