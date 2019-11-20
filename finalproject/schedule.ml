@@ -305,7 +305,7 @@ module HTML = struct
     "\t\t\t\t\t<h4><strong>" ^ (c.name) ^ "</strong></h4>\n" ^ 
     "\t\t\t\t\t<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
     "\t\t\t\t\t<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
-    "\t\t\t\t\t<p>Category: " ^ (string_of_grade c.degree) ^ "</p>\n" ^ 
+    "\t\t\t\t\t<p>Category: " ^ (c.degree) ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
   let html_of_sem sem =
