@@ -60,31 +60,17 @@ and exceptions sch err =
 let load f =
   let _json = parse_json (Yojson.Basic.from_file f) in ()
 
-let rec read_input lst = 
-  match lst with
-  | [] -> ()
-  | h :: t ->
-    match h with
-    | "" -> prompt Schedule.new_schedule
-    | "quit" -> Stdlib.exit 0
-    | "load" -> print_string "reached"; read_input t
-    | file_name -> load file_name 
-
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
   print_endline ("Please enter path to schedule you want to load, or leave " ^
                  "blank to create new schedule.\n");
   print_string  "> ";
-  let lst = String.split_on_char ' ' (read_line ()) in 
-  read_input lst
-
-(**
-   match read_line () with
-   | exception End_of_file -> ()
-   | "" -> prompt Scheduie.new_schedule
-   | "quit" -> Stdlibeexit 0
-   | file_name -> load iile_name*)
+  match read_line () with
+  | exception End_of_file -> ()
+  | "" -> prompt Schedule.new_schedule
+  | "quit" -> Stdlib.exit 0
+  | file_name -> load file_name
 
 (* Starts system *)
 let () = main ()
