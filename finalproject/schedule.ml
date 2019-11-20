@@ -29,7 +29,7 @@ type schedule = {
   mutable cumul_gpa: float;
   mutable exp_grad: int;
   mutable major: string;
-  mutable credits : int;
+  mutable sch_credits : int;
   mutable saved : bool;
 }
 
@@ -244,7 +244,9 @@ let new_schedule =
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = 0;
-    major = ""
+    major = "";
+    sch_credits = 0;
+    saved = false;
   }
 
 let get_name sch =
@@ -325,7 +327,7 @@ end
 
 module LoadJSON = struct
 
-  open Yojson.Basic.Util
+  module Yj = struct include Yojson.Basic.Util end
 
   (** [form_sem_id_helper sem lst] forms a semester id based on the string
       [sem] and the list [lst] which will be parsed to find a year. *)
@@ -360,30 +362,33 @@ module LoadJSON = struct
 
   (** [parse_course json] creates courses by parsing [json]. *)
   let parse_course json = {
-    name = json |> member "name" |> to_string;
-    credits = json |> member "course credits" |> to_int;
-    grade = json |> member "grade" |> to_string |> form_grade;
-    degree = json |> member "degree" |> to_string;
+    name = json |> Yj.member "name" |> Yj.to_string;
+    credits = json |> Yj.member "course credits" |> Yj.to_int;
+    grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
+    degree = json |> Yj.member "degree" |> Yj.to_string;
   }
 
   (** [get_semester json] creates semesters by parsing [json]. *)
   let get_semester json = 
     {
-      id = json |> member "semester id" |> to_string |> form_sem_id;
-      courses = json |> member "courses" |> to_list |> List.map parse_course;
-      tot_credits = json |> member "semester credits" |> to_int;
-      sem_gpa = json |> member "semester gpa" |> to_float;
+      id = json |> Yj.member "semester id" |> Yj.to_string |> form_sem_id;
+      courses = json |> Yj.member "courses" |> Yj.to_list |> List.map parse_course;
+      tot_credits = json |> Yj.member "semester credits" |> Yj.to_int;
+      sem_gpa = json |> Yj.member "semester gpa" |> Yj.to_float;
     }
 
   let parse_json fl = 
     let json = Yojson.Basic.from_file fl in
-    {
-      desc = json |> member "description" |> to_string;
-      semesters = json |> member "semesters" |> to_list |> List.map get_semester;
-      cumul_gpa = json |> member "cumul gpa" |> to_float;
-      exp_grad = json |> member "expected grad year" |> to_int;
-      major = json |> member "major" |> to_string;
-    }
+    let new_sch = {
+      desc = json |> Yj.member "description" |> Yj.to_string;
+      semesters = json |> Yj.member "semesters" |> Yj.to_list |> List.map get_semester;
+      cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
+      exp_grad = json |> Yj.member "expected grad year" |> Yj.to_int;
+      major = json |> Yj.member "major" |> Yj.to_string;
+      sch_credits = 0;
+      saved = true
+    } in
+    {new_sch with sch_credits = (get_credits (to_list new_sch))}
 
 end
 
