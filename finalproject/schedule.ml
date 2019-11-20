@@ -238,7 +238,7 @@ let remove_sem sch semid =
 
 let new_schedule =
   {
-    desc = "New Schedule";
+    desc = "";
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = 0;

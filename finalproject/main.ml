@@ -13,7 +13,7 @@ let rec prompt sch =
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
   | "clear" -> ignore (Sys.command "clear"); prompt sch
-  (*| "close" -> main () (* need to add WARNING about save *) *)
+  | "close" -> init_prompt (read_line ()) (* need to add WARNING about save *)
   | "" -> 
     print_endline "Valid Commands: add | edit | remove | print | export | clear | close | quit";
     print_endline "Enter a command to view usage instructions.";
@@ -50,7 +50,7 @@ let rec prompt sch =
     | MalformedExport ->
       exceptions sch "Usage: export <file_path>"
     | MalformedSave ->
-      exceptions sch "Usage: export <file_path>"
+      exceptions sch "Usage: save <file_path>"
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
@@ -63,16 +63,31 @@ and exceptions sch err =
   print_endline err;
   prompt sch
 
+and load file =
+  try 
+    prompt (LoadJSON.parse_json file)
+  with
+  | Sys_error _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
+    init_prompt (read_line ())
+
+and init_prompt init_str =
+  let split_cmd = String.split_on_char ' ' init_str in
+  match split_cmd with 
+  | [] -> raise Empty
+  | "new"::sch_name::[] -> prompt (edit_name Schedule.new_schedule sch_name)
+  | "load"::json::[] -> load json
+  | "quit"::[] -> Stdlib.exit 0
+  | _ -> print_string ("Unrecognized Command Entry!\n" ^ 
+                       "Valid Commands: new | [load <json_file>] | quit");
+    init_prompt (read_line ())
+
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
-  print_endline ("If you want to open an alredy existing schedule, type the filepath, otherwise leave blank for new schedule.");
+  print_endline ("If you want to open an alredy existing schedule, type 'load' <json_file>, or type " ^
+                 "'new' to create a new schedule.\n");
   print_string  "> ";
-  match read_line () with
-  | exception End_of_file -> ()
-  | "" -> prompt Schedule.new_schedule
-  | "quit" -> Stdlib.exit 0
-  | file_name -> prompt (LoadJSON.parse_json file_name)
+  init_prompt (read_line ())
 
 (* Starts system *)
 let () = main ()
