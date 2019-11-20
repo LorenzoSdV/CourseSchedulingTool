@@ -302,14 +302,15 @@ module HTML = struct
 
   let html_of_course c =
     "\t\t\t\t<td>\n" ^ 
-    "\t\t\t\t\t<p><strong>" ^ (c.name) ^ "</strong></p>\n" ^ 
+    "\t\t\t\t\t<h4><strong>" ^ (c.name) ^ "</strong></h4>\n" ^ 
     "\t\t\t\t\t<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
     "\t\t\t\t\t<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
+    "\t\t\t\t\t<p>Category: " ^ (string_of_grade c.degree) ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
   let html_of_sem sem =
     match sem.courses with
-    | [] -> "\t\t\t<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
+    | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
     | _ -> begin
         "\t\t\t<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td>\n" ^
         "\t\t\t<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ "</strong></p></td>\n" ^ 
@@ -320,8 +321,8 @@ module HTML = struct
     match (get_sems sch) with
     | [] -> "<p>Schedule is empty!</p>\n"
     | _ -> begin
-        "<h1>Schedule: <strong>" ^ sch.desc ^ "</strong></h1>\n" ^ 
-        "\t\t<h2>Cumulative GPA: <strong>" ^ (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
+        "<h1><strong style=\"color:green;\">" ^ sch.desc ^ "</strong></h1>\n" ^ 
+        "\t\t<h2>Cumulative GPA: <strong style=\"color:blue;\">" ^ (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
         "\t\t<table>\n" ^ 
         (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
