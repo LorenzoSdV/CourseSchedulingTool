@@ -170,7 +170,7 @@ let add_course sch c semid =
 let rec get_sem_from_course sch sems course = 
   match sems with 
   | [] -> raise (UnknownCourse course.name)
-  | h :: t -> if get_course sch course.name (to_list sch) = course then h else
+  | h :: t -> if get_course course.name (to_list sch) = course then h else
       get_sem_from_course sch t course
 
 let edit_course_creds course = 
@@ -199,7 +199,7 @@ let edit_course sch cname attr new_val =
 
 let remove_course sch cname =
   try
-    let course = get_course sch cname (to_list sch) in
+    let course = get_course cname (to_list sch) in
     let sem = get_sem_from_course sch sch.semesters course in
     sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
     sem.tot_credits <- get_credits sem.courses;
@@ -301,30 +301,30 @@ module HTML = struct
     input_file "" (open_in "temp.html")
 
   let html_of_course c =
-    "<td>" ^ 
-    "<p><strong>" ^ (c.name) ^ "</strong></p>\n" ^ 
-    "<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
-    "<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
-    "</td>"
+    "\t\t\t\t<td>\n" ^ 
+    "\t\t\t\t\t<p><strong>" ^ (c.name) ^ "</strong></p>\n" ^ 
+    "\t\t\t\t\t<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
+    "\t\t\t\t\t<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
+    "\t\t\t\t</td>\n"
 
   let html_of_sem sem =
     match sem.courses with
-    | [] -> "<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
+    | [] -> "\t\t\t<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
     | _ -> begin
-        "<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td>\n" ^
-        "<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ "</strong></p></td>\n" ^ 
+        "\t\t\t<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td>\n" ^
+        "\t\t\t<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ "</strong></p></td>\n" ^ 
         (List.fold_left (fun acc course -> acc ^ (html_of_course course)) "" sem.courses) ^ 
-        "</tr>\n" end
+        "\t\t\t</tr>\n" end
 
   let html_of_schedule sch =
     match (get_sems sch) with
     | [] -> "<p>Schedule is empty!</p>\n"
     | _ -> begin
         "<h1>Schedule: <strong>" ^ sch.desc ^ "</strong></h1>\n" ^ 
-        "<h2>Cumulative GPA: <strong>" ^ (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
-        "<table>\n" ^ 
+        "\t\t<h2>Cumulative GPA: <strong>" ^ (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
+        "\t\t<table>\n" ^ 
         (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
-        "</table>\n" end
+        "\t\t</table>\n" end
 
   let save filename text = 
     let chan = open_out filename in

@@ -51,4 +51,4 @@ let tests = [
 
 let suite = "search test suite" >::: tests 
 
-let _ = run_test_tt_main suite
+let _ = run_test_tt_main suite; HTML.export_schedule sch10 "test1.html"

@@ -75,10 +75,10 @@ val edit_course : schedule -> string -> string -> string -> schedule
     [add_course sch c semid] is [sch] *)
 val remove_course : schedule -> string -> schedule
 
-(** [get_course sch name courses] returns the course record with name [name]
-    found in [courses] in [sch].
-    Raises: [UnknownCourse name] if course does not exist in the semester. *)
-val get_course : schedule -> string -> course
+(** [get_course name courses] is the course record with name [name]
+    found in [courses].
+    Raises: [UnknownCourse name] if course does not exist in [courses].*)
+val get_course : string -> course list -> course
 
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
