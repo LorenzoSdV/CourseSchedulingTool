@@ -29,6 +29,8 @@ type schedule = {
   mutable cumul_gpa: float;
   mutable exp_grad: int;
   mutable major: string;
+  mutable credits : int;
+  mutable saved : bool;
 }
 
 exception UnknownCourse of string
@@ -330,7 +332,7 @@ module LoadJSON = struct
   let form_sem_id_helper sem lst = 
     match List.rev lst with 
     | [] -> raise (UnknownSemester sem)
-    | h :: t -> let yr = int_of_string h + 2000 in 
+    | h :: t -> let yr = int_of_string h in 
       match sem with 
       | "Fall" -> Fall yr
       | "Spring" -> Spring yr
