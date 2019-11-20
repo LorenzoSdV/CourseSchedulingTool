@@ -49,6 +49,8 @@ let rec prompt sch =
       exceptions sch "Usage: remove [<course_name> | <semester>]"
     | MalformedExport ->
       exceptions sch "Usage: export <file_path>"
+    | MalformedSave ->
+      exceptions sch "Usage: export <file_path>"
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 

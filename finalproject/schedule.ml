@@ -238,7 +238,7 @@ let remove_sem sch semid =
 
 let new_schedule =
   {
-    desc = "";
+    desc = "New Schedule";
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = 0;
@@ -398,24 +398,26 @@ module SaveJSON = struct
     "\t\t\t\t},\n"
 
   let json_of_sem sem = 
+    let reg = Str.regexp "},\n$" in
     "\t\t{\n" ^
     "\t\t\t\"semester id\": \"" ^ (string_of_semid sem.id) ^ "\",\n" ^
     "\t\t\t\"semester credits\": " ^ (string_of_int sem.tot_credits) ^ ",\n" ^
     "\t\t\t\"semester gpa\": " ^ (string_of_float sem.sem_gpa) ^ ",\n" ^
-    "\t\t\t\"coruses\": [\n" ^ 
-    (List.fold_left 
-       (fun acc course -> acc ^ (json_of_course course)) "" (sem.courses)) ^
+    "\t\t\t\"courses\": [\n" ^ 
+    (Str.replace_first reg "}\n" (List.fold_left 
+                                    (fun acc course -> acc ^ (json_of_course course)) "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
   let json_of_schedule sch = 
+    let reg = Str.regexp "},\n$" in
     "{\n" ^
     "\t\"description\": \"" ^ sch.desc ^ "\",\n" ^
     "\t\"cumul gpa\": "  ^ (string_of_float sch.cumul_gpa) ^ ",\n" ^
     "\t\"expected grad year\": " ^ (string_of_int sch.exp_grad) ^ ",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
-    (List.fold_left 
-       (fun acc sem -> acc ^ (json_of_sem sem)) "" (sch.semesters)) ^
+    (Str.replace_first reg "}\n" (List.fold_left 
+                                    (fun acc sem -> acc ^ (json_of_sem sem)) "" (sch.semesters))) ^
     "\t]\n}\n"
 
   let save_schedule sch fl =
