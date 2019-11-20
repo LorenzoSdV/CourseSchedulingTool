@@ -13,7 +13,7 @@ let rec prompt sch =
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
   | "clear" -> ignore (Sys.command "clear"); prompt sch
-  | "close" -> init_prompt (read_line ()) (* need to add WARNING about save *)
+  (*| "close" -> main () (* need to add WARNING about save *) *)
   | "" -> 
     print_endline "Valid Commands: add | edit | remove | print | export | clear | close | quit";
     print_endline "Enter a command to view usage instructions.";
@@ -64,8 +64,7 @@ and exceptions sch err =
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
-  print_endline ("If you want to open an alredy existing schedule, type 'load' <json_file>, or type " ^
-                 "'new' to create a new schedule.\n");
+  print_endline ("If you want to open an alredy existing schedule, type the filepath, otherwise leave blank for new schedule.");
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()
