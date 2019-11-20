@@ -338,12 +338,9 @@ module HTML = struct
 
 end
 
-module JSON = struct
+module LoadJSON = struct
 
   open Yojson.Basic.Util
-
-  let make_json sch = 
-    ()
 
   (** [form_sem_id_helper sem lst] forms a semester id based on the string
       [sem] and the list [lst] which will be parsed to find a year. *)
@@ -385,19 +382,62 @@ module JSON = struct
   }
 
   (** [get_semester json] creates semesters by parsing [json]. *)
-  let get_semester json = {
-    id = json |> member "semester id" |> to_string |> form_sem_id;
-    courses = json |> member "course" |> to_list |> List.map parse_course;
-    tot_credits = json |> member "semester credits" |> to_int;
-    sem_gpa = json |> member "semester gpa" |> to_float;
-  }
+  let get_semester json = 
+    {
+      id = json |> member "semester id" |> to_string |> form_sem_id;
+      courses = json |> member "courses" |> to_list |> List.map parse_course;
+      tot_credits = json |> member "semester credits" |> to_int;
+      sem_gpa = json |> member "semester gpa" |> to_float;
+    }
 
-  let parse_json json = {
-    desc = json |> member "description" |> to_string;
-    semesters = json |> member "semesters" |> to_list |> List.map get_semester;
-    cumul_gpa = json |> member "cumul gpa" |> to_float;
-    exp_grad = json |> member "expected grad year" |> to_int;
-    major = json |> member "major" |> to_string;
-  }
+  let parse_json fl = 
+    let json = Yojson.Basic.from_file fl in
+    {
+      desc = json |> member "description" |> to_string;
+      semesters = json |> member "semesters" |> to_list |> List.map get_semester;
+      cumul_gpa = json |> member "cumul gpa" |> to_float;
+      exp_grad = json |> member "expected grad year" |> to_int;
+      major = json |> member "major" |> to_string;
+    }
+
+end
+
+module SaveJSON = struct   
+
+  open Yojson.Basic.Util
+
+  let json_of_course c = 
+    "\t\t\t\t{\n" ^
+    "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
+    "\t\t\t\t\t\"course credits\": " ^ (string_of_int c.credits) ^ ",\n" ^
+    "\t\t\t\t\t\"grade\": \"" ^ (string_of_grade c.grade) ^ "\",\n" ^
+    "\t\t\t\t\t\"degree\": \"" ^ c.degree ^ "\"\n" ^
+    "\t\t\t\t},\n"
+
+  let json_of_sem sem = 
+    "\t\t{\n" ^
+    "\t\t\t\"semester id\": \"" ^ (string_of_semid sem.id) ^ "\",\n" ^
+    "\t\t\t\"semester credits\": " ^ (string_of_int sem.tot_credits) ^ ",\n" ^
+    "\t\t\t\"semester gpa\": " ^ (string_of_float sem.sem_gpa) ^ ",\n" ^
+    "\t\t\t\"coruses\": [\n" ^ 
+    (List.fold_left 
+       (fun acc course -> acc ^ (json_of_course course)) "" (sem.courses)) ^
+    "\t\t\t]\n\t\t},\n"
+
+  let json_of_schedule sch = 
+    "{\n" ^
+    "\t\"description\": \"" ^ sch.desc ^ "\",\n" ^
+    "\t\"cumul gpa\": "  ^ (string_of_float sch.cumul_gpa) ^ ",\n" ^
+    "\t\"expected grad year\": " ^ (string_of_int sch.exp_grad) ^ ",\n" ^
+    "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
+    "\t\"semesters\": [\n" ^ 
+    (List.fold_left 
+       (fun acc sem -> acc ^ (json_of_sem sem)) "" (sch.semesters)) ^
+    "\t]\n}\n"
+
+  let save_schedule sch fl =
+    let chan = open_out fl in
+    output_string chan (json_of_schedule sch);
+    close_out chan
 
 end

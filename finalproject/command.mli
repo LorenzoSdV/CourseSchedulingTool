@@ -9,14 +9,26 @@ exception Malformed
 (** Raised when a command has an invalid sem_id. *)
 exception MalformedSemId
 
-(** Raised when an Add command has invalid words *)
+(** Raised when an Add command has invalid syntax *)
 exception MalformedAdd
 
-(** Raised when an Edit command has invalid words *)
+(** Raised when an Edit command has invalid syntax *)
 exception MalformedEdit
 
-(** Raised when an Remove command has invalid words *)
+(** Raised when a Remove command has invalid syntax *)
 exception MalformedRemove
+
+(** Raised when a Save command has invalid syntax *)
+exception MalformedSave
+
+(** Raised when an Load command has invalid syntax*)
+exception MalformedLoad
+
+(** Raised when an Export command has invalid syntax*)
+exception MalformedExport
+
+(** Raised when Save/Load/Export command is given with invalid file path. *)
+exception InvalidFile
 
 (** [parse_command cmd_str sch] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 

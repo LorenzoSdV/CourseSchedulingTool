@@ -8,6 +8,11 @@ exception MalformedSemId
 exception MalformedAdd
 exception MalformedEdit
 exception MalformedRemove
+exception MalformedSave
+exception MalformedLoad
+exception MalformedExport
+
+exception InvalidFile
 
 
 let is_valid_coursename str =
@@ -65,13 +70,31 @@ let remove_others sch str_lst =
   | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
+let export_handler sch str_lst = 
+  match str_lst with
+  | file :: [] -> HTML.export_schedule sch file; sch
+  | _ -> raise MalformedExport
+
+let save_handler sch str_lst = 
+  match str_lst with
+  | file :: [] -> SaveJSON.save_schedule sch file; sch
+  | _ -> raise MalformedSave
+
+let load_handler sch str_lst = 
+  match str_lst with
+  | file :: [] -> sch;
+  | _ -> raise MalformedLoad
+
 let parse_command sch cmd_str = 
 
   let match_helper first others =
     match first with
-    | "add" -> (add_others sch others)
-    | "edit" -> (edit_others sch others)
-    | "remove" -> (remove_others sch others)
+    | "add" -> add_others sch others
+    | "edit" -> edit_others sch others
+    | "remove" -> remove_others sch others
+    | "save" -> save_handler sch others
+    | "load" -> load_handler sch others
+    | "export" -> export_handler sch others
     | _ -> raise Malformed
   in
 

@@ -1,7 +1,6 @@
 open Schedule
 open Command
 open ClassRoster
-open JSON
 
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
@@ -11,7 +10,6 @@ let rec prompt sch =
   match read_line () with
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
-  | "export" -> Schedule.HTML.export_schedule sch "test.html"; prompt sch
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "" -> 
     print_endline "Valid Commands: add | edit | remove | print | quit | clear";
@@ -33,9 +31,11 @@ let rec prompt sch =
       exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
     | InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
+    | InvalidFile ->
+      exceptions sch "File path is not valid. Try again."
     | MalformedSemId -> 
       exceptions sch ("Incorrect Semester Entry Format: " ^
-                      "use 'fa18' for fall 2018 and 'sp22' for spring 2022")
+                      "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")
     | MalformedAdd ->
       exceptions sch ("Usage: add [<course_name> [(optional: <credits>) <grade>"
                       ^ " <category> <semester>] | <semester>]")
@@ -44,6 +44,8 @@ let rec prompt sch =
                       "name <new_name>]")
     | MalformedRemove ->
       exceptions sch "Usage: remove [<course_name> | <semester>]"
+    | MalformedExport ->
+      exceptions sch "Usage: export <file_path>"
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
@@ -56,10 +58,6 @@ and exceptions sch err =
   print_endline err;
   prompt sch
 
-(** Loads a file and makes a schedule out of it *)
-let load f =
-  let _json = parse_json (Yojson.Basic.from_file f) in ()
-
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
@@ -70,7 +68,7 @@ let main () =
   | exception End_of_file -> ()
   | "" -> prompt Schedule.new_schedule
   | "quit" -> Stdlib.exit 0
-  | file_name -> load file_name
+  | file_name -> prompt (LoadJSON.parse_json file_name)
 
 (* Starts system *)
 let () = main ()

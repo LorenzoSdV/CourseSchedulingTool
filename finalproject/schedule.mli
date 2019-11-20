@@ -149,14 +149,20 @@ module HTML : sig
 
 end
 
-module JSON : sig 
+module LoadJSON : sig 
 
   (** [make_json sch] takes schedule [sch] and exports it into a JSON file
       that can save the current schedule. *)
-  val make_json : schedule -> unit
+  (*val make_json : schedule -> unit*)
 
   (** [parse_json json] takes a JSON file and parses it to create a schedule
       so a user can use a saved schedule. *)
-  val parse_json : Yojson.Basic.t -> schedule
+  val parse_json : string -> schedule
+
+end
+
+module SaveJSON : sig
+
+  val save_schedule : schedule -> string -> unit
 
 end
