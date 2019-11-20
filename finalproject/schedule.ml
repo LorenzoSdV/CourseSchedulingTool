@@ -302,17 +302,17 @@ module HTML = struct
 
   let html_of_course c =
     "\t\t\t\t<td>\n" ^ 
-    "\t\t\t\t\t<h4><strong>" ^ (c.name) ^ "</strong></h4>\n" ^ 
+    "\t\t\t\t\t<h4><strong>" ^ c.name ^ "</strong></h4>\n" ^ 
     "\t\t\t\t\t<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
     "\t\t\t\t\t<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
-    "\t\t\t\t\t<p>Category: " ^ (c.degree) ^ "</p>\n" ^ 
+    "\t\t\t\t\t<p>Category: " ^ c.degree ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
   let html_of_sem sem =
     match sem.courses with
     | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
     | _ -> begin
-        "\t\t\t<tr><td><h3>" ^ (string_of_semid sem.id) ^ "</h3></td>\n" ^
+        "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ "</h3>\n" ^
         "\t\t\t<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ "</strong></p></td>\n" ^ 
         (List.fold_left (fun acc course -> acc ^ (html_of_course course)) "" sem.courses) ^ 
         "\t\t\t</tr>\n" end
