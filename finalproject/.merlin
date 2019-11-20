@@ -5,4 +5,5 @@ PKG unix
 PKG ocamlbuild
 PKG bisect_ppx-ocamlbuild
 PKG curl
+PKG yojson
 PKG ANSITerminal

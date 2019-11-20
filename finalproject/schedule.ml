@@ -26,7 +26,7 @@ type semester = {
 type schedule = {
   mutable desc: string;
   mutable semesters: semester list;
-  mutable commul_gpa: float;
+  mutable cumul_gpa: float;
   mutable exp_grad: int;
   mutable major: string;
 }
@@ -137,11 +137,10 @@ let create_course name cred gr deg =
       degree = deg;
     }
 
-let get_course sch name = 
-  try
-    List.find (fun c -> c.name = name) (to_list sch)
-  with
-    Not_found -> raise (UnknownCourse name)
+let rec get_course name courses = 
+  match courses with 
+  | [] -> raise (UnknownCourse name)
+  | h :: t -> if h.name = name then h else get_course name t
 
 let rec get_sem sch sems semid = 
   match sems with 
@@ -163,17 +162,16 @@ let add_course sch c semid =
       sem.courses <- (c :: sem.courses);
       sem.sem_gpa <- gpa sem.courses;
       sem.tot_credits <- sem.tot_credits + c.credits;
-      { sch with commul_gpa = gpa (to_list sch) }
+      { sch with cumul_gpa = gpa (to_list sch) }
     end
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-let rec get_sem_from_course sems course = 
+let rec get_sem_from_course sch sems course = 
   match sems with 
   | [] -> raise (UnknownCourse course.name)
-  | h :: t -> 
-    if List.mem course h.courses then h
-    else get_sem_from_course t course
+  | h :: t -> if get_course sch course.name (to_list sch) = course then h else
+      get_sem_from_course sch t course
 
 let edit_course_creds course = 
   true
@@ -181,51 +179,51 @@ let edit_course_creds course =
 let edit_course sch cname attr new_val =
   try
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
-    let sem  = get_sem_from_course sch.semesters course in 
+    let sem  = get_sem_from_course sch sch.semesters course in 
     print_endline (string_of_semid sem.id);
     match attr with
     | "credits" ->
       course.credits <- int_of_string new_val;
       sem.tot_credits <- get_credits sem.courses;
       sem.sem_gpa <- gpa sem.courses;
-      sch.commul_gpa <- gpa (to_list sch); sch
+      sch.cumul_gpa <- gpa (to_list sch); sch
     | "grade" -> 
       course.grade <- gradify new_val;
       sem.sem_gpa <- gpa sem.courses;
-      sch.commul_gpa <- gpa (to_list sch); sch
+      sch.cumul_gpa <- gpa (to_list sch); sch
     | "degree" -> 
       course.degree <- new_val; sch
     | _ -> raise (Failure "Invalid course attribute")
   with
     Not_found -> raise (UnknownCourse cname)
 
-let remove_course sch cname semid =
+let remove_course sch cname =
   try
-    let course = get_course sch cname in
-    let sem = get_sem_from_course sch.semesters course in
+    let course = get_course sch cname (to_list sch) in
+    let sem = get_sem_from_course sch sch.semesters course in
     sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
     sem.tot_credits <- get_credits sem.courses;
     sem.sem_gpa <- gpa sem.courses;
-    sch.commul_gpa <- gpa (to_list sch); sch
+    sch.cumul_gpa <- gpa (to_list sch); sch
   with 
     Not_found -> raise (UnknownCourse cname)
 
-(**let remove_course sch cname semid =
+(* let remove_course sch cname semid =
    try begin
-   let sem = List.find 
-    (fun smstr -> List.mem cname 
-        (List.rev_map 
-           (fun course -> course.name) smstr.courses)) 
-    sch.semesters 
-   in
-   let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in
-   let c = get_course sch cname sem.id in 
-   print_endline ("creds = " ^ string_of_int c.credits);
-   sem.tot_credits <- sem.tot_credits - c.credits;
-   sch
+    let sem = List.find 
+        (fun smstr -> List.mem cname 
+            (List.rev_map 
+               (fun course -> course.name) smstr.courses)) 
+        sch.semesters 
+    in
+    let () = sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses) in
+    let c = get_course sch cname sem.id in 
+    print_endline ("creds = " ^ string_of_int c.credits);
+    sem.tot_credits <- sem.tot_credits - c.credits;
+    sch
    end
    with
-   Not_found -> raise (UnknownCourse cname)*)
+    Not_found -> raise (UnknownCourse cname) *)
 
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
@@ -243,7 +241,7 @@ let add_sem sch sem =
     raise (DuplicateSemester (string_of_semid sem.id))
   else begin
     sch.semesters <- List.sort sem_compare (sem :: sch.semesters);
-    sch.commul_gpa <- gpa (to_list sch);
+    sch.cumul_gpa <- gpa (to_list sch);
     sch end
 
 let remove_sem sch semid = 
@@ -252,14 +250,14 @@ let remove_sem sch semid =
   else begin
     sch.semesters <- 
       (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
-    sch.commul_gpa <- gpa (to_list sch);
+    sch.cumul_gpa <- gpa (to_list sch);
     sch end
 
 let new_schedule =
   {
     desc = "SCHEDULE 1";
     semesters = [];
-    commul_gpa = 0.;
+    cumul_gpa = 0.;
     exp_grad = 0;
     major = ""
   }
@@ -281,12 +279,12 @@ let print_sem sem =
 
 let print_schedule sch =
   if sch.semesters = [] then 
-    ANSITerminal.(print_string [red] "No semesters in current schedule. Try running 'add sem'\n")
+    ANSITerminal.(print_string [red] "No semesters in current schedule. Try running 'add <semester>'\n")
   else begin
     List.fold_left 
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
       () sch.semesters;
-    print_endline ("Cummulative GPA: " ^ (string_of_float sch.commul_gpa));
+    print_endline ("Cumulative GPA: " ^ (string_of_float sch.cumul_gpa));
     print_endline ("Total Credits: " ^ (string_of_int (get_credits (to_list sch))))
   end
 
@@ -323,7 +321,7 @@ module HTML = struct
     | [] -> "<p>Schedule is empty!</p>\n"
     | _ -> begin
         "<h1>Schedule: <strong>" ^ sch.desc ^ "</strong></h1>\n" ^ 
-        "<h2>Cumulative GPA: <strong>" ^ (string_of_float sch.commul_gpa) ^ "</strong></h2>\n" ^ 
+        "<h2>Cumulative GPA: <strong>" ^ (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
         "<table>\n" ^ 
         (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
         "</table>\n" end
@@ -336,5 +334,69 @@ module HTML = struct
   let export_schedule sch fl = 
     let reg = Str.regexp "<\\?sch>" in
     Str.replace_first reg (html_of_schedule sch) template |> save fl
+
+end
+
+module JSON = struct
+
+  open Yojson.Basic.Util
+
+  let make_json sch = 
+    ()
+
+  (** [form_sem_id_helper sem lst] forms a semester id based on the string
+      [sem] and the list [lst] which will be parsed to find a year. *)
+  let form_sem_id_helper sem lst = 
+    match List.rev lst with 
+    | [] -> raise (UnknownSemester sem)
+    | h :: t -> let yr = int_of_string h + 2000 in 
+      match sem with 
+      | "Fall" -> Fall yr
+      | "Spring" -> Spring yr
+      | _ -> raise (UnknownSemester sem)
+
+  (** [form_sem_id semid] determines if the semester in [semid] is referencing
+      a fall or spring semester and calls a helper function to help form a 
+      semester id. *)
+  let form_sem_id semid = 
+    if String.contains semid 'F' then let word = "Fall" in 
+      let lst = String.split_on_char 'A' semid 
+      in form_sem_id_helper word lst
+    else 
+      let word = "Spring" in 
+      let lst = String.split_on_char 'P' semid
+      in form_sem_id_helper word lst
+
+  let form_grade grade = 
+    match grade with 
+    | "Sat" -> Sat
+    | "Unsat" -> Unsat
+    | "Withdrawn" -> Withdrawn
+    | "Incomplete" -> Incomplete
+    | _ -> Letter grade
+
+  (** [parse_course json] creates courses by parsing [json]. *)
+  let parse_course json = {
+    name = json |> member "name" |> to_string;
+    credits = json |> member "course credits" |> to_int;
+    grade = json |> member "grade" |> to_string |> form_grade;
+    degree = json |> member "degree" |> to_string;
+  }
+
+  (** [get_semester json] creates semesters by parsing [json]. *)
+  let get_semester json = {
+    id = json |> member "semester id" |> to_string |> form_sem_id;
+    courses = json |> member "course" |> to_list |> List.map parse_course;
+    tot_credits = json |> member "semester credits" |> to_int;
+    sem_gpa = json |> member "semester gpa" |> to_float;
+  }
+
+  let parse_json json = {
+    desc = json |> member "description" |> to_string;
+    semesters = json |> member "semesters" |> to_list |> List.map get_semester;
+    cumul_gpa = json |> member "cumul gpa" |> to_float;
+    exp_grad = json |> member "expected grad year" |> to_int;
+    major = json |> member "major" |> to_string;
+  }
 
 end

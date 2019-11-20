@@ -73,7 +73,7 @@ val edit_course : schedule -> string -> string -> string -> schedule
 (** [add_course sch c semid] is the schedule with course name [c] removed
     from semester id [semid]. If course [c] is not in semester [semid] then
     [add_course sch c semid] is [sch] *)
-val remove_course : schedule -> string -> sem_id -> schedule
+val remove_course : schedule -> string -> schedule
 
 (** [get_course sch name courses] returns the course record with name [name]
     found in [courses] in [sch].
@@ -146,5 +146,17 @@ module HTML : sig
   (** [export_schedule sch fl] takes schedule [sch] and exports it in visual 
       HTML representation to HTML file given by path [fl] *)
   val export_schedule : schedule -> string -> unit
+
+end
+
+module JSON : sig 
+
+  (** [make_json sch] takes schedule [sch] and exports it into a JSON file
+      that can save the current schedule. *)
+  val make_json : schedule -> unit
+
+  (** [parse_json json] takes a JSON file and parses it to create a schedule
+      so a user can use a saved schedule. *)
+  val parse_json : Yojson.Basic.t -> schedule
 
 end
