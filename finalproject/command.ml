@@ -103,3 +103,4 @@ let parse_command sch cmd_str =
   | [] -> raise Empty
   | "print"::[] -> (print_schedule sch); sch
   | fst::others -> match_helper fst others
+

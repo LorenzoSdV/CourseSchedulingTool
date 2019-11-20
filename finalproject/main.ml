@@ -2,6 +2,8 @@ open Schedule
 open Command
 open ClassRoster
 
+
+
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
     raised during the execution of any commands. *)
@@ -11,8 +13,9 @@ let rec prompt sch =
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
   | "clear" -> ignore (Sys.command "clear"); prompt sch
+  | "close" -> init_prompt (read_line ()) (* need to add WARNING about save *)
   | "" -> 
-    print_endline "Valid Commands: add | edit | remove | print | quit | clear";
+    print_endline "Valid Commands: add | edit | remove | print | export | clear | close | quit";
     print_endline "Enter a command to view usage instructions.";
     prompt sch
   | string_cmd -> 
@@ -49,7 +52,7 @@ let rec prompt sch =
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | print | quit | clear")
+         "Valid Commands: add | edit | remove | print | export | clear | close | quit")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
@@ -61,8 +64,8 @@ and exceptions sch err =
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
-  print_endline ("Please enter path to schedule you want to load, or leave " ^
-                 "blank to create new schedule.\n");
+  print_endline ("If you want to open an alredy existing schedule, type 'load' <json_file>, or type " ^
+                 "'new' to create a new schedule.\n");
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()
