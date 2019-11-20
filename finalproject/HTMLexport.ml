@@ -29,11 +29,11 @@ let html_of_sch sch =
   match (get_sems sch) with
   | [] -> "<p>Schedule is empty!</p>\n"
   | _ -> begin
-    "<h1>Schedule: <strong>" ^ sch.name ^ "</strong></h1>\n" ^ 
-    "<h2>Cumulative GPA: <strong>" ^ sch.gpa ^ "</strong></h2>\n" ^ 
-    "<table>\n" ^ 
-    (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
-    "</table>\n" end
+      "<h1>Schedule: <strong>" ^ sch.name ^ "</strong></h1>\n" ^ 
+      "<h2>Cumulative GPA: <strong>" ^ sch.gpa ^ "</strong></h2>\n" ^ 
+      "<table>\n" ^ 
+      (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
+      "</table>\n" end
 
 let save filename text = 
   let chan = open_out filename in
