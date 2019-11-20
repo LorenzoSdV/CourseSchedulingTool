@@ -87,12 +87,15 @@ let gpa courses =
   in
   (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
 
-let get_credits courses =
+let get_credits sch = 
+  sch.sch_credits
+
+(*let get_credits courses =
   let rec fold courses acc =
     match courses with
     | [] -> acc
     | { credits = c } :: t -> fold t (acc + c)
-  in fold courses 0
+  in fold courses 0*)
 
 let to_list sch =
   let rec fold sems acc = 
@@ -164,6 +167,7 @@ let add_course sch c semid =
       sem.courses <- (c :: sem.courses);
       sem.sem_gpa <- gpa sem.courses;
       sem.tot_credits <- sem.tot_credits + c.credits;
+      sch.sch_credits <- sch.sch_credits + c.credits;
       { sch with cumul_gpa = gpa (to_list sch) }
     end
   with
@@ -175,18 +179,17 @@ let rec get_sem_from_course sch sems course =
   | h :: t -> if get_course course.name (to_list sch) = course then h else
       get_sem_from_course sch t course
 
-let edit_course_creds course = 
-  true
-
 let edit_course sch cname attr new_val =
   try
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
-    let sem  = get_sem_from_course sch sch.semesters course in 
-    print_endline (string_of_semid sem.id);
+    let sem = get_sem_from_course sch sch.semesters course in
+    let old_creds = course.credits in
     match attr with
     | "credits" ->
       course.credits <- int_of_string new_val;
-      sem.tot_credits <- get_credits sem.courses;
+      let diff = int_of_string new_val - old_creds in 
+      sem.tot_credits <- sem.tot_credits + diff;
+      sch.sch_credits <- sch.sch_credits + diff;
       sem.sem_gpa <- gpa sem.courses;
       sch.cumul_gpa <- gpa (to_list sch); sch
     | "grade" -> 
@@ -204,7 +207,8 @@ let remove_course sch cname =
     let course = get_course cname (to_list sch) in
     let sem = get_sem_from_course sch sch.semesters course in
     sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
-    sem.tot_credits <- get_credits sem.courses;
+    sem.tot_credits <- sem.tot_credits - course.credits;
+    sch.sch_credits <- sch.sch_credits - course.credits;
     sem.sem_gpa <- gpa sem.courses;
     sch.cumul_gpa <- gpa (to_list sch); sch
   with 
@@ -272,7 +276,7 @@ let print_schedule sch =
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
       () sch.semesters;
     print_endline ("Cumulative GPA: " ^ (string_of_float sch.cumul_gpa));
-    print_endline ("Total Credits: " ^ (string_of_int (get_credits (to_list sch))))
+    print_endline ("Total Credits: " ^ (string_of_int sch.sch_credits))
   end
 
 
@@ -388,7 +392,7 @@ module LoadJSON = struct
       sch_credits = 0;
       saved = true
     } in
-    {new_sch with sch_credits = (get_credits (to_list new_sch))}
+    {new_sch with sch_credits = new_sch.sch_credits}
 
 end
 

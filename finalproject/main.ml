@@ -78,7 +78,7 @@ and init_prompt init_str =
   | "load"::json::[] -> load json
   | "quit"::[] -> Stdlib.exit 0
   | _ -> print_string ("Unrecognized Command Entry!\n" ^ 
-                       "Valid Commands: new | [load <json_file>] | quit");
+                       "Valid Commands: new | [load <json_file>] | quit\n");
     init_prompt (read_line ())
 
 let main () =
