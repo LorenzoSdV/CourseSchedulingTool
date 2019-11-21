@@ -85,7 +85,7 @@ Or load a previously saved schedule:
 load <filepath>.json
 ```
 
-**NOTE:** We have included an example.json file containg a schedule
+**NOTE:** We have included an _example.json_ file containg a schedule
 already popualted with some courses and semesters. Feel free to try loading and
 working with it!
 

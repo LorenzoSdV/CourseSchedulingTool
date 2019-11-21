@@ -87,6 +87,15 @@ let gpa courses =
   in
   (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
 
+let gpa_to_string gpa_float = 
+  let gpa = string_of_float gpa_float in
+  match String.length gpa with
+  | 0 | 1 -> failwith "Impossible Case"
+  | 2 -> gpa ^ "00"
+  | 3 -> gpa ^ "0"
+  | 4 -> gpa
+  | _ -> Str.first_chars gpa 4
+
 let get_credits sch = 
   sch.sch_credits
 
@@ -263,9 +272,9 @@ let print_sem sem =
   List.fold_right 
     (fun course _ -> print_string ((course.name) ^ ", ")) 
     sem.courses ();
-  print_string (" ] Semester GPA: " ^ (string_of_float sem.sem_gpa));
+  print_string (" ]\nSemester GPA: " ^ (gpa_to_string sem.sem_gpa));
   print_endline (" | Semester Credits: " ^ string_of_int sem.tot_credits);
-  print_endline ""
+  print_newline ()
 
 let print_schedule sch =
   if sch.semesters = [] then 
@@ -276,7 +285,7 @@ let print_schedule sch =
     List.fold_left 
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
       () sch.semesters;
-    print_endline ("Cumulative GPA: " ^ (string_of_float sch.cumul_gpa));
+    print_endline ("Cumulative GPA: " ^ (gpa_to_string sch.cumul_gpa));
     print_endline ("Total Credits: " ^ (string_of_int sch.sch_credits))
   end
 
@@ -307,7 +316,7 @@ module HTML = struct
     | _ -> begin
         "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ 
         "</h3>\n" ^
-        "\t\t\t<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ 
+        "\t\t\t<p>Semester GPA: <strong>" ^ (gpa_to_string sem.sem_gpa) ^ 
         "</strong></p></td>\n" ^ 
         (List.fold_left (fun acc course -> acc ^ (html_of_course course)) 
            "" sem.courses) ^ 
@@ -319,7 +328,8 @@ module HTML = struct
     | _ -> begin
         "<h1><strong style=\"color:green;\">" ^ sch.desc ^ "</strong></h1>\n" ^ 
         "\t\t<h2>Cumulative GPA: <strong style=\"color:blue;\">" ^ 
-        (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
+        (gpa_to_string sch.cumul_gpa) ^ 
+        "</strong></h2>\n" ^ 
         "\t\t<h2>Total Credits: <strong style=\"color:red;\">" ^ 
         (string_of_int sch.sch_credits) ^ "</strong></h2>\n" ^ 
         "\t\t<table>\n" ^ 
