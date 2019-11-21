@@ -1,8 +1,5 @@
 open Schedule
 open Command
-open ClassRoster
-
-
 
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
@@ -33,7 +30,7 @@ let rec prompt sch =
       exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
       exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
-    | InvalidURL -> 
+    | ClassRoster.InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
     | InvalidFile ->
       exceptions sch "File path is not valid. Try again."
