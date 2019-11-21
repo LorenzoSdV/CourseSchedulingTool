@@ -417,17 +417,16 @@ module LoadJSON = struct
 
   let parse_json fl = 
     let json = Yojson.Basic.from_file fl in
-    let new_sch = {
+    {
       desc = json |> Yj.member "description" |> Yj.to_string;
       semesters = json |> Yj.member "semesters" |> Yj.to_list |> 
                   List.map get_semester;
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
       exp_grad = json |> Yj.member "expected grad year" |> Yj.to_int;
       major = json |> Yj.member "major" |> Yj.to_string;
-      sch_credits = 0;
+      sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true
-    } in
-    { new_sch with sch_credits = (calc_credits (to_list new_sch)) }
+    }
 
 end
 
@@ -446,7 +445,7 @@ module SaveJSON = struct
     "\t\t{\n" ^
     "\t\t\t\"semester id\": \"" ^ (string_of_semid sem.id) ^ "\",\n" ^
     "\t\t\t\"semester credits\": " ^ (string_of_int sem.tot_credits) ^ ",\n" ^
-    "\t\t\t\"semester gpa\": " ^ (string_of_float sem.sem_gpa) ^ ",\n" ^
+    "\t\t\t\"semester gpa\": " ^ (gpa_to_string sem.sem_gpa) ^ ",\n" ^
     "\t\t\t\"courses\": [\n" ^ 
     (Str.replace_first reg "}\n" 
        (List.fold_left (fun acc course -> acc ^ (json_of_course course)) 
@@ -457,7 +456,8 @@ module SaveJSON = struct
     let reg = Str.regexp "},\n$" in
     "{\n" ^
     "\t\"description\": \"" ^ sch.desc ^ "\",\n" ^
-    "\t\"cumul gpa\": "  ^ (string_of_float sch.cumul_gpa) ^ ",\n" ^
+    "\t\"cumul gpa\": "  ^ (gpa_to_string sch.cumul_gpa) ^ ",\n" ^
+    "\t\"sch credits\": "  ^ (string_of_int sch.sch_credits) ^ ",\n" ^
     "\t\"expected grad year\": " ^ (string_of_int sch.exp_grad) ^ ",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 

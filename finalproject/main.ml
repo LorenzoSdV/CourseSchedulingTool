@@ -2,27 +2,42 @@ open Schedule
 open Command
 open ClassRoster
 
+let read_input () = 
+  print_string "\n> ";
+  read_line ()
+
 let save_prompt_helper sch =
-  print_string ("Choose the name of the JSON file you will save this schedule to:\n\n");
-  match read_line () with
+  print_endline 
+    ("Choose the name of the JSON file you will save this schedule to:");
+  match read_input () with
   | "" -> raise InvalidFileForSave
   | file_name -> SaveJSON.save_schedule sch file_name
 
 let rec save_prompt_from_quit sch =
-  ANSITerminal.print_string [Bold] "WARNING: You have unsaved changes. Would you like to save now before closing?\n\n";
-  match read_line () with
+  ANSITerminal.print_string [Bold] "Warning: ";
+  print_endline 
+    "You have unsaved changes. Would you like to save now before quitting?";
+  match read_input () with
   | "yes" -> save_prompt_helper sch; set_save_status sch true; 
-    ANSITerminal.print_string [Bold] "\nSaved!\n"; 
+    ANSITerminal.print_string [Bold] "\nSaved!\n";
+    start_prompt ()
   | "no" -> Stdlib.exit 0
-  | _ -> print_endline ("Type 'yes' or 'no' to continue.\n"); save_prompt_from_quit sch
+  | _ -> 
+    print_endline ("Type 'yes' or 'no' to continue."); 
+    save_prompt_from_quit sch
 
 and save_prompt_from_close sch =
-  ANSITerminal.print_string [Bold] "WARNING: You have unsaved changes. Would you like to save now before closing?\n\n";
-  match read_line () with
+  ANSITerminal.print_string [Bold] "WARNING:";
+  print_endline 
+    "You have unsaved changes. Would you like to save now before closing?";
+  match read_input () with
   | "yes" -> save_prompt_helper sch; set_save_status sch true; 
     ANSITerminal.print_string [Bold] "\nSaved!\n"; 
-  | "no" -> ANSITerminal.(print_string [cyan] "\nHOMEPAGE\n\n"); init_prompt (read_line ())
-  | _ -> print_endline ("Type 'yes' or 'no' to continue."); save_prompt_from_close sch
+    start_prompt ()
+  | "no" -> start_prompt ()
+  | _ -> 
+    print_endline ("Type 'yes' or 'no' to continue."); 
+    save_prompt_from_close sch
 
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
@@ -31,15 +46,16 @@ and prompt sch =
   ANSITerminal.(print_string [green] ("\n" ^ (get_name sch) ^ ": "));
   match read_line () with 
   | exception End_of_file -> ()
-  | "quit" -> if get_save_status sch then Stdlib.exit 0 else save_prompt_from_quit sch
+  | "quit" -> 
+    if get_save_status sch then Stdlib.exit 0 
+    else save_prompt_from_quit sch
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "close" -> 
-    begin if get_save_status sch 
-      then (ANSITerminal.(print_string [cyan] "\nHOMEPAGE\n\n"); init_prompt (read_line ())) 
-      else save_prompt_from_close sch; init_prompt (read_line ())
-    end
+    if get_save_status sch then start_prompt ()
+    else save_prompt_from_close sch; init_prompt ()
   | "" -> begin
-      print_endline "Valid Commands: add | edit | remove | save | print | export | clear | close | quit";
+      print_endline ("Valid Commands: add | edit | remove | save |" ^
+                     " print | export | clear | close | quit");
       print_endline "Enter a command to view usage instructions.";
       prompt sch
     end
@@ -81,8 +97,8 @@ and prompt sch =
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | save | print | export | clear | " ^
-         "close | quit\n")
+         "Valid Commands: add | edit | remove | save | print | export | " ^ 
+         "clear | close | quit")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
@@ -93,30 +109,41 @@ and exceptions sch err =
 
 and load file =
   try 
-    prompt (LoadJSON.parse_json file)
+    let sch = LoadJSON.parse_json file in
+    prompt sch
   with
-  | Sys_error _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
-    init_prompt (read_line ())
+  | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
+    init_prompt ()
 
-and init_prompt init_str =
-  let split_cmd = String.split_on_char ' ' init_str in
+and init_prompt () =
+  let split_cmd = String.split_on_char ' ' (read_input ()) in
   match split_cmd with 
   | [] -> raise Empty
   | "new"::sch_name::[] -> prompt (edit_name Schedule.new_schedule sch_name)
   | "load"::json::[] -> load json
   | "quit"::[] -> Stdlib.exit 0
-  | _ -> print_string ("Unrecognized Command Entry!\n" ^ 
-                       "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit\n");
-    init_prompt (read_line ())
+  | _ -> 
+    ANSITerminal.(print_string [red] "\nUnrecognized Command Entry!\n");
+    print_endline 
+      "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
+    init_prompt ()
+
+and start_prompt () =
+  ANSITerminal.(print_string [cyan] "\nSTART PAGE\n"); 
+  print_endline 
+    "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
+  init_prompt ()
 
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
   print_endline 
-    ("If you want to open an alredy existing schedule, type 'load' " ^
-     "<json_file>, or type 'new' <schedule_name> to create a new schedule " ^
-     "(NOTE: The name of the schedule must not have any spaces!).\n");
-  init_prompt (read_line ())
+    "If you want to open an alredy existing schedule, type [load <json_file>]";
+  print_endline 
+    "Or type [new <schedule_name>] to create a new schedule.";
+  print_endline
+    "NOTE: The name of the schedule must not have any spaces!";
+  init_prompt ()
 
 (* Starts system *)
 let () = main ()
