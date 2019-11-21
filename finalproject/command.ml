@@ -73,15 +73,25 @@ let remove_others sch str_lst =
     remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
+let is_not_json file =
+  match String.split_on_char '.' file with
+  | name::extension::[] when extension != "json" -> true
+  | _ -> raise InvalidFileForExport
+
 let export_handler sch str_lst = 
   match str_lst with
-  | file :: [] -> if Yojson.Basic.from_file file = raise (Sys_error "")
+  | file :: [] -> if is_not_json file
     then (HTML.export_schedule sch file; sch) else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
+let is_json file =
+  match String.split_on_char '.' file with
+  | name::extension::[] when extension = "json" -> true
+  | _ -> raise InvalidFileForSave
+
 let save_handler sch str_lst = 
   match str_lst with
-  | file :: [] -> if Yojson.Basic.from_file file <> raise (Sys_error "") 
+  | file :: [] -> if is_json file 
     then (SaveJSON.save_schedule sch file;  
           ANSITerminal.print_string [Bold] "\nSaved!\n"; sch) 
     else raise InvalidFileForSave
