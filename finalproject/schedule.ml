@@ -449,7 +449,7 @@ module SaveJSON = struct
     let reg = Str.regexp "},\n$" in
     "{\n" ^
     "\t\"description\": \"" ^ sch.desc ^ "\",\n" ^
-    "\t\"cumul gpa\": "  ^ (string_of_float sch.cumul_gpa) ^ ",\n" ^
+    "\t\"cumul gpa\": "  ^ (string_of_float sch.cumul_gpa) ^ "\n" ^
     "\t\"expected grad year\": " ^ (string_of_int sch.exp_grad) ^ ",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 

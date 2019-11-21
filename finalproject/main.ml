@@ -58,7 +58,7 @@ and prompt sch =
     | MalformedRemove ->
       exceptions sch "Usage: remove [<course_name> | <semester>]"
     | MalformedExport ->
-      exceptions sch "Usage: export <json_file>"
+      exceptions sch "Usage: export <html_file>"
     | MalformedSave ->
       exceptions sch "Usage: save <json_file>"
     | Malformed | _ -> 
