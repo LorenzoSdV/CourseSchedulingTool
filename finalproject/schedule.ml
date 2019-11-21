@@ -228,10 +228,8 @@ let create_sem semid =
 let add_sem sch sem =
   if (List.mem sem.id (sem_ids sch)) then
     raise (DuplicateSemester (string_of_semid sem.id))
-  else begin
-    sch.semesters <- List.sort sem_compare (sem :: sch.semesters);
-    sch.cumul_gpa <- gpa (to_list sch);
-    sch end
+  else
+    sch.semesters <- List.sort sem_compare (sem :: sch.semesters); sch
 
 let remove_sem sch semid = 
   if (not (List.mem semid (sem_ids sch))) then
@@ -240,6 +238,7 @@ let remove_sem sch semid =
     sch.semesters <- 
       (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
     sch.cumul_gpa <- gpa (to_list sch);
+    sch.sch_credits <- calc_credits (to_list sch);
     sch end
 
 let new_schedule =
