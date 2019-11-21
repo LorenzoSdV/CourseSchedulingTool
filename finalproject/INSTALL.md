@@ -15,15 +15,18 @@ After which, you should run "make check" to ensure that your environment is what
 
 Then, you can start our program by running "make run". Press Enter/return at the main prompt for help on learning which commands can be executed. 
 
-## Some example commands:
+## Some example commands for MS1 functionality:
+
+Initially, at the first prompt, type "new" to start a new schedule.
 
 To create a new semester(s):
 ```
-add sem FA19
-add sem SP19
+add FA19
+add SP20
 ```
 
 Add a new course:
+(Here, 4 is # of credits, A- is grade, "CSCore" is degree catagory, FA19 is semester).
 ```
 add CS3110 4 A- CScore FA19 
 ```
@@ -53,3 +56,5 @@ Exit:
 ```
 quit
 ```
+
+## Some example commands for MS2 functionality:

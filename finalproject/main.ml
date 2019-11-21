@@ -10,7 +10,7 @@ let rec prompt sch =
   | exception End_of_file -> ()
   | "quit" -> Stdlib.exit 0
   | "clear" -> ignore (Sys.command "clear"); prompt sch
-  | "close" -> init_prompt (read_line ()) (* need to add WARNING about save *)
+  | "close" -> init_prompt () (* need to add WARNING about save *)
   | "" -> 
     print_endline ("Valid Commands: add | edit | remove | print | export | " ^
                    "clear | close | quit");
@@ -67,10 +67,11 @@ and load file =
     prompt (LoadJSON.parse_json file)
   with
   | Sys_error _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
-    init_prompt (read_line ())
+    init_prompt ()
 
-and init_prompt init_str =
-  let split_cmd = String.split_on_char ' ' init_str in
+and init_prompt () =
+  print_string "> ";
+  let split_cmd = String.split_on_char ' ' (read_line ()) in
   match split_cmd with 
   | [] -> raise Empty
   | "new"::sch_name::[] -> prompt (edit_name Schedule.new_schedule sch_name)
@@ -79,7 +80,7 @@ and init_prompt init_str =
   | _ -> print_string ("Unrecognized Command Entry!\n" ^ 
                        "Valid Commands: [new <schedule_name>] | " ^
                        "[load <json_file>] | quit\n");
-    init_prompt (read_line ())
+    init_prompt ()
 
 let main () =
   ANSITerminal.(print_string [red]
@@ -88,8 +89,7 @@ let main () =
     ("If you want to open an alredy existing schedule, type 'load' " ^
      "<json_file>, or type 'new' <schedule_name> to create a new schedule " ^
      "(NOTE: The name of the schedule must not have any spaces!).\n");
-  print_string  "> ";
-  init_prompt (read_line ())
+  init_prompt ()
 
 (* Starts system *)
 let () = main ()
