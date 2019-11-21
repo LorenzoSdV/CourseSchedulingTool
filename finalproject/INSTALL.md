@@ -13,7 +13,12 @@ opam install ocurl
 
 After which, you should run "make check" to ensure that your environment is what it should be. We've edited the checkenv.sh file to reflect our system.
 
-Then, you can start our program by running "make run". Press Enter/return at the main prompt for help on learning which commands can be executed. 
+Then, you can start our program by running "make run".
+
+**NOTE:** You can always just press Enter/Return at the main prompt for info
+on what possible commands can be used. Then, entering only that command with no
+arguments will either executet the command (like "clear" or "quit"), or it will
+provide info on what other arguments are required.
 
 ## Some example commands for MS1 functionality:
 
@@ -52,9 +57,52 @@ Remove a course:
 remove CS3110
 ```
 
+Remove a semester:
+```
+remove SP20
+```
+
 Exit:
 ```
 quit
 ```
 
 ## Some example commands for MS2 functionality:
+
+MS2 contains all of the same functionality as MS1, but the user now has the
+ability to save a current schedule, load that schedule later, "close" the
+current schedule, and export a schedule to an HTML file for visualization.
+
+To start, again use "make run" to begin the initial prompt.
+
+To make a new schedule:
+```
+new <schedule_name>
+```
+
+Or load a previously saved schedule:
+```
+load <filepath>.json
+```
+
+**NOTE:** We have included an example.json file containg a schedule
+already popualted with some courses and semesters. Feel free to try loading and
+working with it!
+
+Once schedule is loaded, you'll be taken to the primary user prompt, where the
+schedule name appears in green at the input line. New commands availble are:
+
+Saving a schedule:
+_This command saves schedule as test.json in current working directory._
+```
+save test.json
+```
+
+Exporting a schedule to HTML:
+_Exports HTML file to working directory._
+```
+export test.html
+```
+
+You can now open the html file in a web browser to see a nice visualization of
+the schedule!
