@@ -57,6 +57,9 @@ let grade_map gr =
   | Letter "F" -> 0.0
   | _ -> failwith "Impossible Failure"
 
+let set_save_status sch bool =
+  sch.is_saved <- bool
+
 let gradify str =
   let str_upper = String.uppercase_ascii str in
   if Str.string_match (Str.regexp "^[A-D][\\+-]?$\\|^F$") str_upper 0 then
@@ -177,7 +180,9 @@ let add_course sch c semid =
       sem.sem_gpa <- gpa sem.courses;
       sem.tot_credits <- sem.tot_credits + c.credits;
       sch.sch_credits <- sch.sch_credits + c.credits;
-      sch.cumul_gpa <- gpa (to_list sch); sch
+      sch.cumul_gpa <- gpa (to_list sch); 
+      set_save_status sch false;
+      sch
     end
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
@@ -200,13 +205,13 @@ let edit_course sch cname attr new_val =
       sem.tot_credits <- sem.tot_credits + diff;
       sch.sch_credits <- sch.sch_credits + diff;
       sem.sem_gpa <- gpa sem.courses;
-      sch.cumul_gpa <- gpa (to_list sch); sch
+      sch.cumul_gpa <- gpa (to_list sch); set_save_status sch false; sch
     | "grade" -> 
       course.grade <- gradify new_val;
       sem.sem_gpa <- gpa sem.courses;
-      sch.cumul_gpa <- gpa (to_list sch); sch
+      sch.cumul_gpa <- gpa (to_list sch); set_save_status sch false; sch
     | "degree" -> 
-      course.degree <- new_val; sch
+      course.degree <- new_val; set_save_status sch false; sch
     | _ -> raise (Failure "Invalid course attribute")
   with
     Not_found -> raise (UnknownCourse cname)
@@ -219,7 +224,9 @@ let remove_course sch cname =
     sem.tot_credits <- sem.tot_credits - course.credits;
     sch.sch_credits <- sch.sch_credits - course.credits;
     sem.sem_gpa <- gpa sem.courses;
-    sch.cumul_gpa <- gpa (to_list sch); sch
+    sch.cumul_gpa <- gpa (to_list sch); 
+    set_save_status sch false;
+    sch
   with 
     Not_found -> raise (UnknownCourse cname)
 
@@ -238,7 +245,8 @@ let add_sem sch sem =
   if (List.mem sem.id (sem_ids sch)) then
     raise (DuplicateSemester (string_of_semid sem.id))
   else
-    sch.semesters <- List.sort sem_compare (sem :: sch.semesters); sch
+    sch.semesters <- List.sort sem_compare (sem :: sch.semesters); 
+  set_save_status sch false; sch
 
 let remove_sem sch semid = 
   if (not (List.mem semid (sem_ids sch))) then
@@ -248,6 +256,7 @@ let remove_sem sch semid =
       (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
     sch.cumul_gpa <- gpa (to_list sch);
     sch.sch_credits <- calc_credits (to_list sch);
+    set_save_status sch false;
     sch end
 
 let new_schedule =
@@ -264,14 +273,13 @@ let new_schedule =
 let get_save_status sch = 
   sch.is_saved
 
-let set_save_status sch bool =
-  sch.is_saved <- bool
-
 let get_name sch =
   sch.desc
 
 let edit_name sch nm =
-  sch.desc <- nm; sch
+  sch.desc <- nm;
+  set_save_status sch false;
+  sch
 
 let print_sem sem =
   print_string ": [ ";
@@ -461,6 +469,7 @@ module SaveJSON = struct
   let save_schedule sch fl =
     let chan = open_out fl in
     output_string chan (json_of_schedule sch);
+    set_save_status sch true;
     close_out chan
 
 end

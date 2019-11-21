@@ -34,9 +34,8 @@ let sem_id_parse sem_id =
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
-  | sem_id::[] -> set_save_status sch false; 
-    add_sem sch (create_sem (sem_id_parse sem_id))
-  | course_name::grade::degree::sem_id::[] -> set_save_status sch false;
+  | sem_id::[] -> add_sem sch (create_sem (sem_id_parse sem_id))
+  | course_name::grade::degree::sem_id::[] ->
     let name = String.uppercase_ascii course_name in
     add_course sch 
       (create_course name 
@@ -44,7 +43,7 @@ let add_others sch str_lst =
             (sem_id_parse sem_id)) 
          (Schedule.gradify grade) degree) 
       (sem_id_parse sem_id)
-  | course_name::credits::grade::degree::sem_id::[] -> set_save_status sch false;
+  | course_name::credits::grade::degree::sem_id::[] ->
     let name = String.uppercase_ascii course_name in
     add_course sch (create_course name 
                       (int_of_string credits) 
@@ -56,8 +55,8 @@ let add_others sch str_lst =
 let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
-  | "name"::new_val::[] -> set_save_status sch false; edit_name sch new_val
-  | course_name::field::new_val::[] -> set_save_status sch false;
+  | "name"::new_val::[] -> edit_name sch new_val
+  | course_name::field::new_val::[] ->
     edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
@@ -67,10 +66,8 @@ let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
   | sem_id::[] when is_valid_coursename sem_id = false -> 
-    set_save_status sch false;
     remove_sem sch (sem_id_parse sem_id)
-  | course_name::[] -> set_save_status sch false; 
-    remove_course sch (String.uppercase_ascii course_name)
+  | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
 let is_not_json file =
@@ -92,7 +89,7 @@ let is_json file =
 let save_handler sch str_lst = 
   match str_lst with
   | file :: [] -> if is_json file 
-    then (SaveJSON.save_schedule sch file; set_save_status sch true;   
+    then (SaveJSON.save_schedule sch file;  
           ANSITerminal.print_string [Bold] "\nSaved!\n"; sch) 
     else raise InvalidFileForSave
   | _ -> raise MalformedSave
