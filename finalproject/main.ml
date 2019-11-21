@@ -8,7 +8,7 @@ let read_input () =
 
 let save_prompt_helper sch =
   print_endline 
-    ("Choose the name of the JSON file you will save this schedule to:");
+    ("\nChoose the name of the JSON file you will save this schedule to:");
   match read_input () with
   | "" -> raise InvalidFileForSave
   | file_name -> SaveJSON.save_schedule sch file_name
@@ -27,7 +27,7 @@ let rec save_prompt_from_quit sch =
     save_prompt_from_quit sch
 
 and save_prompt_from_close sch =
-  ANSITerminal.print_string [Bold] "WARNING:";
+  ANSITerminal.print_string [Bold] "Warning: ";
   print_endline 
     "You have unsaved changes. Would you like to save now before closing?";
   match read_input () with
@@ -79,6 +79,8 @@ and prompt sch =
       exceptions sch "File path cannot be a JSON. Try again."
     | InvalidFileForSave -> 
       exceptions sch "File path must be a JSON. Try again." 
+    | SemesterDoesNotExist ->
+      exceptions sch "This semester does not exist in your schedule."
     | MalformedSemId -> 
       exceptions sch ("Incorrect Semester Entry Format: " ^
                       "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")
@@ -107,8 +109,12 @@ and exceptions sch err =
   print_endline err;
   prompt sch
 
-and load file =
+and load (file_lst: string list) =
   try 
+    let file_extra_space = 
+      List.fold_left (fun acc str -> acc ^ str ^ " ") "" file_lst in
+    let file = 
+      String.sub file_extra_space 0 (String.length file_extra_space - 1) in
     let sch = LoadJSON.parse_json file in
     prompt sch
   with
@@ -119,8 +125,14 @@ and init_prompt () =
   let split_cmd = String.split_on_char ' ' (read_input ()) in
   match split_cmd with 
   | [] -> raise Empty
-  | "new"::sch_name::[] -> prompt (edit_name Schedule.new_schedule sch_name)
-  | "load"::json::[] -> load json
+  | "new"::sch_name when sch_name <> [] -> begin
+      let sch_extra_space = 
+        List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
+      let new_name = 
+        String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
+      prompt (edit_name Schedule.new_schedule new_name)
+    end
+  | "load"::json_lst when json_lst <> [] -> load json_lst
   | "quit"::[] -> Stdlib.exit 0
   | _ -> 
     ANSITerminal.(print_string [red] "\nUnrecognized Command Entry!\n");
@@ -138,11 +150,9 @@ let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
   print_endline 
-    "If you want to open an alredy existing schedule, type [load <json_file>]";
+    "If you want to open an already existing schedule, type [load <json_file>]";
   print_endline 
     "Or type [new <schedule_name>] to create a new schedule.";
-  print_endline
-    "NOTE: The name of the schedule must not have any spaces!";
   init_prompt ()
 
 (* Starts system *)

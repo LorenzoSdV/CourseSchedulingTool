@@ -233,6 +233,9 @@ let remove_course sch cname =
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
 
+let sem_ids_to_string sch =
+  List.rev_map (fun sem -> string_of_semid sem.id) sch.semesters
+
 let create_sem semid =
   {
     id = semid;

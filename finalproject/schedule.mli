@@ -45,11 +45,11 @@ exception DuplicateCourse of string
     to a schedule where a semester with the same id already exists. *)
 exception DuplicateSemester of string
 
-(** [gradify s] is the grade representation of [s] where is some grade value 
+(** [gradify str] is the grade representation of [str] where is some grade value 
     represented as a string.
-    Requires: [s] is a valid string rep of a grade, like: 
+    Requires: [str] is a valid string rep of a grade, like: 
     "A+" or "b" or "unsat" or "w". 
-    Raises: [Failure "Unknown Grade"] if [s] is not a valid grade 
+    Raises: [Failure "Unknown Grade"] if [str] is not a valid grade 
     representation. *)
 val gradify: string -> grade
 
@@ -72,7 +72,7 @@ val edit_course : schedule -> string -> string -> string -> schedule
 
 (** [add_course sch c semid] is the schedule with course name [c] removed
     from semester id [semid]. If course [c] is not in semester [semid] then
-    [add_course sch c semid] is [sch] *)
+    [add_course sch c semid] is [sch]. *)
 val remove_course : schedule -> string -> schedule
 
 (** [get_course name courses] is the course record with name [name]
@@ -100,7 +100,7 @@ val gpa : course list -> float
 val get_credits : schedule -> int
 
 (** [create_sem courses semid] is a semester with courses [courses] and id
-    [semid]. Automatically calculates GPA and # credits.*)
+    [semid]. Automatically calculates GPA and # credits. *)
 val create_sem : sem_id -> semester
 
 (** [add_sem sch sem] is the schedule [sch] with semester [sem] added to its
@@ -118,11 +118,16 @@ val remove_sem : schedule -> sem_id -> schedule
     representations are like FA20 or SP18, etc. *)
 val string_of_semid : sem_id -> string
 
-(** [sem_ids s] is the list of semester ids from each semester in schedule [s]*)
+(** [sem_ids s] is the list of semester ids from each semester in 
+    schedule [sch]. *)
 val sem_ids : schedule -> sem_id list
 
+(** [sem_ids_to_string sch] is the list of semester ids as strings from each 
+    semester in schedule [sch]. *)
+val sem_ids_to_string : schedule -> string list
+
 (** [to_list sch] is the list of all courses contained in each semester in 
-    [sch] *)
+    [sch]. *)
 val to_list : schedule -> course list
 
 (** [new_schedule] is a new empty schedule with no courses or semesters. *)
@@ -149,7 +154,7 @@ val edit_name : schedule -> string -> schedule
 module HTML : sig
 
   (** [export_schedule sch fl] takes schedule [sch] and exports it in visual 
-      HTML representation to HTML file given by path [fl] *)
+      HTML representation to HTML file given by path [fl]. *)
   val export_schedule : schedule -> string -> unit
 
 end

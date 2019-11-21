@@ -9,26 +9,29 @@ exception Malformed
 (** Raised when a command has an invalid sem_id. *)
 exception MalformedSemId
 
-(** Raised when an Add command has invalid syntax *)
+(** Raised when an Add command has invalid syntax. *)
 exception MalformedAdd
 
-(** Raised when an Edit command has invalid syntax *)
+(** Raised when an Edit command has invalid syntax. *)
 exception MalformedEdit
 
-(** Raised when a Remove command has invalid syntax *)
+(** Raised when a Remove command has invalid syntax. *)
 exception MalformedRemove
 
-(** Raised when a Save command has invalid syntax *)
+(** Raised when a Save command has invalid syntax. *)
 exception MalformedSave
 
-(** Raised when an Export command has invalid syntax*)
+(** Raised when an Export command has invalid syntax. *)
 exception MalformedExport
 
 (** Raised when Export command is given with invalid file path. *)
 exception InvalidFileForExport
 
-(** Raised when Save command is given with invalid file path *)
+(** Raised when Save command is given with invalid file path. *)
 exception InvalidFileForSave
+
+(** Raised when Add command is given a semester that has not been added. *)
+exception SemesterDoesNotExist
 
 (** [parse_command cmd_str sch] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 

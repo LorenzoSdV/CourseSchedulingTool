@@ -14,7 +14,10 @@ exception MalformedExport
 exception InvalidFileForExport
 exception InvalidFileForSave
 
+exception SemesterDoesNotExist
 
+(** [is_valid_coursename str] checks if [str] has the correct format of a 
+    Cornell class. *)
 let is_valid_coursename str =
   if (Str.string_match (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") str 0) 
   then true else false 
@@ -30,20 +33,35 @@ let sem_id_parse sem_id =
   else 
     raise MalformedSemId
 
+(** [sem_exists sem_id_list sem_id] checks if [sem_id] is in [sem_id_list]. *)
+let rec sem_exists sem_id_lst sem_id =
+  match sem_id_lst with 
+  | [] -> raise SemesterDoesNotExist
+  | sem::others when sem = (String.uppercase_ascii sem_id) -> ()
+  | sem::others -> sem_exists others sem_id
+
+(** [format_sem_id sem_id] checks if user is trying to add a semester or not. *)
+let format_sem_id sem_id =
+  let id = String.uppercase_ascii(String.sub sem_id 0 2) in
+  if id = "SP" || id = "FA" then true else false
+
 (** [add_others sch str_lst] parses [str_lst] in [sch] for the Add command. *)
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
-  | sem_id::[] -> add_sem sch (create_sem (sem_id_parse sem_id))
+  | sem_id::[] when format_sem_id sem_id -> 
+    add_sem sch (create_sem (sem_id_parse sem_id))
   | course_name::grade::degree::sem_id::[] ->
+    (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
     add_course sch 
       (create_course name 
-         (get_course_creds name
+         (get_course_creds name 
             (sem_id_parse sem_id)) 
          (Schedule.gradify grade) degree) 
       (sem_id_parse sem_id)
   | course_name::credits::grade::degree::sem_id::[] ->
+    (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
     add_course sch (create_course name 
                       (int_of_string credits) 
@@ -75,6 +93,8 @@ let is_not_json file =
   | name::extension::[] when extension <> "json" -> true
   | _ -> raise InvalidFileForExport
 
+(** [export_handler sch str_lst] parses [str_lst] in [sch] for the 
+    Export command. *)
 let export_handler sch str_lst = 
   match str_lst with
   | file :: [] -> if is_not_json file
@@ -86,6 +106,8 @@ let is_json file =
   | name::extension::[] when extension = "json" -> true
   | _ -> raise InvalidFileForSave
 
+(** [save_handler sch str_lst] parses [str_lst] in [sch] for the 
+    Save command. *)
 let save_handler sch str_lst = 
   match str_lst with
   | file :: [] -> if is_json file 
