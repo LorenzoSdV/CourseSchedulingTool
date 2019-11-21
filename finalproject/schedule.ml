@@ -389,6 +389,7 @@ module LoadJSON = struct
       let lst = String.split_on_char 'P' semid
       in form_sem_id_helper word lst
 
+  (** [form_grade grade] returns the grade represented by [grade]. *)
   let form_grade grade = 
     match grade with 
     | "Sat" -> Sat
@@ -432,6 +433,8 @@ end
 
 module SaveJSON = struct
 
+  (** [json_of_course c] returns a string that represents a course that can be 
+      converted into a JSON. *)
   let json_of_course c = 
     "\t\t\t\t{\n" ^
     "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
@@ -440,6 +443,8 @@ module SaveJSON = struct
     "\t\t\t\t\t\"degree\": \"" ^ c.degree ^ "\"\n" ^
     "\t\t\t\t},\n"
 
+  (** [json_of_sem sem] returns a string that represents a semester that can be
+      converted into a JSON. *)
   let json_of_sem sem = 
     let reg = Str.regexp "},\n$" in
     "\t\t{\n" ^
@@ -452,6 +457,8 @@ module SaveJSON = struct
           "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
+  (** [json_of_schedule sch] returns a string that can be converted into a JSON
+      file that can be saved. *)
   let json_of_schedule sch = 
     let reg = Str.regexp "},\n$" in
     "{\n" ^
