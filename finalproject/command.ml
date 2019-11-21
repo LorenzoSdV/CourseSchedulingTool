@@ -80,11 +80,6 @@ let save_handler sch str_lst =
   | file :: [] -> SaveJSON.save_schedule sch file; sch
   | _ -> raise MalformedSave
 
-let load_handler sch str_lst = 
-  match str_lst with
-  | file :: [] -> sch;
-  | _ -> raise MalformedLoad
-
 let parse_command sch cmd_str = 
 
   let match_helper first others =
@@ -93,7 +88,6 @@ let parse_command sch cmd_str =
     | "edit" -> edit_others sch others
     | "remove" -> remove_others sch others
     | "save" -> save_handler sch others
-    | "load" -> load_handler sch others
     | "export" -> export_handler sch others
     | _ -> raise Malformed
   in

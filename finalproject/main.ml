@@ -15,7 +15,8 @@ let rec prompt sch =
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "close" -> init_prompt (read_line ()) (* need to add WARNING about save *)
   | "" -> 
-    print_endline "Valid Commands: add | edit | remove | print | export | clear | close | quit";
+    print_endline ("Valid Commands: add | edit | remove | print | export | " ^
+                   "clear | close | quit");
     print_endline "Enter a command to view usage instructions.";
     prompt sch
   | string_cmd -> 
@@ -54,7 +55,8 @@ let rec prompt sch =
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | print | export | clear | close | quit\n")
+         "Valid Commands: add | edit | remove | print | export | clear | " ^
+         "close | quit\n")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
@@ -78,15 +80,17 @@ and init_prompt init_str =
   | "load"::json::[] -> load json
   | "quit"::[] -> Stdlib.exit 0
   | _ -> print_string ("Unrecognized Command Entry!\n" ^ 
-                       "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit\n");
+                       "Valid Commands: [new <schedule_name>] | " ^
+                       "[load <json_file>] | quit\n");
     init_prompt (read_line ())
 
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
-  print_endline ("If you want to open an alredy existing schedule, type 'load' <json_file>, or type " ^
-                 "'new' <schedule_name> to create a new schedule (NOTE: The name " ^
-                 "of the schedule must not have any spaces!).\n");
+  print_endline 
+    ("If you want to open an alredy existing schedule, type 'load' " ^
+     "<json_file>, or type 'new' <schedule_name> to create a new schedule " ^
+     "(NOTE: The name of the schedule must not have any spaces!).\n");
   print_string  "> ";
   init_prompt (read_line ())
 
