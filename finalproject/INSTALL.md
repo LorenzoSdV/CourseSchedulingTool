@@ -106,3 +106,11 @@ export test.html
 
 You can now open the html file in a web browser to see a nice visualization of
 the schedule!
+
+You can also close a current scedule to return to the initial prompt:
+_Note: If you haven't saved your schedule it will prompt you to do so!_
+```
+close
+```
+
+A similar "save? prompt" wil appear when you try to quit now!
