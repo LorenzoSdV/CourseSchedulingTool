@@ -75,7 +75,7 @@ let remove_others sch str_lst =
 
 let is_not_json file =
   match String.split_on_char '.' file with
-  | name::extension::[] when extension != "json" -> true
+  | name::extension::[] when extension <> "json" -> true
   | _ -> raise InvalidFileForExport
 
 let export_handler sch str_lst = 
@@ -92,7 +92,7 @@ let is_json file =
 let save_handler sch str_lst = 
   match str_lst with
   | file :: [] -> if is_json file 
-    then (SaveJSON.save_schedule sch file;  
+    then (SaveJSON.save_schedule sch file; set_save_status sch true;   
           ANSITerminal.print_string [Bold] "\nSaved!\n"; sch) 
     else raise InvalidFileForSave
   | _ -> raise MalformedSave
