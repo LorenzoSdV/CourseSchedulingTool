@@ -82,7 +82,7 @@ let save_handler sch str_lst =
 
 let load_handler sch str_lst = 
   match str_lst with
-  | file :: [] -> sch;
+  | file :: [] -> sch
   | _ -> raise MalformedLoad
 
 let parse_command sch cmd_str = 

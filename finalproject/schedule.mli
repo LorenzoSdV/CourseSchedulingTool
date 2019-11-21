@@ -131,6 +131,12 @@ val new_schedule : schedule
 (** COMMENT *)
 val print_schedule : schedule -> unit
 
+(** [get_save_status sch] verifies if [sch] has been saved or not. *)
+val get_save_status : schedule -> bool
+
+(** [set_save_status sch] sets save status of [sch] to [bool]. *)
+val set_save_status : schedule -> bool -> unit
+
 (** [get_name sch] is the user-defined name of schedule [sch]. *)
 val get_name : schedule -> string
 

@@ -22,7 +22,7 @@ let make_sch_creds_tests
     (name: string)
     (sched: schedule)
     (expected_output: int) : test = 
-  name >:: (fun _ -> assert_equal expected_output (get_credits (to_list sched))
+  name >:: (fun _ -> assert_equal expected_output (get_credits sched)
                ~printer:string_of_int)
 
 let make_sem_creds_tests

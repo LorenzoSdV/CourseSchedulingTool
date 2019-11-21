@@ -30,7 +30,7 @@ type schedule = {
   mutable exp_grad: int;
   mutable major: string;
   mutable sch_credits : int;
-  mutable saved : bool;
+  mutable is_saved : bool;
 }
 
 exception UnknownCourse of string
@@ -249,8 +249,14 @@ let new_schedule =
     exp_grad = 0;
     major = "";
     sch_credits = 0;
-    saved = false;
+    is_saved = true;
   }
+
+let get_save_status sch = 
+  sch.is_saved
+
+let set_save_status sch bool =
+  sch.is_saved <- bool
 
 let get_name sch =
   sch.desc
@@ -401,7 +407,7 @@ module LoadJSON = struct
       exp_grad = json |> Yj.member "expected grad year" |> Yj.to_int;
       major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = 0;
-      saved = true
+      is_saved = true
     } in
     { new_sch with sch_credits = (calc_credits (to_list new_sch)) }
 
