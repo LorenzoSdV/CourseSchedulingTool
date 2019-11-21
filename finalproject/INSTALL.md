@@ -1,6 +1,6 @@
 # CS 3110 Final Project 
 
-**Members:** Chris O'Brian (co253), Lorenzo Scotti di Vettimo (ls769), Radha Patel (rdp89)
+**Members:** Chris O'Brian (co253), Lorenzo Scotto di Vettimo (ls769), Radha Patel (rdp89)
 
 
 ## Installation Instructions
@@ -17,7 +17,7 @@ Then, you can start our program by running "make run".
 
 **NOTE:** You can always just press Enter/Return at the main prompt for info
 on what possible commands can be used. Then, entering only that command with no
-arguments will either executet the command (like "clear" or "quit"), or it will
+arguments will either execute the command (like "clear" or "quit"), or it will
 provide info on what other arguments are required.
 
 ## Some example commands for MS1 functionality:
@@ -62,7 +62,7 @@ Remove a semester:
 remove SP20
 ```
 
-Exit:
+close:
 ```
 quit
 ```
@@ -85,12 +85,12 @@ Or load a previously saved schedule:
 load <filepath>.json
 ```
 
-**NOTE:** We have included an _example.json_ file containg a schedule
-already popualted with some courses and semesters. Feel free to try loading and
+**NOTE:** We have included an _example.json_ file containing a schedule
+already populated with some courses and semesters. Feel free to try loading and
 working with it!
 
 Once schedule is loaded, you'll be taken to the primary user prompt, where the
-schedule name appears in green at the input line. New commands availble are:
+schedule name appears in green at the input line. New commands available are:
 
 Saving a schedule:
 _This command saves schedule as test.json in current working directory._
@@ -107,10 +107,10 @@ export test.html
 You can now open the html file in a web browser to see a nice visualization of
 the schedule!
 
-You can also close a current scedule to return to the initial prompt:
+You can also close a current schedule to return to the initial prompt:
 _Note: If you haven't saved your schedule it will prompt you to do so!_
 ```
 close
 ```
 
-A similar "save? prompt" wil appear when you try to quit now!
+A similar "save? prompt" will appear when you try to quit now!
