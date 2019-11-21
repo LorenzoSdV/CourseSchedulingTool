@@ -24,7 +24,7 @@ and prompt sch =
       else save_prompt sch; init_prompt (read_line ())
     end
   | "" -> begin
-      print_endline "Valid Commands: add | edit | remove | print | export | clear | close | quit";
+      print_endline "Valid Commands: add | edit | remove | save | print | export | clear | close | quit";
       print_endline "Enter a command to view usage instructions.";
       prompt sch
     end
@@ -64,7 +64,7 @@ and prompt sch =
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | print | export | clear | " ^
+         "Valid Commands: add | edit | remove | save | print | export | clear | " ^
          "close | quit\n")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
