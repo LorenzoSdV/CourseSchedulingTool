@@ -168,7 +168,7 @@ let add_course sch c semid =
       sem.sem_gpa <- gpa sem.courses;
       sem.tot_credits <- sem.tot_credits + c.credits;
       sch.sch_credits <- sch.sch_credits + c.credits;
-      { sch with cumul_gpa = gpa (to_list sch) }
+      sch.cumul_gpa <- gpa (to_list sch); sch
     end
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))

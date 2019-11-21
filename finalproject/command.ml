@@ -93,7 +93,6 @@ let parse_command sch cmd_str =
     | "edit" -> edit_others sch others
     | "remove" -> remove_others sch others
     | "save" -> save_handler sch others
-    | "load" -> load_handler sch others
     | "export" -> export_handler sch others
     | _ -> raise Malformed
   in

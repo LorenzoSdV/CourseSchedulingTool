@@ -39,7 +39,7 @@ and prompt sch =
       exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
       exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
-    | InvalidURL -> 
+    | ClassRoster.InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
     | InvalidFile ->
       exceptions sch "File path is not valid. Try again."
@@ -63,8 +63,9 @@ and prompt sch =
     | Malformed | _ -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | print | export | clear | close | quit\n") 
-  end
+         "Valid Commands: add | edit | remove | print | export | clear | " ^
+         "close | quit\n")
+
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
 and exceptions sch err = 
@@ -93,11 +94,11 @@ and init_prompt init_str =
 let main () =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
-  print_endline ("If you want to open an alredy existing schedule, type 'load' <json_file>, or type " ^
-                 "'new' <schedule_name> to create a new schedule (NOTE: The name " ^
-                 "of the schedule must not have any spaces!).\n");
-  print_string  "> ";
-  init_prompt (read_line ())
+  print_endline 
+    ("If you want to open an alredy existing schedule, type 'load' " ^
+     "<json_file>, or type 'new' <schedule_name> to create a new schedule " ^
+     "(NOTE: The name of the schedule must not have any spaces!).\n");
+  init_prompt ()
 
 (* Starts system *)
 let () = main ()
