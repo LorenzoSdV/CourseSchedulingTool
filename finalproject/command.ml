@@ -9,7 +9,6 @@ exception MalformedAdd
 exception MalformedEdit
 exception MalformedRemove
 exception MalformedSave
-exception MalformedLoad
 exception MalformedExport
 
 exception InvalidFile
@@ -79,11 +78,6 @@ let save_handler sch str_lst =
   match str_lst with
   | file :: [] -> SaveJSON.save_schedule sch file; sch
   | _ -> raise MalformedSave
-
-let load_handler sch str_lst = 
-  match str_lst with
-  | file :: [] -> sch
-  | _ -> raise MalformedLoad
 
 let parse_command sch cmd_str = 
 

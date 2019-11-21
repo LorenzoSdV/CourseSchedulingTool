@@ -21,9 +21,6 @@ exception MalformedRemove
 (** Raised when a Save command has invalid syntax *)
 exception MalformedSave
 
-(** Raised when an Load command has invalid syntax*)
-exception MalformedLoad
-
 (** Raised when an Export command has invalid syntax*)
 exception MalformedExport
 

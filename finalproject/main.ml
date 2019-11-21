@@ -19,52 +19,51 @@ and prompt sch =
   | "quit" -> Stdlib.exit 0
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "close" -> begin if get_save_status sch 
-      then ANSITerminal.(print_string [cyan] "\nHOMEPAGE\n\n"); init_prompt (read_line ()) else save_prompt sch end
+      then ANSITerminal.(print_string [cyan] "\nHOMEPAGE\n\n"); init_prompt (read_line ()) else save_prompt sch
+end
 | "" -> begin
     print_endline "Valid Commands: add | edit | remove | print | export | clear | close | quit";
     print_endline "Enter a command to view usage instructions.";
     prompt sch
   end
-| string_cmd -> begin
-    try
-      prompt (parse_command sch string_cmd)
-    with
-    | UnknownCourse msg -> 
-      exceptions sch ("Invalid/Unknown Course: " ^ msg)
-    | UnknownSemester msg -> 
-      exceptions sch ("Invalid/Unknown Semester: " ^ msg)
-    | UnknownGrade msg -> 
-      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg)
-    | DuplicateCourse msg -> 
-      exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
-    | DuplicateSemester msg -> 
-      exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
-    | ClassRoster.InvalidURL -> 
-      exceptions sch "Error Retrieving Course Info from Online"
-    | InvalidFile ->
-      exceptions sch "File path is not valid. Try again."
-    | MalformedSemId -> 
-      exceptions sch ("Incorrect Semester Entry Format: " ^
-                      "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")
-    | MalformedAdd ->
-      exceptions sch ("Usage: add [<course_name> [(optional: <credits>) <grade>"
-                      ^ " <category> <semester>] | <semester>]")
-    | MalformedEdit ->
-      exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
-                      "name <new_name>]")
-    | MalformedRemove ->
-      exceptions sch "Usage: remove [<course_name> | <semester>]"
-    | MalformedExport ->
-      exceptions sch "Usage: export <json_file>"
-    | MalformedSave ->
-      exceptions sch "Usage: save <json_file>"
-    | MalformedLoad -> 
-      exceptions sch "Usage: load <json_file>"
-    | Malformed | _ -> 
-      exceptions sch 
-        ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | print | export | clear | " ^
-         "close | quit\n")
+| string_cmd ->
+  try
+    prompt (parse_command sch string_cmd)
+  with
+  | UnknownCourse msg -> 
+    exceptions sch ("Invalid/Unknown Course: " ^ msg)
+  | UnknownSemester msg -> 
+    exceptions sch ("Invalid/Unknown Semester: " ^ msg)
+  | UnknownGrade msg -> 
+    exceptions sch ("Invalid/Unknown Grade Value: " ^ msg)
+  | DuplicateCourse msg -> 
+    exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
+  | DuplicateSemester msg -> 
+    exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
+  | ClassRoster.InvalidURL -> 
+    exceptions sch "Error Retrieving Course Info from Online"
+  | InvalidFile ->
+    exceptions sch "File path is not valid. Try again."
+  | MalformedSemId -> 
+    exceptions sch ("Incorrect Semester Entry Format: " ^
+                    "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")
+  | MalformedAdd ->
+    exceptions sch ("Usage: add [<course_name> [(optional: <credits>) <grade>"
+                    ^ " <category> <semester>] | <semester>]")
+  | MalformedEdit ->
+    exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
+                    "name <new_name>]")
+  | MalformedRemove ->
+    exceptions sch "Usage: remove [<course_name> | <semester>]"
+  | MalformedExport ->
+    exceptions sch "Usage: export <json_file>"
+  | MalformedSave ->
+    exceptions sch "Usage: save <json_file>"
+  | Malformed | _ -> 
+    exceptions sch 
+      ("Unrecognized Command Entry!\n" ^ 
+       "Valid Commands: add | edit | remove | print | export | clear | " ^
+       "close | quit\n")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
