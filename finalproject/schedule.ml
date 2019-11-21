@@ -90,12 +90,12 @@ let gpa courses =
 let get_credits sch = 
   sch.sch_credits
 
-(*let get_credits courses =
+let calc_credits courses =
   let rec fold courses acc =
     match courses with
     | [] -> acc
     | { credits = c } :: t -> fold t (acc + c)
-  in fold courses 0*)
+  in fold courses 0
 
 let to_list sch =
   let rec fold sems acc = 
@@ -118,7 +118,7 @@ let string_of_grade gr =
   | Incomplete -> "Incomplete"
   | Letter l -> l
 
-(** [sem_compare s1 s2] returns a negative number if [s1] comes before [s2], 
+(** [sem_compare s1 s2] is a negative number if [s1] comes before [s2], 
     0 if theyre the same semester, and a positive number if [s1] comes after
     [s2]. *)
 let sem_compare s1 s2 =
@@ -244,7 +244,7 @@ let remove_sem sch semid =
 
 let new_schedule =
   {
-    desc = "";
+    desc = "New Schedule";
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = 0;
@@ -270,7 +270,9 @@ let print_sem sem =
 
 let print_schedule sch =
   if sch.semesters = [] then 
-    ANSITerminal.(print_string [red] "No semesters in current schedule. Try running 'add <semester>'\n")
+    ANSITerminal.(
+      print_string [red] 
+        "No semesters in current schedule. Try running 'add <semester>'\n")
   else begin
     List.fold_left 
       (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
@@ -301,11 +303,15 @@ module HTML = struct
 
   let html_of_sem sem =
     match sem.courses with
-    | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ "</h3></td></tr>\n"
+    | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ 
+            "</h3></td></tr>\n"
     | _ -> begin
-        "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ "</h3>\n" ^
-        "\t\t\t<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ "</strong></p></td>\n" ^ 
-        (List.fold_left (fun acc course -> acc ^ (html_of_course course)) "" sem.courses) ^ 
+        "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ 
+        "</h3>\n" ^
+        "\t\t\t<p>Semester GPA: <strong>" ^ (string_of_float sem.sem_gpa) ^ 
+        "</strong></p></td>\n" ^ 
+        (List.fold_left (fun acc course -> acc ^ (html_of_course course)) 
+           "" sem.courses) ^ 
         "\t\t\t</tr>\n" end
 
   let html_of_schedule sch =
@@ -313,9 +319,13 @@ module HTML = struct
     | [] -> "<p>Schedule is empty!</p>\n"
     | _ -> begin
         "<h1><strong style=\"color:green;\">" ^ sch.desc ^ "</strong></h1>\n" ^ 
-        "\t\t<h2>Cumulative GPA: <strong style=\"color:blue;\">" ^ (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
+        "\t\t<h2>Cumulative GPA: <strong style=\"color:blue;\">" ^ 
+        (string_of_float sch.cumul_gpa) ^ "</strong></h2>\n" ^ 
+        "\t\t<h2>Total Credits: <strong style=\"color:red;\">" ^ 
+        (string_of_int sch.sch_credits) ^ "</strong></h2>\n" ^ 
         "\t\t<table>\n" ^ 
-        (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) "" (get_sems sch)) ^ 
+        (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) 
+           "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
   let save filename text = 
@@ -376,7 +386,8 @@ module LoadJSON = struct
   let get_semester json = 
     {
       id = json |> Yj.member "semester id" |> Yj.to_string |> form_sem_id;
-      courses = json |> Yj.member "courses" |> Yj.to_list |> List.map parse_course;
+      courses = json |> Yj.member "courses" |> Yj.to_list |> 
+                List.map parse_course;
       tot_credits = json |> Yj.member "semester credits" |> Yj.to_int;
       sem_gpa = json |> Yj.member "semester gpa" |> Yj.to_float;
     }
@@ -385,20 +396,19 @@ module LoadJSON = struct
     let json = Yojson.Basic.from_file fl in
     let new_sch = {
       desc = json |> Yj.member "description" |> Yj.to_string;
-      semesters = json |> Yj.member "semesters" |> Yj.to_list |> List.map get_semester;
+      semesters = json |> Yj.member "semesters" |> Yj.to_list |> 
+                  List.map get_semester;
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
       exp_grad = json |> Yj.member "expected grad year" |> Yj.to_int;
       major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = 0;
       saved = true
     } in
-    {new_sch with sch_credits = new_sch.sch_credits}
+    { new_sch with sch_credits = (calc_credits (to_list new_sch)) }
 
 end
 
-module SaveJSON = struct   
-
-  open Yojson.Basic.Util
+module SaveJSON = struct
 
   let json_of_course c = 
     "\t\t\t\t{\n" ^
@@ -415,8 +425,9 @@ module SaveJSON = struct
     "\t\t\t\"semester credits\": " ^ (string_of_int sem.tot_credits) ^ ",\n" ^
     "\t\t\t\"semester gpa\": " ^ (string_of_float sem.sem_gpa) ^ ",\n" ^
     "\t\t\t\"courses\": [\n" ^ 
-    (Str.replace_first reg "}\n" (List.fold_left 
-                                    (fun acc course -> acc ^ (json_of_course course)) "" (sem.courses))) ^
+    (Str.replace_first reg "}\n" 
+       (List.fold_left (fun acc course -> acc ^ (json_of_course course)) 
+          "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
   let json_of_schedule sch = 
@@ -427,8 +438,9 @@ module SaveJSON = struct
     "\t\"expected grad year\": " ^ (string_of_int sch.exp_grad) ^ ",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
-    (Str.replace_first reg "}\n" (List.fold_left 
-                                    (fun acc sem -> acc ^ (json_of_sem sem)) "" (sch.semesters))) ^
+    (Str.replace_first reg "}\n" 
+       (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem)) 
+          "" (sch.semesters))) ^
     "\t]\n}\n"
 
   let save_schedule sch fl =
