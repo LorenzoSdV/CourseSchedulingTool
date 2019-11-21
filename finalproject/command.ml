@@ -74,11 +74,8 @@ let remove_others sch str_lst =
 
 let export_handler sch str_lst = 
   match str_lst with
-  | file :: [] -> begin
-      try ignore(Yojson.Basic.from_file file); raise InvalidFile
-      with
-      | Sys_error _ -> HTML.export_schedule sch file; sch
-    end
+  | file :: [] -> if Yojson.Basic.from_file file = raise (Sys_error "")
+    then (HTML.export_schedule sch file; sch) else raise InvalidFile
   | _ -> raise MalformedExport
 
 let save_handler sch str_lst = 
