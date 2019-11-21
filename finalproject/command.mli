@@ -24,8 +24,11 @@ exception MalformedSave
 (** Raised when an Export command has invalid syntax*)
 exception MalformedExport
 
-(** Raised when Save/Load/Export command is given with invalid file path. *)
-exception InvalidFile
+(** Raised when Export command is given with invalid file path. *)
+exception InvalidFileForExport
+
+(** Raised when Save command is given with invalid file path *)
+exception InvalidFileForSave
 
 (** [parse_command cmd_str sch] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 

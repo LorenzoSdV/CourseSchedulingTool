@@ -2,12 +2,27 @@ open Schedule
 open Command
 open ClassRoster
 
-let rec save_prompt sch =
-  ANSITerminal.print_string [Bold; Blink] "WARNING: You have unsaved changes. Would you like to save now?";
+let save_prompt_helper sch =
+  print_string ("Choose the name of the JSON file you will save this schedule to:\n\n");
   match read_line () with
-  | "yes" -> set_save_status sch true; ANSITerminal.print_string [Bold] "\nSaved!\n"; 
+  | "" -> raise InvalidFileForSave
+  | file_name -> SaveJSON.save_schedule sch file_name
+
+let rec save_prompt_from_quit sch =
+  ANSITerminal.print_string [Bold] "WARNING: You have unsaved changes. Would you like to save now before closing?\n\n";
+  match read_line () with
+  | "yes" -> save_prompt_helper sch; set_save_status sch true; 
+    ANSITerminal.print_string [Bold] "\nSaved!\n"; 
+  | "no" -> Stdlib.exit 0
+  | _ -> print_endline ("Type 'yes' or 'no' to continue.\n"); save_prompt_from_quit sch
+
+and save_prompt_from_close sch =
+  ANSITerminal.print_string [Bold] "WARNING: You have unsaved changes. Would you like to save now before closing?\n\n";
+  match read_line () with
+  | "yes" -> save_prompt_helper sch; set_save_status sch true; 
+    ANSITerminal.print_string [Bold] "\nSaved!\n"; 
   | "no" -> ANSITerminal.(print_string [cyan] "\nHOMEPAGE\n\n"); init_prompt (read_line ())
-  | _ -> print_endline ("Type 'yes' or 'no' to continue."); save_prompt sch
+  | _ -> print_endline ("Type 'yes' or 'no' to continue."); save_prompt_from_close sch
 
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
@@ -16,12 +31,12 @@ and prompt sch =
   ANSITerminal.(print_string [green] ("\n" ^ (get_name sch) ^ ": "));
   match read_line () with 
   | exception End_of_file -> ()
-  | "quit" -> if get_save_status sch then Stdlib.exit 0 else save_prompt sch; Stdlib.exit 0
+  | "quit" -> if get_save_status sch then Stdlib.exit 0 else save_prompt_from_quit sch
   | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "close" -> 
     begin if get_save_status sch 
       then (ANSITerminal.(print_string [cyan] "\nHOMEPAGE\n\n"); init_prompt (read_line ())) 
-      else save_prompt sch; init_prompt (read_line ())
+      else save_prompt_from_close sch; init_prompt (read_line ())
     end
   | "" -> begin
       print_endline "Valid Commands: add | edit | remove | save | print | export | clear | close | quit";
@@ -44,8 +59,10 @@ and prompt sch =
       exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
     | ClassRoster.InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
-    | InvalidFile ->
-      exceptions sch "File path is not valid. Try again."
+    | InvalidFileForExport ->
+      exceptions sch "File path cannot be a JSON. Try again."
+    | InvalidFileForSave -> 
+      exceptions sch "File path must be a JSON. Try again." 
     | MalformedSemId -> 
       exceptions sch ("Incorrect Semester Entry Format: " ^
                       "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")

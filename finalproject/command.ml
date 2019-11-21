@@ -11,7 +11,8 @@ exception MalformedRemove
 exception MalformedSave
 exception MalformedExport
 
-exception InvalidFile
+exception InvalidFileForExport
+exception InvalidFileForSave
 
 
 let is_valid_coursename str =
@@ -33,9 +34,9 @@ let sem_id_parse sem_id =
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
-  | sem_id::[] -> set_save_status sch true; 
+  | sem_id::[] -> set_save_status sch false; 
     add_sem sch (create_sem (sem_id_parse sem_id))
-  | course_name::grade::degree::sem_id::[] -> set_save_status sch true;
+  | course_name::grade::degree::sem_id::[] -> set_save_status sch false;
     let name = String.uppercase_ascii course_name in
     add_course sch 
       (create_course name 
@@ -43,7 +44,7 @@ let add_others sch str_lst =
             (sem_id_parse sem_id)) 
          (Schedule.gradify grade) degree) 
       (sem_id_parse sem_id)
-  | course_name::credits::grade::degree::sem_id::[] -> set_save_status sch true;
+  | course_name::credits::grade::degree::sem_id::[] -> set_save_status sch false;
     let name = String.uppercase_ascii course_name in
     add_course sch (create_course name 
                       (int_of_string credits) 
@@ -55,8 +56,8 @@ let add_others sch str_lst =
 let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
-  | "name"::new_val::[] -> set_save_status sch true; edit_name sch new_val
-  | course_name::field::new_val::[] -> set_save_status sch true;
+  | "name"::new_val::[] -> set_save_status sch false; edit_name sch new_val
+  | course_name::field::new_val::[] -> set_save_status sch false;
     edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
@@ -66,22 +67,24 @@ let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
   | sem_id::[] when is_valid_coursename sem_id = false -> 
-    set_save_status sch true;
+    set_save_status sch false;
     remove_sem sch (sem_id_parse sem_id)
-  | course_name::[] -> set_save_status sch true; 
+  | course_name::[] -> set_save_status sch false; 
     remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
 let export_handler sch str_lst = 
   match str_lst with
   | file :: [] -> if Yojson.Basic.from_file file = raise (Sys_error "")
-    then (HTML.export_schedule sch file; sch) else raise InvalidFile
+    then (HTML.export_schedule sch file; sch) else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
 let save_handler sch str_lst = 
   match str_lst with
-  | file :: [] -> SaveJSON.save_schedule sch file;  
-    ANSITerminal.print_string [Bold] "\nSaved!\n"; sch
+  | file :: [] -> if Yojson.Basic.from_file file <> raise (Sys_error "") 
+    then (SaveJSON.save_schedule sch file;  
+          ANSITerminal.print_string [Bold] "\nSaved!\n"; sch) 
+    else raise InvalidFileForSave
   | _ -> raise MalformedSave
 
 let parse_command sch cmd_str = 
