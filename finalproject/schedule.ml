@@ -314,6 +314,7 @@ let print_schedule sch =
 
 module HTML = struct
 
+  (** [template] inputs data from a created HTML into a template. *)
   let template =
     let rec input_file acc chan = 
       try
@@ -323,6 +324,8 @@ module HTML = struct
     in
     input_file "" (open_in "temp.html")
 
+  (** [html_of_course c] returns a string that represents a course that can be
+      converted into an HTML. *) 
   let html_of_course c =
     "\t\t\t\t<td>\n" ^ 
     "\t\t\t\t\t<h4><strong>" ^ c.name ^ "</strong></h4>\n" ^ 
@@ -331,6 +334,8 @@ module HTML = struct
     "\t\t\t\t\t<p>Category: " ^ c.degree ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
+  (** [html_of_sem sem] returns a string that represents a semester that can be
+      converted into an HTML. *) 
   let html_of_sem sem =
     match sem.courses with
     | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ 
@@ -344,6 +349,8 @@ module HTML = struct
            "" sem.courses) ^ 
         "\t\t\t</tr>\n" end
 
+  (** [html_of_schedule sch] returns a string that represents a schedule that 
+      can be converted into an HTML. *) 
   let html_of_schedule sch =
     match (get_sems sch) with
     | [] -> "<p>Schedule is empty!</p>\n"
@@ -359,6 +366,8 @@ module HTML = struct
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
+  (** [save filename text] creates a file named [filename] and puts [text]
+      in it. *)
   let save filename text = 
     let chan = open_out filename in
     output_string chan text;
