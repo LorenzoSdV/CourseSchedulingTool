@@ -89,7 +89,7 @@ load <filepath>.json
 already populated with some courses and semesters. Feel free to try loading and
 working with it!
 
-Once schedule is loaded, you'll be taken to the primary user prompt, where the
+Once schedule is loaded or created, you'll be taken to the primary user prompt, where the
 schedule name appears in green at the input line. New commands available are:
 
 Saving a schedule:
