@@ -40,6 +40,9 @@ let tests = [
   make_sch_creds_tests "total credits with edited class, raised # credits"
     sch10 11;
 
+  (* We've been doing A LOT of interactive testing. This will be
+     our primary testing method from here on out. *)
+
 ]
 
 let suite = "search test suite" >::: tests 
