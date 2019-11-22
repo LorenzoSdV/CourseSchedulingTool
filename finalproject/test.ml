@@ -30,22 +30,15 @@ let make_sem_creds_tests
     (sem: semester)
     (expected_output: int) : test = 
   name >:: 
-  (fun _ -> assert_equal expected_output (get_sem_courses sem |> get_credits)
+  (fun _ -> assert_equal expected_output (get_sem_courses sem |> calc_credits)
       ~printer:string_of_int)        
 
 let tests = [
   (** Schedule tests *)
   make_sch_creds_tests "total credits of sch10" sch10 11;
-  (*make_sch_creds_tests "total credits with one semester, added classes" sch4 7;
-    make_sch_creds_tests "total credits with two semesters, added classes" sch7 15;
-    make_sch_creds_tests "total credits with removed class" sch8 11;
-    make_sch_creds_tests "total credits with edited class, lowered # credits"
-    sch9 10; 
-    make_sch_creds_tests "total credits with edited class, raised # credits"
+  make_sch_creds_tests "total credits with removed class" sch8 11;
+  make_sch_creds_tests "total credits with edited class, raised # credits"
     sch10 11;
-
-    make_sem_creds_tests "fall semester, no classes" 
-    (get_sem sch2 (get_sems sch2) (Fall 2019)) 0;*)
 
 ]
 

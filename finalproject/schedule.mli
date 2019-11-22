@@ -99,6 +99,9 @@ val gpa : course list -> float
 (** [get_credits sch] is the sum of all the credits in the schedule [sch]. *)
 val get_credits : schedule -> int
 
+(** [get_credits cl] is the calculated sum of credits of each course in [cl] *)
+val calc_credits : course list -> int
+
 (** [create_sem courses semid] is a semester with courses [courses] and id
     [semid]. Automatically calculates GPA and # credits. *)
 val create_sem : sem_id -> semester
