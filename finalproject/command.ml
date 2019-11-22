@@ -83,7 +83,7 @@ let edit_others sch str_lst =
 let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
-  | sem_id::[] when is_valid_coursename sem_id = false -> 
+  | sem_id::[] when format_sem_id sem_id && is_valid_coursename sem_id = false-> 
     remove_sem sch (sem_id_parse sem_id)
   | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
@@ -103,7 +103,7 @@ let export_handler sch str_lst =
 
 let is_json file =
   match String.split_on_char '.' file with
-  | name::extension::[] when extension = "json" -> true
+  | name::extension::[] when name <> "" && extension = "json" -> true
   | _ -> raise InvalidFileForSave
 
 (** [save_handler sch str_lst] parses [str_lst] in [sch] for the 

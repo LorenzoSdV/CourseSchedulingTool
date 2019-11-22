@@ -145,9 +145,12 @@ val set_save_status : schedule -> bool -> unit
 (** [get_name sch] is the user-defined name of schedule [sch]. *)
 val get_name : schedule -> string
 
-(** [edit_name sch nm] is the shcedule that results from changing the name of 
+(** [edit_name sch nm] is the schedule that results from changing the name of 
     [sch] to [nm]. *)
 val edit_name : schedule -> string -> schedule
+
+(** [set_name sch nm] is the schedule with its initial name. *)
+val set_init_name : schedule -> string -> schedule
 
 
 

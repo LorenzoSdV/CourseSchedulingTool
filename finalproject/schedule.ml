@@ -264,7 +264,7 @@ let remove_sem sch semid =
 
 let new_schedule =
   {
-    desc = "New Schedule";
+    desc = "";
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = 0;
@@ -282,6 +282,11 @@ let get_name sch =
 let edit_name sch nm =
   sch.desc <- nm;
   set_save_status sch false;
+  sch
+
+let set_init_name sch nm =
+  sch.desc <- nm;
+  set_save_status sch true;
   sch
 
 let print_sem sem =
