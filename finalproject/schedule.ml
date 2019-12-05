@@ -90,6 +90,7 @@ let gpa courses =
   in
   (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
 
+(** NEEDS COMMENT *)
 let gpa_to_string gpa_float = 
   let gpa = string_of_float gpa_float in
   match String.length gpa with

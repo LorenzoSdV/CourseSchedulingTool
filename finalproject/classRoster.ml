@@ -30,7 +30,7 @@ let course_html name sem =
     webpage is stored in [html].
     Raises: [InvalidURL] if [html] doesn't contain this information. *)
 let parse_credits html =
-  let reg = Str.regexp_string "<span class=\"credit-val\">" in
+  let reg = Str.regexp_string {|<span class="credit-val">|} in
   try
     int_of_string (String.sub html ((Str.search_forward reg html 0) + 25) 1)
   with
@@ -45,7 +45,7 @@ let get_course_creds name sem =
     raise (UnknownCourse name)
 
 (*
-  FOR SPRINT 2
+  FOR SPRINT 3
 let valid_course name sem credits =
   try
     if (get_course_creds name sem = credits) then true

@@ -30,7 +30,7 @@ bisect: clean test
 	bisect-ppx-report -I _build -html report bisect0001.out
 
 zip:
-	zip scheduler_src.zip *.ml* *.sh* temp.html example.json _tags Makefile INSTALL.md .ocamlinit
+	zip scheduler_src.zip *.ml* *.sh* temp.html example.json _tags Makefile INSTALL.md .ocamlinit LOC.txt
 	
 docs: docs-public docs-private
 	

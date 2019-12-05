@@ -2,7 +2,7 @@
     semester, a present one, or a future semester. *)
 type sem_status = Past | Present | Future
 
-(**  NEEDS COMMENT *)
+(** NEEDS COMMENT *)
 type sem_id = Spring of int | Fall of int
 
 (** The type representing the grade of a course. *)
