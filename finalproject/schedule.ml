@@ -1,5 +1,5 @@
 type sem_status = Past | Present | Future
-type grade = Sat | Unsat | Withdrawn | Incomplete | Letter of string 
+type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
 
 type sem_id = Spring of int | Fall of int
 
@@ -70,6 +70,7 @@ let gradify str =
     | "W" | "WITHDRAWN" -> Withdrawn
     | "SAT" | "S" -> Sat
     | "UNSAT" | "U" -> Unsat
+    | "NONE" -> None
     | _ -> raise (UnknownGrade str)
 
 let gpa courses =
@@ -129,6 +130,7 @@ let string_of_grade gr =
   | Unsat -> "Unsatisfactory"
   | Withdrawn -> "Withdrawn"
   | Incomplete -> "Incomplete"
+  | None -> "None"
   | Letter l -> l
 
 (** [sem_compare s1 s2] is a negative number if [s1] comes before [s2], 
