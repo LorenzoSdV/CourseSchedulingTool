@@ -114,3 +114,19 @@ close
 ```
 
 A similar "save? prompt" will appear when you try to quit now!
+
+
+
+## Example commands for MS3 functionality:
+
+We've now added the ability for a user to add courses from a semester built 
+with the Scheduler tool on Cornell's Class Roster website. This entails building
+the semester online, then downloading the iCal (.ics) file. This sem can be 
+imported to a schedule using:
+
+```
+import <file>.ics
+```
+
+_Notice_ that this command will create a new semester if the semester doesn't
+already exist automatically.

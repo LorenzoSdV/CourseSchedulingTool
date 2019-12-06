@@ -1,7 +1,8 @@
 open Schedule
 
-(** Needs Comment == is the list of lines of an ical file. *)
-let ical_to_list file =
+(** [file_to_list file] is a list of the lines of text from [file]. 
+    Rasises: [Sys_Error] with an error message if file cannot be found. *)
+let file_to_list file =
   let inch = open_in file in
   let rec all_lines ch acc = 
     try
@@ -12,7 +13,9 @@ let ical_to_list file =
   let result = all_lines inch [] in
   close_in inch; result
 
-(** Gets courses from list of data *)
+(** [parse_courses data] is a list of course names in format XX#### parsed from
+    [data]. Requires that [data] is the value of calling [file_to_list] on an
+    ical file downloaded from Cornell Class Roster (Scheduler). *)
 let parse_courses data_list =
   let regexp = Str.regexp "[A-Z][A-Z]+ [0-9][0-9][0-9][0-9]" in
   let important_lines = 
@@ -26,7 +29,9 @@ let parse_courses data_list =
   |> List.sort_uniq compare
   |> List.rev_map (let reg = Str.regexp " " in Str.replace_first reg "")
 
-(** gets semester info from ical data *)
+(** [parse_semid data] is a semester identifier of form FA## or SP## parsed 
+    from [data]. Requires that [data] is the value of calling [file_to_list] on 
+    an ical file downloaded from Cornell Class Roster (Scheduler). *)
 let parse_semid data_list =
   let line = 
     List.filter (fun s -> (Str.first_chars s 7) = "DTSTART") data_list
@@ -39,5 +44,5 @@ let parse_semid data_list =
   | _ -> failwith "Don't support summmer/winter sessions"
 
 let parse_file file = 
-  let data = ical_to_list file in
+  let data = file_to_list file in
   (parse_courses data, parse_semid data)
