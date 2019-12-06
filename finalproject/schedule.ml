@@ -55,7 +55,7 @@ let grade_map gr =
   | Letter "D" -> 1.0
   | Letter "D-" -> 0.7
   | Letter "F" -> 0.0
-  | _ -> failwith "Impossible Failure"
+  | _ -> -1.0
 
 let set_save_status sch bool =
   sch.is_saved <- bool
@@ -78,7 +78,7 @@ let gpa courses =
     match courses with
     | [] -> acc
     | { credits = c; grade = g } :: t -> 
-      if (grade_map g > 0.) then fold_credits t (acc + c)
+      if (grade_map g >= 0.) then fold_credits t (acc + c)
       else fold_credits t acc
   in
   let rec fold_gps courses acc =

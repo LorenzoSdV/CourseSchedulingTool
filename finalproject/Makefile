@@ -1,4 +1,4 @@
-MODULES=schedule classRoster command main authors
+MODULES=schedule classRoster iCalParser command main authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)

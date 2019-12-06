@@ -124,7 +124,7 @@ and prompt sch =
       exceptions sch "Usage: export <html_file_name>"
     | MalformedSave ->
       exceptions sch "Usage: save <json_file>"
-    | Malformed | _ -> 
+    | Malformed -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
          "Valid Commands: add | edit | remove | save | print | export | " ^ 

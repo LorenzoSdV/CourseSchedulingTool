@@ -34,8 +34,8 @@ let parse_semid data_list =
   in
   let timestamp = Str.string_before (Str.string_after line 10) 4 in
   match Str.last_chars timestamp 2 |> int_of_string with
-  | 1 | 2 -> "SP" ^ (Str.first_chars timestamp 4)
-  | 8 | 9 -> "FA" ^ (Str.first_chars timestamp 4)
+  | 1 | 2 -> "SP" ^ (Str.first_chars timestamp 2)
+  | 8 | 9 -> "FA" ^ (Str.first_chars timestamp 2)
   | _ -> failwith "Don't support summmer/winter sessions"
 
 let parse_file file = 
