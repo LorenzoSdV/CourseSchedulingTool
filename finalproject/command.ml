@@ -10,8 +10,10 @@ exception MalformedEdit
 exception MalformedRemove
 exception MalformedSave
 exception MalformedExport
+exception MalformedImport
 
 exception InvalidFileForExport
+exception InvalidFileForImport
 exception InvalidFileForSave
 
 exception SemesterDoesNotExist
@@ -33,7 +35,8 @@ let sem_id_parse sem_id =
   else 
     raise MalformedSemId
 
-(** [sem_exists sem_id_list sem_id] checks if [sem_id] is in [sem_id_list]. *)
+(** [sem_exists sem_id_list sem_id] is [()] if [sem_id] is in [sem_id_list]. 
+    Rasies [SemesterDoesNotExist] otherwise. *)
 let rec sem_exists sem_id_lst sem_id =
   match sem_id_lst with 
   | [] -> raise SemesterDoesNotExist
@@ -101,6 +104,24 @@ let export_handler sch str_lst =
     then (HTML.export_schedule sch file; sch) else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
+(** needs comment *)
+let import_handler sch str_lst = 
+  match str_lst with
+  | file :: [] -> begin
+      try
+        let courses, semid = ICalParser.parse_file file in
+        List.fold_left 
+          (fun acc name -> add_course acc 
+              (create_course name
+                 (get_course_creds name 
+                    (sem_id_parse semid))
+                 (gradify "none") "none") 
+              (sem_id_parse semid)) sch courses
+      with
+      | Sys_error _ -> raise InvalidFileForImport end
+  | _ -> raise MalformedImport
+
+(** Needs comment *)
 let is_json file =
   match String.split_on_char '.' file with
   | name::extension::[] when name <> "" && extension = "json" -> true
@@ -125,6 +146,7 @@ let parse_command sch cmd_str =
     | "remove" -> remove_others sch others
     | "save" -> save_handler sch others
     | "export" -> export_handler sch others
+    | "import" -> import_handler sch others
     | _ -> raise Malformed
   in
 

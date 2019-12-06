@@ -24,8 +24,14 @@ exception MalformedSave
 (** Raised when an Export command has invalid syntax. *)
 exception MalformedExport
 
+(** Raised when an Import command has invalid syntax. *)
+exception MalformedImport
+
 (** Raised when Export command is given with invalid file path. *)
 exception InvalidFileForExport
+
+(** Raised when Import command is given with invalid file path. *)
+exception InvalidFileForImport
 
 (** Raised when Save command is given with invalid file path. *)
 exception InvalidFileForSave
