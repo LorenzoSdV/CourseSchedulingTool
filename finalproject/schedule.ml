@@ -97,7 +97,9 @@ let gpa_to_string gpa_float =
   match String.length gpa with
   | 0 | 1 -> failwith "Impossible Case"
   | 2 -> gpa ^ "00"
-  | 3 -> gpa ^ "0"
+  | 3 -> 
+    if gpa = "nan" then "0.00"
+    else gpa ^ "0"
   | 4 -> gpa
   | _ -> Str.first_chars gpa 4
 
