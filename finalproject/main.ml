@@ -165,7 +165,7 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
-      prompt (set_init_name Schedule.new_schedule new_name)
+      prompt (new_schedule new_name)
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
   | "quit"::[] -> Stdlib.exit 0

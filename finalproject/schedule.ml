@@ -278,9 +278,9 @@ let remove_sem sch semid =
     sch.is_saved <- false;
     sch end
 
-let new_schedule =
+let new_schedule name=
   {
-    desc = "";
+    desc = name;
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = 0;
@@ -303,13 +303,18 @@ let edit_name sch nm =
   sch.is_saved <- false;
   sch
 
-let set_init_name sch nm =
-  sch.desc <- nm;
-  sch.is_saved <- true;
-  sch
+let print_course sch course =
+  print_newline ();
+  ANSITerminal.(print_string [Bold] course.name); print_newline ();
+  print_endline ( "Credits: " ^ (string_of_int course.credits) );
+  print_endline ( "Grade: " ^ (string_of_grade course.grade) );
+  print_endline ( "Degree Category: " ^ course.degree );
+  let semid = (get_sem_from_course sch.semesters course).id in
+  print_endline ("Semester: " ^ string_of_semid semid)
 
+(** COMMENT *)
 let print_sem sem =
-  print_string ": [ ";
+  print_string ((string_of_semid sem.id) ^ ": [ ");
   List.fold_right 
     (fun course _ -> print_string ((course.name) ^ ", ")) 
     sem.courses ();
@@ -323,9 +328,7 @@ let print_schedule sch =
       print_string [red] 
         "No semesters in current schedule. Try running 'add <semester>'\n")
   else begin
-    List.fold_left 
-      (fun () sem -> print_string (string_of_semid sem.id); print_sem sem)
-      () sch.semesters;
+    List.fold_left (fun () sem -> print_sem sem) () sch.semesters;
     print_endline ("Cumulative GPA: " ^ (gpa_to_string sch.cumul_gpa));
     print_endline ("Total Credits: " ^ (string_of_int sch.sch_credits))
   end

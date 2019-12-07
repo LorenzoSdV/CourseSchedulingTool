@@ -173,6 +173,7 @@ let parse_command sch cmd_str =
   let split_cmd = String.split_on_char ' ' cmd_str in
   match split_cmd with 
   | [] -> raise Empty
-  | "print"::[] -> (print_schedule sch); sch
+  | "print"::[] -> print_schedule sch; sch
+  | "print"::c::[] -> get_course c (to_list sch) |> print_course sch; sch
   | fst::others -> match_helper fst others
 
