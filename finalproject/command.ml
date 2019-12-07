@@ -178,9 +178,8 @@ let parse_command sch cmd_str =
   | [] -> raise Empty
   | "print"::[] -> print_schedule sch; sch
   | "print"::c::[] ->
-    let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
     let nm = String.uppercase_ascii c in
-    if (Str.string_match reg nm 0) then
+    if is_valid_coursename nm then
       (get_course nm (to_list sch) |> print_course sch; sch)
     else
       raise MalformedPrint
