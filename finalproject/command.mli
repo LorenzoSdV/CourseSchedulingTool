@@ -18,6 +18,9 @@ exception MalformedEdit
 (** Raised when a Remove command has invalid syntax. *)
 exception MalformedRemove
 
+(** Raised when a Swap command has invalid syntax *)
+exception MalformedSwap
+
 (** Raised when a Save command has invalid syntax. *)
 exception MalformedSave
 

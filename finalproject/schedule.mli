@@ -75,6 +75,11 @@ val edit_course : schedule -> string -> string -> string -> schedule
     [add_course sch c semid] is [sch]. *)
 val remove_course : schedule -> string -> schedule
 
+(** [swap_courses c1_name c2_name sch] is the schedule with c1_name and c2_name 
+    swapped. [c1_name] cannot be the same course as [c2_name], and [c1_name]'s 
+    semester cannot be the same semester as [c2_name]'s semester. *)
+val swap_courses : string -> string -> schedule -> schedule
+
 (** [get_course name courses] is the course record with name [name]
     found in [courses].
     Raises: [UnknownCourse name] if course does not exist in [courses].*)

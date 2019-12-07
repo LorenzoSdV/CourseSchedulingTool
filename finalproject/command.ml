@@ -8,6 +8,7 @@ exception MalformedSemId
 exception MalformedAdd
 exception MalformedEdit
 exception MalformedRemove
+exception MalformedSwap
 exception MalformedSave
 exception MalformedExport
 exception MalformedImport
@@ -91,6 +92,8 @@ let remove_others sch str_lst =
   | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
+(** [is_not_json file] checks if [file] has the extension .json.
+    Raises: InvalidFileForExport if [file] is a .json. *)
 let is_not_json file =
   match String.split_on_char '.' file with
   | name::extension::[] when extension <> "json" -> true
@@ -104,7 +107,8 @@ let export_handler sch str_lst =
     then (HTML.export_schedule sch file; sch) else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
-(** needs comment *)
+(** [import_handler sch str_lst] parses [str_lst] in [sch] for the Import 
+    command. *)
 let import_handler sch str_lst = 
   match str_lst with
   | file :: [] -> begin
@@ -128,7 +132,8 @@ let import_handler sch str_lst =
     end
   | _ -> raise MalformedImport
 
-(** Needs comment *)
+(** [is_json file] checks if [file] has the extension .json.
+    Raises: InvalidFileForSave if [file] is not a .json. *)
 let is_json file =
   match String.split_on_char '.' file with
   | name::extension::[] when name <> "" && extension = "json" -> true
@@ -144,6 +149,13 @@ let save_handler sch str_lst =
     else raise InvalidFileForSave
   | _ -> raise MalformedSave
 
+let swap_others sch str_lst =
+  match str_lst with
+  | course1::course2::[] -> 
+    swap_courses (String.uppercase_ascii course1) 
+      (String.uppercase_ascii course2) sch
+  | _ -> raise MalformedSwap
+
 let parse_command sch cmd_str = 
 
   let match_helper first others =
@@ -151,6 +163,7 @@ let parse_command sch cmd_str =
     | "add" -> add_others sch others
     | "edit" -> edit_others sch others
     | "remove" -> remove_others sch others
+    | "swap" -> swap_others sch others
     | "save" -> save_handler sch others
     | "export" -> export_handler sch others
     | "import" -> import_handler sch others

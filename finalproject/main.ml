@@ -126,6 +126,8 @@ and prompt sch =
       exceptions sch "Usage: export <html_file_name>"
     | MalformedSave ->
       exceptions sch "Usage: save <json_file>"
+    | MalformedSwap -> 
+      exceptions sch "Usage: swap <course_name> <course_name>"
     | Malformed -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 

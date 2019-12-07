@@ -235,6 +235,27 @@ let remove_course sch cname =
   with 
     Not_found -> raise (UnknownCourse cname)
 
+let swap_courses c1_name c2_name sch =
+  let c1 = get_course c1_name (to_list sch) in
+  let sem1 = get_sem_from_course sch sch.semesters c1 in
+  let c2 = get_course c2_name (to_list sch) in
+  let sem2 = get_sem_from_course sch sch.semesters c2 in
+  if c1 = c2 then (ANSITerminal.(print_string [red] "Invalid\n");
+                   print_endline "You cannot swap the same course."; sch) 
+  else
+  if (string_of_semid sem1.id) = (string_of_semid sem2.id) 
+  then (ANSITerminal.(print_string [red] "Invalid\n"); 
+        print_endline (string_of_semid sem1.id);
+        print_endline (string_of_semid sem2.id);
+        print_endline "You cannot swap courses in the same semester."; sch)
+  else
+    (
+      ignore(remove_course sch c1_name);
+      ignore(remove_course sch c2_name);
+      ignore(add_course sch c1 sem2.id);
+      add_course sch c2 sem1.id
+    )
+
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
 
