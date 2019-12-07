@@ -45,6 +45,10 @@ exception DuplicateCourse of string
     to a schedule where a semester with the same id already exists. *)
 exception DuplicateSemester of string
 
+(** [InvalidSwap] is raised when an illegal swap is attempted. Swap is illegal 
+    if both courses are in same semester or both are same course. *)
+exception InvalidSwap
+
 (** [gradify str] is the grade representation of [str] where is some grade value 
     represented as a string.
     Requires: [str] is a valid string rep of a grade, like: 

@@ -101,6 +101,9 @@ and prompt sch =
       exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
       exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
+    | InvalidSwap ->
+      exceptions sch 
+        "Cannot swap course with itself or courses that are in same semester"
     | ClassRoster.InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
     | InvalidFileForExport ->

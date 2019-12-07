@@ -39,6 +39,7 @@ exception UnknownGrade of string
 exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
+exception InvalidSwap
 
 let grade_map gr = 
   match gr with
@@ -56,9 +57,6 @@ let grade_map gr =
   | Letter "D-" -> 0.7
   | Letter "F" -> 0.0
   | _ -> -1.0
-
-let set_save_status sch bool =
-  sch.is_saved <- bool
 
 let gradify str =
   let str_upper = String.uppercase_ascii str in
@@ -186,22 +184,24 @@ let add_course sch c semid =
       sem.tot_credits <- sem.tot_credits + c.credits;
       sch.sch_credits <- sch.sch_credits + c.credits;
       sch.cumul_gpa <- gpa (to_list sch); 
-      set_save_status sch false;
+      sch.is_saved <- false;
       sch
     end
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-let rec get_sem_from_course sch sems course = 
+(** Needs comment *)
+let rec get_sem_from_course sems course = 
   match sems with 
   | [] -> raise (UnknownCourse course.name)
-  | h :: t -> if get_course course.name (to_list sch) = course then h else
-      get_sem_from_course sch t course
+  | h :: t ->
+    if List.mem course h.courses then h
+    else get_sem_from_course t course
 
 let edit_course sch cname attr new_val =
   try
     let course = List.find (fun course -> course.name = cname) (to_list sch) in
-    let sem = get_sem_from_course sch sch.semesters course in
+    let sem = get_sem_from_course sch.semesters course in
     let old_creds = course.credits in
     match attr with
     | "credits" ->
@@ -210,13 +210,13 @@ let edit_course sch cname attr new_val =
       sem.tot_credits <- sem.tot_credits + diff;
       sch.sch_credits <- sch.sch_credits + diff;
       sem.sem_gpa <- gpa sem.courses;
-      sch.cumul_gpa <- gpa (to_list sch); set_save_status sch false; sch
+      sch.cumul_gpa <- gpa (to_list sch); sch.is_saved <- false; sch
     | "grade" -> 
       course.grade <- gradify new_val;
       sem.sem_gpa <- gpa sem.courses;
-      sch.cumul_gpa <- gpa (to_list sch); set_save_status sch false; sch
+      sch.cumul_gpa <- gpa (to_list sch); sch.is_saved <- false; sch
     | "degree" -> 
-      course.degree <- new_val; set_save_status sch false; sch
+      course.degree <- new_val; sch.is_saved <- false; sch
     | _ -> raise (Failure "Invalid course attribute")
   with
     Not_found -> raise (UnknownCourse cname)
@@ -224,37 +224,27 @@ let edit_course sch cname attr new_val =
 let remove_course sch cname =
   try
     let course = get_course cname (to_list sch) in
-    let sem = get_sem_from_course sch sch.semesters course in
+    let sem = get_sem_from_course sch.semesters course in
     sem.courses <- (List.filter (fun crs -> crs.name <> cname) sem.courses);
     sem.tot_credits <- sem.tot_credits - course.credits;
     sch.sch_credits <- sch.sch_credits - course.credits;
     sem.sem_gpa <- gpa sem.courses;
     sch.cumul_gpa <- gpa (to_list sch); 
-    set_save_status sch false;
+    sch.is_saved <- false;
     sch
   with 
     Not_found -> raise (UnknownCourse cname)
 
 let swap_courses c1_name c2_name sch =
   let c1 = get_course c1_name (to_list sch) in
-  let sem1 = get_sem_from_course sch sch.semesters c1 in
+  let sem1 = get_sem_from_course sch.semesters c1 in
   let c2 = get_course c2_name (to_list sch) in
-  let sem2 = get_sem_from_course sch sch.semesters c2 in
-  if c1 = c2 then (ANSITerminal.(print_string [red] "Invalid\n");
-                   print_endline "You cannot swap the same course."; sch) 
+  let sem2 = get_sem_from_course sch.semesters c2 in
+  if sem1.id = sem2.id then 
+    raise InvalidSwap
   else
-  if (string_of_semid sem1.id) = (string_of_semid sem2.id) 
-  then (ANSITerminal.(print_string [red] "Invalid\n"); 
-        print_endline (string_of_semid sem1.id);
-        print_endline (string_of_semid sem2.id);
-        print_endline "You cannot swap courses in the same semester."; sch)
-  else
-    (
-      ignore(remove_course sch c1_name);
-      ignore(remove_course sch c2_name);
-      ignore(add_course sch c1 sem2.id);
-      add_course sch c2 sem1.id
-    )
+    let sch' = remove_course (remove_course sch c1.name) c2.name in
+    add_course (add_course sch' c1 sem2.id) c2 sem1.id
 
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
@@ -275,7 +265,7 @@ let add_sem sch sem =
     raise (DuplicateSemester (string_of_semid sem.id))
   else
     sch.semesters <- List.sort sem_compare (sem :: sch.semesters); 
-  set_save_status sch false; sch
+  sch.is_saved <- false; sch
 
 let remove_sem sch semid = 
   if (not (List.mem semid (sem_ids sch))) then
@@ -285,7 +275,7 @@ let remove_sem sch semid =
       (List.filter (fun sem -> sem.id <> semid) sch.semesters); 
     sch.cumul_gpa <- gpa (to_list sch);
     sch.sch_credits <- calc_credits (to_list sch);
-    set_save_status sch false;
+    sch.is_saved <- false;
     sch end
 
 let new_schedule =
@@ -302,17 +292,20 @@ let new_schedule =
 let get_save_status sch = 
   sch.is_saved
 
+let set_save_status sch b =
+  sch.is_saved <- b
+
 let get_name sch =
   sch.desc
 
 let edit_name sch nm =
   sch.desc <- nm;
-  set_save_status sch false;
+  sch.is_saved <- false;
   sch
 
 let set_init_name sch nm =
   sch.desc <- nm;
-  set_save_status sch true;
+  sch.is_saved <- true;
   sch
 
 let print_sem sem =
@@ -519,7 +512,7 @@ module SaveJSON = struct
   let save_schedule sch fl =
     let chan = open_out fl in
     output_string chan (json_of_schedule sch);
-    set_save_status sch true;
+    sch.is_saved <- true;
     close_out chan
 
 end
