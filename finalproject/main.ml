@@ -131,7 +131,9 @@ and prompt sch =
       exceptions sch "Usage: save <json_file>"
     | MalformedSwap -> 
       exceptions sch "Usage: swap <course_name> <course_name>"
-    | Malformed -> 
+    | MalformedPrint ->
+      exceptions sch "Usage: print [<>|<course_name>]"
+    | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
          "Valid Commands: add | edit | remove | save | print | export | " ^ 

@@ -39,6 +39,9 @@ exception InvalidFileForImport
 (** Raised when Save command is given with invalid file path. *)
 exception InvalidFileForSave
 
+(** Raised when a Print command has invalid syntax. *)
+exception MalformedPrint
+
 (** Raised when Add command is given a semester that has not been added. *)
 exception SemesterDoesNotExist
 

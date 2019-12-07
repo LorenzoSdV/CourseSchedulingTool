@@ -12,6 +12,7 @@ exception MalformedSwap
 exception MalformedSave
 exception MalformedExport
 exception MalformedImport
+exception MalformedPrint
 
 exception InvalidFileForExport
 exception InvalidFileForImport
@@ -174,6 +175,12 @@ let parse_command sch cmd_str =
   match split_cmd with 
   | [] -> raise Empty
   | "print"::[] -> print_schedule sch; sch
-  | "print"::c::[] -> get_course c (to_list sch) |> print_course sch; sch
+  | "print"::c::[] ->
+    let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
+    let nm = String.uppercase_ascii c in
+    if (Str.string_match reg nm 0) then
+      (get_course nm (to_list sch) |> print_course sch; sch)
+    else
+      raise MalformedPrint
   | fst::others -> match_helper fst others
 
