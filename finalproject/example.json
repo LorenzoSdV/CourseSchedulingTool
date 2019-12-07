@@ -1,9 +1,9 @@
 {
 	"description": "Example Schedule",
-	"cumul gpa": 2.03,
+	"cumul gpa": 3.03,
 	"sch credits": 15,
-	"expected grad year": 2022,
-	"major": "Computer Science",
+	"expected grad year": 0,
+	"major": "",
 	"semesters": [
 		{
 			"semester id": "FA19",
@@ -11,15 +11,15 @@
 			"semester gpa": 3.30,
 			"courses": [
 				{
-					"name": "CS3110",
-					"course credits": 4,
-					"grade": "B",
-					"degree": "CScore"
-				},
-				{
 					"name": "CS2800",
 					"course credits": 3,
 					"grade": "A-",
+					"degree": "CSCore"
+				},
+				{
+					"name": "CS3110",
+					"course credits": 4,
+					"grade": "B",
 					"degree": "CScore"
 				}
 			]
@@ -30,16 +30,16 @@
 			"semester gpa": 2.80,
 			"courses": [
 				{
-					"name": "CS4820",
-					"course credits": 4,
-					"grade": "B+",
-					"degree": "CScore"
-				},
-				{
 					"name": "PHYS2213",
 					"course credits": 4,
 					"grade": "C+",
 					"degree": "Engineering"
+				},
+				{
+					"name": "CS4820",
+					"course credits": 4,
+					"grade": "B+",
+					"degree": "CScore"
 				}
 			]
 		}
