@@ -124,12 +124,14 @@ let import_handler sch str_lst =
           add_sem sch (create_sem (sem_id_parse semid))
       in
       List.fold_left 
-        (fun acc name -> add_course acc 
-            (create_course name
-               (get_course_creds name 
-                  (sem_id_parse semid))
-               (gradify "none") "none") 
-            (sem_id_parse semid)) sch' courses
+        (fun acc name -> 
+           try add_course acc 
+                 (create_course name
+                    (get_course_creds name 
+                       (sem_id_parse semid))
+                    (gradify "none") "none") 
+                 (sem_id_parse semid) 
+           with DuplicateCourse _ -> acc) sch' courses
     end
   | _ -> raise MalformedImport
 

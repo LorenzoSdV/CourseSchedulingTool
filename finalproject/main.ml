@@ -98,9 +98,9 @@ and prompt sch =
     | UnknownGrade msg -> 
       exceptions sch ("Invalid/Unknown Grade Value: " ^ msg)
     | DuplicateCourse msg -> 
-      exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
+      exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
-      exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
+      exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
     | InvalidSwap ->
       exceptions sch 
         "Cannot swap course with itself or courses that are in same semester"
