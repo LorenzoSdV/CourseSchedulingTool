@@ -45,6 +45,10 @@ exception DuplicateCourse of string
     to a schedule where a semester with the same id already exists. *)
 exception DuplicateSemester of string
 
+(** [InvalidSwap] is raised when an illegal swap is attempted. Swap is illegal 
+    if both courses are in same semester or both are same course. *)
+exception InvalidSwap
+
 (** [gradify str] is the grade representation of [str] where is some grade value 
     represented as a string.
     Requires: [str] is a valid string rep of a grade, like: 
@@ -138,13 +142,17 @@ val sem_ids_to_string : schedule -> string list
     [sch]. *)
 val to_list : schedule -> course list
 
-(** [new_schedule] is a new empty schedule with no courses or semesters. *)
-val new_schedule : schedule
+(** [new_schedule nm] is a new empty schedule with name [nm] but no courses 
+    or semesters. *)
+val new_schedule : string -> schedule
+
+(** COMMENT *)
+val print_course : schedule -> course -> unit
 
 (** COMMENT *)
 val print_schedule : schedule -> unit
 
-(** [get_save_status sch] verifies if [sch] has been saved or not. *)
+(** [get_save_status sch] is whether or not [sch] has been saved. *)
 val get_save_status : schedule -> bool
 
 (** [set_save_status sch] sets save status of [sch] to [bool]. *)
@@ -156,11 +164,6 @@ val get_name : schedule -> string
 (** [edit_name sch nm] is the schedule that results from changing the name of 
     [sch] to [nm]. *)
 val edit_name : schedule -> string -> schedule
-
-(** [set_name sch nm] is the schedule with its initial name. *)
-val set_init_name : schedule -> string -> schedule
-
-
 
 module HTML : sig
 

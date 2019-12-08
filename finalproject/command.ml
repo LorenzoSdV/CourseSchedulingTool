@@ -12,6 +12,7 @@ exception MalformedSwap
 exception MalformedSave
 exception MalformedExport
 exception MalformedImport
+exception MalformedPrint
 
 exception InvalidFileForExport
 exception InvalidFileForImport
@@ -123,12 +124,14 @@ let import_handler sch str_lst =
           add_sem sch (create_sem (sem_id_parse semid))
       in
       List.fold_left 
-        (fun acc name -> add_course acc 
-            (create_course name
-               (get_course_creds name 
-                  (sem_id_parse semid))
-               (gradify "none") "none") 
-            (sem_id_parse semid)) sch' courses
+        (fun acc name -> 
+           try add_course acc 
+                 (create_course name
+                    (get_course_creds name 
+                       (sem_id_parse semid))
+                    (gradify "none") "none") 
+                 (sem_id_parse semid) 
+           with DuplicateCourse _ -> acc) sch' courses
     end
   | _ -> raise MalformedImport
 
@@ -173,6 +176,12 @@ let parse_command sch cmd_str =
   let split_cmd = String.split_on_char ' ' cmd_str in
   match split_cmd with 
   | [] -> raise Empty
-  | "print"::[] -> (print_schedule sch); sch
+  | "print"::[] -> print_schedule sch; sch
+  | "print"::c::[] ->
+    let nm = String.uppercase_ascii c in
+    if is_valid_coursename nm then
+      (get_course nm (to_list sch) |> print_course sch; sch)
+    else
+      raise MalformedPrint
   | fst::others -> match_helper fst others
 

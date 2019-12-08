@@ -98,9 +98,12 @@ and prompt sch =
     | UnknownGrade msg -> 
       exceptions sch ("Invalid/Unknown Grade Value: " ^ msg)
     | DuplicateCourse msg -> 
-      exceptions sch ("Duplicate: Course Already Exists: " ^ msg)
+      exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
-      exceptions sch ("Duplicate: Semester Already Exists: " ^ msg)
+      exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
+    | InvalidSwap ->
+      exceptions sch 
+        "Cannot swap course with itself or courses that are in same semester."
     | ClassRoster.InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
     | InvalidFileForExport ->
@@ -128,7 +131,9 @@ and prompt sch =
       exceptions sch "Usage: save <json_file>"
     | MalformedSwap -> 
       exceptions sch "Usage: swap <course_name> <course_name>"
-    | Malformed -> 
+    | MalformedPrint ->
+      exceptions sch "Usage: print [<>|<course_name>]"
+    | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
          "Valid Commands: add | edit | remove | save | print | export | " ^ 
@@ -162,7 +167,7 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
-      prompt (set_init_name Schedule.new_schedule new_name)
+      prompt (new_schedule new_name)
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
   | "quit"::[] -> Stdlib.exit 0
