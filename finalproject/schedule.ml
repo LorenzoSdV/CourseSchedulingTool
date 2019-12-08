@@ -243,18 +243,18 @@ let swap_courses c1_name c2_name sch =
   if c1 = c2 then (ANSITerminal.(print_string [red] "Invalid\n");
                    print_endline "You cannot swap the same course."; sch) 
   else
-  if (string_of_semid sem1.id) = (string_of_semid sem2.id) 
+  if sem_compare sem1 sem2 = 0 
   then (ANSITerminal.(print_string [red] "Invalid\n"); 
         print_endline (string_of_semid sem1.id);
         print_endline (string_of_semid sem2.id);
         print_endline "You cannot swap courses in the same semester."; sch)
   else
     (
-      ignore(remove_course sch c1_name);
-      ignore(remove_course sch c2_name);
-      ignore(add_course sch c1 sem2.id);
-      add_course sch c2 sem1.id
-    )
+      let sch' = remove_course sch c1_name in
+      let sch'' = remove_course sch' c2_name in
+      let sch''' = add_course sch'' c2 sem1.id in
+      add_course sch''' c1 sem2.id
+    ) 
 
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
@@ -336,7 +336,6 @@ let print_schedule sch =
     print_endline ("Cumulative GPA: " ^ (gpa_to_string sch.cumul_gpa));
     print_endline ("Total Credits: " ^ (string_of_int sch.sch_credits))
   end
-
 
 module HTML = struct
 
