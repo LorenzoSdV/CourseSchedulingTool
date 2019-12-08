@@ -338,7 +338,6 @@ let print_schedule sch =
     print_endline ("Total Credits: " ^ (string_of_int sch.sch_credits))
   end
 
-
 module HTML = struct
 
   (** [template] inputs data from a created HTML into a template. *)
