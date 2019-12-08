@@ -1,25 +1,28 @@
 {
   "engineering": [
-    "MATH 1910",
-    "MATH 1920"
-  ],
-  "core": [
-    "CS 1110",
-    "CS 2110",
-    "CS 3110"
-  ],
-  "subs": {
-    "CS 1110": [
-      "CS 1112"
-    ],
-    "CS 2800": [
-      "CS 2802"
-    ]
-  },
-  "catagories": {
-    "ENGRD": 3,
-    "CS 4000+": 9,
-    "CS Technical": 9,
-    "CS Ext Spec": 9
-  }
+    {
+      "MATH1910": 4,
+      "MATH1920": 4,
+      "MATH2940": 4,
+      "CHEM2090": 4,
+      "CHEM2080": [
+        "CHEM2080",
+        "CHEM2150",
+        "BTRY3080",
+        "ECON3130",
+        "MATH2930",
+        "MATH4710",
+        "PHYS2214",
+        "PHYS2218"
+      ],
+      "PHYS1112": [
+        "PHYS1112",
+        "PHYS1116"
+      ],
+      "PHYS2213": [
+        "PHYS2213",
+        "PHYS2217"
+      ]
+    }
+  ]
 }
