@@ -1,11 +1,9 @@
 type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
 
-type sem_id = Spring of int | Fall of int
+type school = ENG | CAS
 
-type reqs = {
-  temp: int;
-}
+type sem_id = Spring of int | Fall of int
 
 type course = {
   name: string;
@@ -23,11 +21,18 @@ type semester = {
   mutable sem_gpa: float;
 }
 
+type settings = {
+  autosave: bool;
+  html_background: string;
+  html_squares: string;
+}
+
 type schedule = {
   mutable desc: string;
+  mutable school: school;
   mutable semesters: semester list;
   mutable cumul_gpa: float;
-  mutable exp_grad: int;
+  mutable exp_grad: sem_id;
   mutable major: string;
   mutable sch_credits : int;
   mutable is_saved : bool;
