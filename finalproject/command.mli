@@ -18,6 +18,9 @@ exception MalformedEdit
 (** Raised when a Remove command has invalid syntax. *)
 exception MalformedRemove
 
+(** Raised when a Swap command has invalid syntax *)
+exception MalformedSwap
+
 (** Raised when a Save command has invalid syntax. *)
 exception MalformedSave
 
@@ -35,6 +38,9 @@ exception InvalidFileForImport
 
 (** Raised when Save command is given with invalid file path. *)
 exception InvalidFileForSave
+
+(** Raised when a Print command has invalid syntax. *)
+exception MalformedPrint
 
 (** Raised when Add command is given a semester that has not been added. *)
 exception SemesterDoesNotExist
