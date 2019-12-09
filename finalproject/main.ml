@@ -11,6 +11,8 @@ let save_prompt_helper sch =
     ("\nChoose the name of the JSON file you will save this schedule to:");
   save_handler sch (String.split_on_char ' ' (read_input ()))
 
+(** [save_prompt_from_quit sch] prompts the user whether they want to save
+    [sch] or not after the Quit command. *)
 let rec save_prompt_from_quit sch =
   ANSITerminal.print_string [Bold] "Warning: ";
   print_endline 
@@ -23,7 +25,8 @@ let rec save_prompt_from_quit sch =
   | _ -> 
     print_endline ("Type 'yes' or 'no' to continue."); 
     save_prompt_from_quit sch
-
+(** [save_prompt_from_close sch] prompts the user whether they want to save 
+    [sch] or not after the Close command. *)
 and save_prompt_from_close sch =
   ANSITerminal.print_string [Bold] "Warning: ";
   print_endline 
@@ -82,8 +85,9 @@ and prompt sch =
     if get_save_status sch then start_prompt ()
     else save_prompt_from_close sch; init_prompt ()
   | "" -> begin
-      print_endline ("Valid Commands: add | edit | remove | save |" ^
-                     " print | export | delete | clear | close | quit");
+      print_endline ("Valid Commands: add | edit | remove | swap | save |" ^
+                     " print | import | export | delete | clear | close | 
+                     quit");
       print_endline "Enter a command to view usage instructions.";
       prompt sch
     end
@@ -96,7 +100,9 @@ and prompt sch =
     | UnknownSemester msg -> 
       exceptions sch ("Invalid/Unknown Semester: " ^ msg)
     | UnknownGrade msg -> 
-      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg)
+      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg ^ 
+                      "\nValid grades: s/sat, u/unsat, w/withdrawn, 
+                      inc/incomplete")
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
@@ -109,7 +115,7 @@ and prompt sch =
     | InvalidFileForExport ->
       exceptions sch "File path cannot be a JSON. Try again."
     | InvalidFileForImport ->
-      exceptions sch "File path is not valid. Try again."
+      exceptions sch "File must be an iCal. Try again."
     | InvalidFileForSave -> 
       exceptions sch "File path must be a JSON. Try again." 
     | SemesterDoesNotExist ->
@@ -132,7 +138,7 @@ and prompt sch =
     | MalformedSwap -> 
       exceptions sch "Usage: swap <course_name> <course_name>"
     | MalformedPrint ->
-      exceptions sch "Usage: print [<>|<course_name>]"
+      exceptions sch "Usage: print [<> | <course_name>]"
     | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
@@ -186,7 +192,7 @@ and start_prompt () =
 let main () =
   ignore(Sys.command "clear");
   ANSITerminal.(print_string [red]
-                  "\n\nWelcome to the 3110 Project Schedule Planning Tool\n");
+                  "Welcome to the 3110 Project Schedule Planning Tool\n");
   print_endline 
     "If you want to open an already existing schedule, type [load <json_file>]";
   print_endline 
