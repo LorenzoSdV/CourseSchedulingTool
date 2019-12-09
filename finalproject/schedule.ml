@@ -116,12 +116,7 @@ let calc_credits courses =
   in fold courses 0
 
 let to_list sch =
-  let rec fold sems acc = 
-    match sems with
-    | [] -> acc
-    | {courses=x} :: t -> fold t (x @ acc)
-  in
-  fold sch.semesters []
+  List.fold_left (fun acc sem -> acc @ sem.courses) [] sch.semesters
 
 let string_of_semid semid =
   match semid with
@@ -167,6 +162,9 @@ let rec get_course name courses =
   match courses with 
   | [] -> raise (UnknownCourse name)
   | h :: t -> if h.name = name then h else get_course name t
+
+let get_course_name course =
+  course.name
 
 let rec get_sem sch sems semid = 
   match sems with 

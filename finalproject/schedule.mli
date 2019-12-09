@@ -84,10 +84,13 @@ val remove_course : schedule -> string -> schedule
     semester cannot be the same semester as [c2_name]'s semester. *)
 val swap_courses : string -> string -> schedule -> schedule
 
-(** [get_course name courses] is the course record with name [name]
+(** [get_course name courses] is the course with name [name]
     found in [courses].
     Raises: [UnknownCourse name] if course does not exist in [courses].*)
 val get_course : string -> course list -> course
+
+(** [get_course_name course] is the name of [course] *)
+val get_course_name : course -> string
 
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
@@ -104,6 +107,9 @@ val get_sem_courses : semester -> course list
 (** [gpa courses] is the GPA of all the courses in [courses] that have been
     given a letter grade. *)
 val gpa : course list -> float
+
+(** COMMENT *)
+val gpa_to_string : float -> string
 
 (** [get_credits sch] is the sum of all the credits in the schedule [sch]. *)
 val get_credits : schedule -> int
