@@ -4,6 +4,11 @@
 	"sch credits": 15,
 	"expected grad year": "None",
 	"major": "",
+	"settings": {
+		"autosave": false,
+		"html_bg_color": "",
+		"html_square_color": ""
+	},
 	"semesters": [
 		{
 			"semester id": "FA19",

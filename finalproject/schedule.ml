@@ -22,9 +22,9 @@ type semester = {
 }
 
 type settings = {
-  autosave: bool;
-  html_background: string;
-  html_squares: string;
+  mutable autosave: bool;
+  mutable html_background: string;
+  mutable html_squares: string;
 }
 
 type schedule = {
@@ -35,6 +35,7 @@ type schedule = {
   mutable major: string;
   mutable sch_credits : int;
   mutable is_saved : bool;
+  mutable settings : settings;
 }
 
 exception UnknownCourse of string
@@ -296,6 +297,12 @@ let remove_sem sch semid =
     sch end
 
 let new_schedule name =
+  let default_settings = {
+    autosave = false;
+    html_background = "rgb(255, 224, 198)";
+    html_squares = "rgb(206, 225, 231)"
+  } 
+  in
   {
     desc = name;
     semesters = [];
@@ -304,6 +311,7 @@ let new_schedule name =
     major = "";
     sch_credits = 0;
     is_saved = true;
+    settings = default_settings;
   }
 
 let get_save_status sch = 
@@ -412,8 +420,13 @@ module HTML = struct
     close_out chan
 
   let export_schedule sch fl = 
-    let reg = Str.regexp "<\\?sch>" in
-    Str.replace_first reg (html_of_schedule sch) template |> save fl
+    let reg1 = Str.regexp "<\\?sch_bg_color>" in
+    let reg2 = Str.regexp "<\\?sch_square_color>" in
+    let reg3 = Str.regexp "<\\?sch>" in
+    Str.global_replace reg1 sch.settings.html_background template
+    |> Str.replace_first reg2 sch.settings.html_squares
+    |> Str.replace_first reg3 (html_of_schedule sch)
+    |> save fl
 
 end
 
@@ -451,8 +464,9 @@ module LoadJSON = struct
     degree = json |> Yj.member "degree" |> Yj.to_string;
   }
 
-  (** [get_semester json] creates semesters by parsing [json]. *)
-  let get_semester json = 
+  (** [parse_semester json] creates a semester from JSON representation
+      of a semester [json]. *)
+  let parse_semester json = 
     {
       id = json |> Yj.member "semester id" |> Yj.to_string |> form_sem_id;
       courses = json |> Yj.member "courses" |> Yj.to_list |> 
@@ -461,26 +475,36 @@ module LoadJSON = struct
       sem_gpa = json |> Yj.member "semester gpa" |> Yj.to_float;
     }
 
+  (** [parse_settings json] creates a settings value from JSON representation
+      of settigns [json]. *)
+  let parse_settings json = 
+    {
+      autosave = json |> Yj.member "autosave" |> Yj.to_bool;
+      html_background = json |> Yj.member "html_bg_color" |> Yj.to_string;
+      html_squares = json |> Yj.member "html_square_color" |> Yj.to_string
+    }
+
   let parse_json fl = 
     let json = Yojson.Basic.from_file fl in
     {
       desc = json |> Yj.member "description" |> Yj.to_string;
       semesters = json |> Yj.member "semesters" |> Yj.to_list |> 
-                  List.map get_semester;
+                  List.map parse_semester;
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
       exp_grad = 
         json |> Yj.member "expected grad year" |> Yj.to_string |> form_sem_id;
       major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
-      is_saved = true
+      is_saved = true;
+      settings = json |> Yj.member "settings" |> parse_settings
     }
 
 end
 
 module SaveJSON = struct
 
-  (** [json_of_course c] returns a string that represents a course that can be 
-      converted into a JSON. *)
+  (** [json_of_course c] is a string repreesentation of [c] that can be 
+      stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_course c = 
     "\t\t\t\t{\n" ^
     "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
@@ -489,8 +513,8 @@ module SaveJSON = struct
     "\t\t\t\t\t\"degree\": \"" ^ c.degree ^ "\"\n" ^
     "\t\t\t\t},\n"
 
-  (** [json_of_sem sem] returns a string that represents a semester that can be
-      converted into a JSON. *)
+  (** [json_of_sem sem] is a string repreesentation of [sem] that can be 
+      stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_sem sem = 
     let reg = Str.regexp "},\n$" in
     "\t\t{\n" ^
@@ -503,8 +527,17 @@ module SaveJSON = struct
           "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
-  (** [json_of_schedule sch] returns a string that can be converted into a JSON
-      file that can be saved. *)
+  (** [json_of_settigns set] is a string repreesentation of [set] that can be 
+      stored in a JSON file and later interpreted by Yojson.Basic *)
+  let json_of_settings settings = 
+    "{\n" ^
+    "\t\t\t\"autosave\": " ^ (string_of_bool settings.autosave) ^ ",\n" ^
+    "\t\t\t\"html_bg_color\": \"" ^ settings.html_background ^ "\",\n" ^
+    "\t\t\t\"html_square_color\": \"" ^ settings.html_squares ^ "\"\n" ^
+    "\t}"
+
+  (** [json_of_schedule sch] is a string repreesentation of [sch] that can be 
+      stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_schedule sch = 
     let reg = Str.regexp "},\n$" in
     "{\n" ^
@@ -513,6 +546,7 @@ module SaveJSON = struct
     "\t\"sch credits\": "  ^ (string_of_int sch.sch_credits) ^ ",\n" ^
     "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
+    "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
     "\t\"semesters\": [\n" ^ 
     (Str.replace_first reg "}\n" 
        (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem)) 

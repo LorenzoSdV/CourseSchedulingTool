@@ -2,6 +2,10 @@ open Schedule
 open Command
 open ClassRoster
 
+let valid_commands = 
+  ("Valid Commands: add | edit | remove | swap | move | save |" ^
+   " print | import | export | delete | clear | close | quit ")
+
 let read_input () = 
   print_string "\n> ";
   read_line ()
@@ -85,9 +89,7 @@ and prompt sch =
     if get_save_status sch then start_prompt ()
     else save_prompt_from_close sch; init_prompt ()
   | "" -> begin
-      print_endline ("Valid Commands: add | edit | remove | swap | move | save |" ^
-                     " print | import | export | delete | clear | close | 
-                     quit");
+      print_endline valid_commands;
       print_endline "Enter a command to view usage instructions.";
       prompt sch
     end
@@ -146,9 +148,7 @@ and prompt sch =
       exceptions sch "Usage: print [<> | <course_name>]"
     | Malformed | Empty -> 
       exceptions sch 
-        ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | swap | move | save | print | export | " ^ 
-         "delete | clear | close | quit")
+        ("Unrecognized Command Entry!\n" ^ valid_commands)
 
 (** [exceptions sch err] prints the promper error message [err] and reloads
     the prompt for the user. *)
