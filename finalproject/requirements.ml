@@ -20,7 +20,7 @@ let check_required sch required =
     match reqs with 
     | [] -> acc
     | h :: t ->
-      if List.mem h courses || List.mem h (substitutues h) then
+      if List.mem h courses then
         loop courses t acc
       else
         loop courses t (h :: acc)
