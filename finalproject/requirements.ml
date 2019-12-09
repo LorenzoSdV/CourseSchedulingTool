@@ -5,7 +5,7 @@ let eng_reqs = {
   categories = [];
 }
 
-let cehck_reqs sch =
+let check_reqs sch =
   let rec loop courses reqs =
     match reqs with 
     | [] -> true
