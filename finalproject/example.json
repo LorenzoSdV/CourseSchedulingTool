@@ -2,7 +2,7 @@
 	"description": "Example Schedule",
 	"cumul gpa": 3.03,
 	"sch credits": 15,
-	"expected grad year": 0,
+	"expected grad year": "None",
 	"major": "",
 	"semesters": [
 		{

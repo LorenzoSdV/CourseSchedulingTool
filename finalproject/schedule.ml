@@ -3,7 +3,7 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string
 
 type school = ENG | CAS
 
-type sem_id = Spring of int | Fall of int
+type sem_id = Spring of int | Fall of int | None
 
 type course = {
   name: string;
@@ -29,7 +29,6 @@ type settings = {
 
 type schedule = {
   mutable desc: string;
-  mutable school: school;
   mutable semesters: semester list;
   mutable cumul_gpa: float;
   mutable exp_grad: sem_id;
@@ -128,6 +127,7 @@ let string_of_semid semid =
   match semid with
   | Spring yr -> "SP" ^ (string_of_int yr)
   | Fall yr -> "FA" ^ (string_of_int yr)
+  | None -> "None"
 
 let string_of_grade gr =
   match gr with
@@ -147,6 +147,7 @@ let sem_compare s1 s2 =
   | Spring y1 , Spring y2 -> Stdlib.compare y1 y2
   | Fall y1 , Spring y2 -> if y1 = y2 then 1 else Stdlib.compare y1 y2
   | Spring y1 , Fall y2 -> if y1 = y2 then -1 else Stdlib.compare y1 y2
+  | _ -> failwith "Impossible case."
 
 let create_course name cred gr deg = 
   if cred < 0 then 
@@ -283,12 +284,12 @@ let remove_sem sch semid =
     sch.is_saved <- false;
     sch end
 
-let new_schedule name=
+let new_schedule name =
   {
     desc = name;
     semesters = [];
     cumul_gpa = 0.;
-    exp_grad = 0;
+    exp_grad = None;
     major = "";
     sch_credits = 0;
     is_saved = true;
@@ -409,28 +410,18 @@ module LoadJSON = struct
 
   module Yj = struct include Yojson.Basic.Util end
 
-  (** [form_sem_id_helper sem lst] forms a semester id based on the string
-      [sem] and the list [lst] which will be parsed to find a year. *)
-  let form_sem_id_helper sem lst = 
-    match List.rev lst with 
-    | [] -> raise (UnknownSemester sem)
-    | h :: t -> let yr = int_of_string h in 
-      match sem with 
-      | "Fall" -> Fall yr
-      | "Spring" -> Spring yr
-      | _ -> raise (UnknownSemester sem)
-
-  (** [form_sem_id semid] determines if the semester in [semid] is referencing
-      a fall or spring semester and calls a helper function to help form a 
-      semester id. *)
+  (** [form_sem_id semid] is the semester id formed from its string 
+      representation [semid]. 
+      Requires: [semid] is "None" or of form "FAYY" or "SPYY" where YY
+      is a valid year. *)
   let form_sem_id semid = 
-    if String.contains semid 'F' then let word = "Fall" in 
-      let lst = String.split_on_char 'A' semid 
-      in form_sem_id_helper word lst
-    else 
-      let word = "Spring" in 
-      let lst = String.split_on_char 'P' semid
-      in form_sem_id_helper word lst
+    match Str.first_chars semid 2 with
+    | "FA" -> let year = Str.last_chars semid 2 |> int_of_string in
+      Fall year
+    | "SP" -> let year = Str.last_chars semid 2 |> int_of_string in
+      Spring year
+    | "No" -> None
+    | _ -> raise (UnknownSemester semid)
 
   (** [form_grade grade] returns the grade represented by [grade]. *)
   let form_grade grade = 
@@ -466,7 +457,8 @@ module LoadJSON = struct
       semesters = json |> Yj.member "semesters" |> Yj.to_list |> 
                   List.map get_semester;
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
-      exp_grad = json |> Yj.member "expected grad year" |> Yj.to_int;
+      exp_grad = 
+        json |> Yj.member "expected grad year" |> Yj.to_string |> form_sem_id;
       major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true
@@ -508,7 +500,7 @@ module SaveJSON = struct
     "\t\"description\": \"" ^ sch.desc ^ "\",\n" ^
     "\t\"cumul gpa\": "  ^ (gpa_to_string sch.cumul_gpa) ^ ",\n" ^
     "\t\"sch credits\": "  ^ (string_of_int sch.sch_credits) ^ ",\n" ^
-    "\t\"expected grad year\": " ^ (string_of_int sch.exp_grad) ^ ",\n" ^
+    "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
     (Str.replace_first reg "}\n" 
