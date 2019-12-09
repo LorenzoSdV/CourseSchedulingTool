@@ -58,6 +58,8 @@ let basic_schedule_tests = [
 let example_sch = LoadJSON.parse_json "example.json"
 let fa19_courses = 
   get_sem example_sch (get_sems example_sch) (Fall 19) |> get_sem_courses
+let sp20_courses = 
+  get_sem example_sch (get_sems example_sch) (Spring 20) |> get_sem_courses
 
 let load_schedule_tests = [
   make_int_test "Credits of example.json schedule" 15 (get_credits example_sch);
@@ -70,6 +72,10 @@ let load_schedule_tests = [
     "FA19 GPA for exmaple.json sch" "3.30" (gpa fa19_courses |> gpa_to_string);
   make_int_test "Correct number of courses in FA19 in example.json" 2
     (List.length fa19_courses);
+  make_string_test 
+    "SP20 GPA for exmaple.json sch" "2.80" (gpa sp20_courses |> gpa_to_string);
+  make_int_test "Correct number of courses in SP20 in example.json" 2
+    (List.length sp20_courses);
   make_string_test "Sch is correct in example.json" 
     "CS2800CS3110PHYS2213CS4820" (string_of_sch example_sch)
 ]
