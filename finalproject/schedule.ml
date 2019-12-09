@@ -103,7 +103,9 @@ let gpa_to_string gpa_float =
   | 3 -> 
     if gpa = "nan" then "0.00"
     else gpa ^ "0"
-  | 4 -> gpa
+  | 4 -> 
+    if gpa = "-nan" then "0.00"
+    else gpa
   | _ -> Str.first_chars gpa 4
 
 let get_credits sch = 
