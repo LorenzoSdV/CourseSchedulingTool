@@ -9,6 +9,7 @@ exception MalformedAdd
 exception MalformedEdit
 exception MalformedRemove
 exception MalformedSwap
+exception MalformedMove
 exception MalformedSave
 exception MalformedExport
 exception MalformedImport
@@ -152,12 +153,19 @@ let save_handler sch str_lst =
     else raise InvalidFileForSave
   | _ -> raise MalformedSave
 
+(** [swap_others sch str_lst] parses [str_lst] in [sch] for the Swap command. *)
 let swap_others sch str_lst =
   match str_lst with
   | course1::course2::[] -> 
     swap_courses (String.uppercase_ascii course1) 
       (String.uppercase_ascii course2) sch
   | _ -> raise MalformedSwap
+
+let move_others sch str_lst =
+  match str_lst with
+  | course::sem::[] -> (sem_exists (sem_ids_to_string sch) sem); 
+    move_course (String.uppercase_ascii course) (sem_id_parse sem) sch
+  | _ -> raise MalformedMove
 
 let parse_command sch cmd_str = 
 
@@ -167,6 +175,7 @@ let parse_command sch cmd_str =
     | "edit" -> edit_others sch others
     | "remove" -> remove_others sch others
     | "swap" -> swap_others sch others
+    | "move" -> move_others sch others
     | "save" -> save_handler sch others
     | "export" -> export_handler sch others
     | "import" -> import_handler sch others

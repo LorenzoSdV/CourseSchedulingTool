@@ -49,6 +49,11 @@ exception DuplicateSemester of string
     if both courses are in same semester or both are same course. *)
 exception InvalidSwap
 
+(** [InvalidMove] is raised when an illegal move is attempted. Move is illegal 
+    the new semester is equal to the previous semester where that course was 
+    located. *)
+exception InvalidMove
+
 (** [gradify str] is the grade representation of [str] where is some grade value 
     represented as a string.
     Requires: [str] is a valid string rep of a grade, like: 
@@ -79,10 +84,13 @@ val edit_course : schedule -> string -> string -> string -> schedule
     [add_course sch c semid] is [sch]. *)
 val remove_course : schedule -> string -> schedule
 
-(** [swap_courses c1_name c2_name sch] is the schedule with c1_name and c2_name 
-    swapped. [c1_name] cannot be the same course as [c2_name], and [c1_name]'s 
-    semester cannot be the same semester as [c2_name]'s semester. *)
+(** [swap_courses c1_name c2_name sch] is the schedule with [c1_name] and 
+    [c2_name] swapped. [c1_name] cannot be the same course as [c2_name], and 
+    [c1_name]'s semester cannot be the same semester as [c2_name]'s semester. *)
 val swap_courses : string -> string -> schedule -> schedule
+
+(** [move_course c_name sem sch] is the schedule with [c_name] moved to [sem] *)
+val move_course : string -> sem_id -> schedule -> schedule
 
 (** [get_course name courses] is the course with name [name]
     found in [courses].

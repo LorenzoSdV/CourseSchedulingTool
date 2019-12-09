@@ -85,7 +85,7 @@ and prompt sch =
     if get_save_status sch then start_prompt ()
     else save_prompt_from_close sch; init_prompt ()
   | "" -> begin
-      print_endline ("Valid Commands: add | edit | remove | swap | save |" ^
+      print_endline ("Valid Commands: add | edit | remove | swap | move | save |" ^
                      " print | import | export | delete | clear | close | 
                      quit");
       print_endline "Enter a command to view usage instructions.";
@@ -110,6 +110,9 @@ and prompt sch =
     | InvalidSwap ->
       exceptions sch 
         "Cannot swap course with itself or courses that are in same semester."
+    | InvalidMove ->
+      exceptions sch
+        "This course is already located in this semester."
     | ClassRoster.InvalidURL -> 
       exceptions sch "Error Retrieving Course Info from Online"
     | InvalidFileForExport ->
@@ -137,12 +140,14 @@ and prompt sch =
       exceptions sch "Usage: save <json_file>"
     | MalformedSwap -> 
       exceptions sch "Usage: swap <course_name> <course_name>"
+    | MalformedMove ->
+      exceptions sch "Usage: move <course_name> <new_semester>"
     | MalformedPrint ->
       exceptions sch "Usage: print [<> | <course_name>]"
     | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ 
-         "Valid Commands: add | edit | remove | save | print | export | " ^ 
+         "Valid Commands: add | edit | remove | swap | move | save | print | export | " ^ 
          "delete | clear | close | quit")
 
 (** [exceptions sch err] prints the promper error message [err] and reloads

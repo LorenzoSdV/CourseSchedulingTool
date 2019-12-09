@@ -44,6 +44,7 @@ exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
 exception InvalidSwap
+exception InvalidMove
 
 let grade_map gr = 
   match gr with
@@ -249,6 +250,16 @@ let swap_courses c1_name c2_name sch =
   else
     let sch' = remove_course (remove_course sch c1.name) c2.name in
     add_course (add_course sch' c1 sem2.id) c2 sem1.id
+
+let move_course c_name semid sch =
+  let course = get_course c_name (to_list sch) in
+  let old_sem = get_sem_from_course sch.semesters course in
+  let sem = List.find (fun sm -> sm.id = semid) sch.semesters in
+  if old_sem.id = sem.id then
+    raise InvalidMove
+  else
+    let sch' = remove_course sch c_name in
+    add_course sch' course sem.id
 
 let sem_ids sch =
   List.rev_map (fun sem -> sem.id) sch.semesters
