@@ -37,6 +37,10 @@ exception UnknownSemester of string
     string representation of a grade. *)
 exception UnknownGrade of string
 
+(** [UnknownGrade grd] raised when function attempts to work with invalid 
+    setting for schedule. *)
+exception UnknownSetting of string
+
 (** [DuplicateCourse nm] raised when course with name [nm] is added to a
     semester where a course with same name already exists. *)
 exception DuplicateCourse of string
@@ -178,6 +182,11 @@ val get_name : schedule -> string
 (** [edit_name sch nm] is the schedule that results from changing the name of 
     [sch] to [nm]. *)
 val edit_name : schedule -> string -> schedule
+
+(** [edit_settings sch attr val] is [sch] with the setting [attr] updated to 
+    the new value [val].
+    Raises: [UnknownSetting attr] is [attr] is not a valid setting *)
+val edit_settings : schedule -> string -> string -> schedule
 
 module HTML : sig
 

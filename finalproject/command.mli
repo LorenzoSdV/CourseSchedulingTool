@@ -33,6 +33,12 @@ exception MalformedExport
 (** Raised when an Import command has invalid syntax. *)
 exception MalformedImport
 
+(** Raised when a Print command has invalid syntax. *)
+exception MalformedPrint
+
+(** Raised when a Set command has invalid syntax. *)
+exception MalformedSet
+
 (** Raised when Export command is given with invalid file path. *)
 exception InvalidFileForExport
 
@@ -41,9 +47,6 @@ exception InvalidFileForImport
 
 (** Raised when Save command is given with invalid file path. *)
 exception InvalidFileForSave
-
-(** Raised when a Print command has invalid syntax. *)
-exception MalformedPrint
 
 (** Raised when Add command is given a semester that has not been added. *)
 exception SemesterDoesNotExist

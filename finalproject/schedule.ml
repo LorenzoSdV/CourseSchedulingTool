@@ -41,6 +41,7 @@ type schedule = {
 exception UnknownCourse of string
 exception UnknownSemester of string
 exception UnknownGrade of string
+exception UnknownSetting of string
 exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
@@ -327,6 +328,16 @@ let edit_name sch nm =
   sch.desc <- nm;
   sch.is_saved <- false;
   sch
+
+let edit_settings sch attr new_val =
+  match attr with
+  | "autosave" -> 
+    sch.settings.autosave <- bool_of_string new_val; sch
+  | "html_bg_color" -> 
+    sch.settings.html_background <- new_val; sch
+  | "html_tile_color" ->
+    sch.settings.html_squares <- new_val; sch
+  | _ -> raise (UnknownSetting attr)
 
 let print_course sch course =
   print_newline ();
