@@ -146,6 +146,8 @@ and prompt sch =
       exceptions sch "Usage: move <course_name> <new_semester>"
     | MalformedPrint ->
       exceptions sch "Usage: print [<> | <course_name>]"
+    | MalformedSet ->
+      exceptions sch "Usage: set <attribute> <new_value>"
     | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ valid_commands)
