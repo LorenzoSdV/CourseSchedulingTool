@@ -52,8 +52,8 @@ and save_prompt_from_close sch =
     command."); 
     save_prompt_from_close sch
 
-(** [delete_prompt sch] erases [sch] to make it blank, 
-    but first asks the user if they are sure they want to delete [sch]. *)
+(** [delete_prompt sch] is [prompt sch'] where [sch'] is either [sch] or a 
+    new empty schedule depending on user's response to prompt. *)
 and delete_prompt sch = 
   if get_save_status sch 
   then
@@ -63,7 +63,7 @@ and delete_prompt sch =
      match read_input () with
      | "yes" ->
        ANSITerminal.print_string [Bold] "\nErased!\n";
-       start_prompt ()
+       prompt (new_schedule (get_name sch))
      | "no" -> prompt sch
      | _ -> 
        print_endline ("Type 'yes' or 'no' to continue."); 
@@ -74,9 +74,9 @@ and delete_prompt sch =
       print_endline 
         "This will erase all information from the current schedule.";
       match read_input () with
-      | "yes" -> ignore(new_schedule);
+      | "yes" -> 
         ANSITerminal.print_string [Bold] "\nErased!\n";
-        start_prompt ()
+        prompt (new_schedule (get_name sch))
       | "no" -> prompt sch
       | _ -> 
         print_endline ("Type 'yes' or 'no' to continue."); 

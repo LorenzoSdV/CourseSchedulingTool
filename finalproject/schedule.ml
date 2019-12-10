@@ -324,7 +324,7 @@ let new_schedule name =
 let get_save_status sch = 
   sch.is_saved
 
-let set_save_status sch b =
+let set_save_status sch b = 
   sch.is_saved <- b
 
 let get_name sch =
@@ -576,3 +576,8 @@ module SaveJSON = struct
     close_out chan
 
 end
+
+let autosave sch = 
+  if sch.settings.autosave && (not sch.is_saved) then
+    SaveJSON.save_schedule sch (sch.desc ^ ".json")
+  else ()

@@ -185,8 +185,15 @@ val print_schedule : schedule -> unit
 (** [get_save_status sch] is whether or not [sch] has been saved. *)
 val get_save_status : schedule -> bool
 
-(** [set_save_status sch] sets save status of [sch] to [bool]. *)
+(** [set_save_status sch] is [unit] after setting the save status of 
+    [sch]. *)
 val set_save_status : schedule -> bool -> unit
+
+(** [autosave sch] is [()] after autosaving [sch] if autosave is asserted.
+
+    Autosave files are saved in working directory with schedule name as 
+    file name. *)
+val autosave : schedule -> unit
 
 (** [get_name sch] is the user-defined name of schedule [sch]. *)
 val get_name : schedule -> string

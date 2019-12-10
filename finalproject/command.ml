@@ -202,5 +202,7 @@ let parse_command sch cmd_str =
       (get_course nm (to_list sch) |> print_course sch; sch)
     else
       raise MalformedPrint
-  | fst::others -> match_helper fst others
+  | fst::others -> 
+    let new_sch = match_helper fst others in
+    autosave new_sch; new_sch
 
