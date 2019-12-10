@@ -196,7 +196,7 @@ let parse_command sch cmd_str =
     | "export" -> export_handler sch others
     | "import" -> import_handler sch others
     | "set" -> settings_handler sch others
-    | "validate" -> validate_handler sch
+    | "check" -> validate_handler sch
     | _ -> raise Malformed
   in
 

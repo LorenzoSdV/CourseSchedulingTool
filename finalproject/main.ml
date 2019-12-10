@@ -3,7 +3,7 @@ open Command
 open ClassRoster
 
 let valid_commands = 
-  ("Valid Commands: add | edit | remove | swap | move | save |" ^
+  ("Valid Commands: add | edit | remove | swap | move | check | save |" ^
    " set | print | import | export | delete | clear | close | quit")
 
 (** [read_input ()] is [read_line ()] after displaying helpful text prompt
@@ -57,8 +57,8 @@ and save_prompt_from_close sch =
 and delete_prompt sch = 
   if get_save_status sch 
   then
-    (ANSITerminal.print_string [Bold] "Warning:";
-     print_endline "You did not make any changes to this schedule yet.";
+    (ANSITerminal.print_string [Bold] "\nWarning: ";
+     print_endline "You did not make any changes to this schedule yet.\n";
      print_endline "Are you sure you still want to delete?";
      match read_input () with
      | "yes" ->
@@ -214,7 +214,7 @@ and init_prompt () =
   | _ -> 
     ANSITerminal.(print_string [red] "\nUnrecognized Command Entry!\n");
     print_endline 
-      "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
+      "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
     init_prompt ()
 
 (** [start_prompt ()] is the low-level prompt the user is taken to when not
@@ -222,7 +222,7 @@ and init_prompt () =
 and start_prompt () =
   ANSITerminal.(print_string [cyan] "\nStart Page\n"); 
   print_endline 
-    "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
+    "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
   init_prompt ()
 
 let main () =
