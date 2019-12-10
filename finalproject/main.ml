@@ -2,6 +2,8 @@ open Schedule
 open Command
 open ClassRoster
 
+(** [valid_commands] is a textual representation of a list of valid commands
+    the user can enter in [prompt] *)
 let valid_commands = 
   ("Valid Commands: add | edit | remove | swap | move | check | save |" ^
    " set | print | import | export | delete | clear | close | quit")
@@ -12,7 +14,7 @@ let read_input () =
   print_string "\n> ";
   read_line ()
 
-(** [save_prompt_helper sch] saves [sch] as a json file. *)
+(** [save_prompt_helper sch] is [sch] after saving [sch] as a json file. *)
 let save_prompt_helper sch =
   print_endline 
     ("\nChoose the name of the JSON file you will save this schedule to:");
@@ -186,7 +188,7 @@ and load (file_lst: string list) =
   | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
     init_prompt ()
 
-(** [init_prompt ()] is the initiali user prompt and first entry into the 
+(** [init_prompt ()] is the initial user prompt and first entry into the 
     system. *)
 and init_prompt () =
   let split_cmd = String.split_on_char ' ' (read_input ()) in

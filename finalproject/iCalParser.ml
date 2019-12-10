@@ -29,7 +29,7 @@ let parse_courses data_list =
   |> List.sort_uniq compare
   |> List.rev_map (let reg = Str.regexp " " in Str.replace_first reg "")
 
-(** [parse_semid data] is a semester identifier of form FA## or SP## parsed 
+(** [parse_semid data] is a semester identifier of form "FA##" or "SP##" parsed 
     from [data]. Requires that [data] is the value of calling [file_to_list] on 
     an ical file downloaded from Cornell Class Roster (Scheduler). *)
 let parse_semid data_list =

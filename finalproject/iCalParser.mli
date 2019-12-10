@@ -1,3 +1,8 @@
+(**
+   Data Types and Functions to parse an iCal file and add to schedule.
+   @author Chris O'Brian (co253), Radha (rdp89), 
+   and Lorenzo Scotto di Vettimo (ls769)
+*)
 
 (** [parse_file file] is a the tuple of course names and a semester identifier
     for an ical schedule [file] downlaoded from Class Roster.

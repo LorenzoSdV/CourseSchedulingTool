@@ -3,7 +3,7 @@ open Schedule
 exception InvalidURL
 
 (* Returns body of URL as string *)
-let string_of_url url nm = 
+let string_of_url url = 
   try
     let connection = Curl.init () and result = ref "" in
     Curl.set_writefunction connection
@@ -24,10 +24,10 @@ let course_html name sem =
   let url = "https://classes.cornell.edu/browse/roster/" ^ 
             (string_of_semid sem) ^ "/class/" ^ c_dep ^ "/" ^ 
             c_num in
-  string_of_url url name
+  string_of_url url
 
-(** [parse_credits] is the number of credits for the course whose class roster
-    webpage is stored in [html].
+(** [parse_credits html] is the number of credits for the course whose class 
+    roster webpage is stored as plain text in [html].
     Raises: [InvalidURL] if [html] doesn't contain this information. *)
 let parse_credits html =
   let reg = Str.regexp_string {|<span class="credit-val">|} in
@@ -43,12 +43,3 @@ let get_course_creds name sem =
     parse_credits (course_html n_upper sem)
   else
     raise (UnknownCourse name)
-
-(*
-  FOR SPRINT 3
-let valid_course name sem credits =
-  try
-    if (get_course_creds name sem = credits) then true
-    else raise InvalidCredits;
-  with
-    _ -> raise (UnknownCourse name)*)

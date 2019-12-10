@@ -1,8 +1,5 @@
-type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
-           | Letter of string 
-
-type school = ENG | CAS
+           | Letter of string
 
 type sem_id = Spring of int | Fall of int | None
 
@@ -190,10 +187,13 @@ let get_course_credits course =
 let get_course_cat course =
   course.degree
 
-let rec get_sem sch sems semid = 
-  match sems with 
-  | [] -> raise (UnknownSemester (string_of_semid semid))
-  | h :: t -> if h.id = semid then h else get_sem sch t semid
+let get_sem sch semid = 
+  let rec get_sem_loop sems semid' = 
+    match sems with 
+    | [] -> raise (UnknownSemester (string_of_semid semid'))
+    | h :: t -> if h.id = semid then h else get_sem_loop t semid'
+  in
+  get_sem_loop sch.semesters semid
 
 let get_sems sch = 
   sch.semesters
