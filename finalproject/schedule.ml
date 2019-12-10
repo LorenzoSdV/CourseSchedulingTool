@@ -2,7 +2,8 @@ type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string 
 
-type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo | Hist | Lang
+type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo 
+              | Hist | Lang
 
 type school = ENG | CAS
 
