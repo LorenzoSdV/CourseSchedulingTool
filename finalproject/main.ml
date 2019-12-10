@@ -4,7 +4,11 @@ open ClassRoster
 
 let valid_commands = 
   ("Valid Commands: add | edit | remove | swap | move | save |" ^
+<<<<<<< HEAD
    " print | import | export | delete | clear | close | quit")
+=======
+   " print | import | export | delete | clear | close | settings | quit ")
+>>>>>>> 1ebaf0d85a64b590136ddd0f56baf70759592ee1
 
 let read_input () = 
   print_string "\n> ";
@@ -187,6 +191,14 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
+      print_endline("\nThe following commands are available for use. Type in" 
+                    ^ " any command to see usage instructions.\n");
+      ANSITerminal.(print_string [yellow] valid_commands);
+      print_endline("\nThe following are the grade options when adding a " ^
+                    "new course to the schedule.\n");
+      ANSITerminal.(print_string [yellow] ("Valid grades: s/sat, u/unsat, " ^
+                                           "w/withdrawn, inc/incomplete\n"));
+      print_string("\n");
       prompt (new_schedule new_name)
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
