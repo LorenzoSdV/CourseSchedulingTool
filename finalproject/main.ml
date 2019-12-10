@@ -197,17 +197,30 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
-      print_endline("\nThe following commands are available for use. Type in" 
-                    ^ " any command to see usage instructions.");
-      ANSITerminal.(print_string [yellow] valid_commands);
-      print_endline("\nThe following are the grade options when adding a " ^
-                    "new course to the schedule.\n");
-      ANSITerminal.(print_string [yellow] 
-                      ("Valid grades: A Letter grade, s/sat, " 
-                       ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
-                       "none, transfer\n"));
-      print_string("\n");
-      prompt (new_schedule new_name)
+      if not(Str.string_match (Str.regexp "^\\s+$") new_name 0)  
+      then 
+        begin
+          print_endline("\nThe following commands are available for use. Type" 
+                        ^ " in any command to see usage instructions.");
+          ANSITerminal.(print_string [yellow] valid_commands);
+          print_endline("\nThe following are the grade options when adding a " ^
+                        "new course to the schedule.");
+          ANSITerminal.(print_string [yellow] 
+                          ("Valid grades: A Letter grade, s/sat, " 
+                           ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
+                           "none, transfer\n"));
+          print_string("\n");
+          prompt (new_schedule new_name)
+        end
+      else 
+        begin
+          ANSITerminal.(print_string [red] 
+                          ("\nSchedule name cannot contain only"
+                           ^" whitespaces!\n"));
+          print_endline 
+            "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
+          init_prompt ()
+        end
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
   | "quit"::[] -> Stdlib.exit 0
