@@ -4,7 +4,7 @@ open ClassRoster
 
 let valid_commands = 
   "Valid Commands: add | edit | remove | swap | move | save |" ^
-  " print | import | export | delete | clear | close | settings | quit "
+  " print | import | export | delete | clear | close | set | quit "
 
 let read_input () = 
   print_string "\n> ";
