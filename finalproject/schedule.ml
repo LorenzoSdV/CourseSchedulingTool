@@ -225,7 +225,7 @@ let get_course_credits course =
   course.credits
 
 let get_course_cat course =
-  course.category
+  (string_of_category course.category)
 
 let get_sem sch semid = 
   let rec get_sem_loop sems semid' = 
@@ -627,7 +627,7 @@ module SaveJSON = struct
     "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
     "\t\t\t\t\t\"course credits\": " ^ (string_of_int c.credits) ^ ",\n" ^
     "\t\t\t\t\t\"grade\": \"" ^ (string_of_grade c.grade) ^ "\",\n" ^
-    "\t\t\t\t\t\"degree\": \"" ^ (string_of_category c.category) ^ "\"\n" ^
+    "\t\t\t\t\t\"category\": \"" ^ (string_of_category c.category) ^ "\"\n" ^
     "\t\t\t\t},\n"
 
   (** [json_of_sem sem] is a string representation of [sem] that can be 

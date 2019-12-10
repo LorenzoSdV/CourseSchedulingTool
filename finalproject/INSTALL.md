@@ -11,7 +11,8 @@ Our system requires the "Ocurl" package to function, to install, please run:
 opam install ocurl
 ```
 
-After which, you should run "make check" to ensure that your environment is what it should be. We've edited the checkenv.sh file to reflect our system.
+After which, you should run "make check" to ensure that your environment is what
+it should be. We've edited the checkenv.sh file to reflect our system.
 
 Then, you can start our program by running "make run".
 
@@ -31,7 +32,8 @@ add SP20
 ```
 
 Add a new course:
-(Here, 4 is # of credits, A- is grade, "CSCore" is degree catagory, FA19 is semester).
+(Here, 4 is # of credits, A- is grade, "CSCore" is degree catagory, FA19 is
+ semester).
 ```
 add CS3110 4 A- CScore FA19 
 ```
@@ -62,7 +64,7 @@ Remove a semester:
 remove SP20
 ```
 
-close:
+close
 ```
 quit
 ```
@@ -89,8 +91,9 @@ load <filepath>.json
 already populated with some courses and semesters. Feel free to try loading and
 working with it!
 
-Once schedule is loaded or created, you'll be taken to the primary user prompt, where the
-schedule name appears in green at the input line. New commands available are:
+Once schedule is loaded or created, you'll be taken to the primary user prompt, 
+where the schedule name appears in green at the input line. New commands 
+available are:
 
 Saving a schedule:
 _This command saves schedule as test.json in current working directory._
@@ -132,8 +135,8 @@ _Notice_ that this command will create a new semester if the semester doesn't
 already exist automatically.
 
 
-We've also added the _swap_ and _move_ commands to swap two courses from semester
-to semester, and to just move a course to another semester:
+We've also added the _swap_ and _move_ commands to swap two courses from 
+semester to semester, and to just move a course to another semester:
 
 Assuming you've just loaded example.json, you can use the following command
 to move PHYS2213 to the FA19 semester:

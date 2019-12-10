@@ -96,7 +96,7 @@ val string_of_list : string list -> string
     "A+" or "b" or "unsat" or "w". 
     Raises: [Unknown Grade str] if [str] is not a valid grade 
     representation. *)
-val gradify: string -> grade
+val gradify : string -> grade
 
 (** [create_course name cred gr cat] is a new course type with name [name], 
     number of credits [cred], grade [gr], and category [cat]. *)
@@ -140,8 +140,8 @@ val get_course_name : course -> string
 (** [get_course_credits course] is the number of credits of [course]. *)
 val get_course_credits : course -> int
 
-(** [get_course_cat course] is the category of [course]. *)
-val get_course_cat : course -> category
+(** [get_course_cat course] is the category in string form of [course]. *)
+val get_course_cat : course -> string
 
 (** [get_sem sch semid] is the semester with the semester id [sem_id]
     if found in [sch]. 

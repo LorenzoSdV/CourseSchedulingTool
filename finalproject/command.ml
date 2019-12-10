@@ -122,21 +122,22 @@ let add_others sch str_lst =
                       (int_of_string credits)
                       (Schedule.gradify grade) guessed_deg)
       (sem_id_parse sem_id)
-  | course_name::grade::degree::sem_id::[] ->
+  | course_name::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
     add_course sch 
       (create_course name 
          (get_course_creds name 
             (sem_id_parse sem_id)) 
-         (Schedule.gradify grade) (String.uppercase_ascii degree)) 
+         (Schedule.gradify grade) (String.uppercase_ascii category)) 
       (sem_id_parse sem_id)
-  | course_name::credits::grade::degree::sem_id::[] ->
+  | course_name::credits::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
     add_course sch (create_course name 
                       (int_of_string credits) 
-                      (Schedule.gradify grade) (String.uppercase_ascii degree)) 
+                      (Schedule.gradify grade) 
+                      (String.uppercase_ascii category)) 
       (sem_id_parse sem_id)
   | _ -> raise MalformedAdd
 

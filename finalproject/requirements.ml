@@ -57,8 +57,8 @@ let check_required sch reqs =
 (** [check_categories sch reqs] is a list of tuples of categories and credits
     required for each category that aren't met in [sch]
 
-    For example, if [check_categories sch reqs] = [("CS4000+", 3)], then [sch] 
-    is missing one course satisfying the CS4000+ requirement. If 
+    For example, if [check_categories sch reqs] = [("4000+", 3)], then [sch] 
+    is missing one course satisfying the 4000+ requirement. If 
     [check_categories sch reqs] = [] then all category requirment are met. *)
 let check_categories sch reqs =
   let rec loop courses categories acc =

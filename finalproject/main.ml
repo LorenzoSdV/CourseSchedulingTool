@@ -33,8 +33,8 @@ let rec save_prompt_from_quit sch =
     start_prompt ()
   | "no" -> Stdlib.exit 0
   | _ -> 
-    print_endline ("Type 'yes' or 'no' to continue. 'cancel' to undo this 
-    command."); 
+    print_endline ("Type 'yes' or 'no' to continue. 'cancel' to undo this " ^
+                   "command."); 
     save_prompt_from_quit sch
 
 (** [save_prompt_from_close sch] prompts the user whether they want to save 
@@ -50,8 +50,8 @@ and save_prompt_from_close sch =
     start_prompt ()
   | "no" -> start_prompt ()
   | _ -> 
-    print_endline ("Type 'yes' or 'no' to continue. 'cancel' to undo this 
-    command."); 
+    print_endline ("Type 'yes' or 'no' to continue. 'cancel' to undo this " ^
+                   "command."); 
     save_prompt_from_close sch
 
 (** [delete_prompt sch] is [prompt sch'] where [sch'] is either [sch] or a 
@@ -114,17 +114,18 @@ and prompt sch =
     | UnknownSemester msg -> 
       exceptions sch ("Invalid/Unknown Semester: " ^ msg)
     | UnknownGrade msg -> 
-      exceptions sch ("Invalid/Unknown Grade Value: \n" ^ msg ^ 
-                      "Valid grades: Letter grade, s/sat, u/unsat, w/withdrawn, 
-                      inc/incomplete, none, transfer")
+      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg ^ 
+                      "\nValid grades: Letter grade, s/sat, u/unsat, 
+                      w/withdrawn, inc/incomplete, none, transfer")
     | UnknownSetting msg ->
       exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
       exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
-    | InvalidAttribute ->
-      exceptions sch "Valid attributes: credits, grade, or category."
+    | InvalidAttribute msg ->
+      exceptions sch ("Invalid/Unknown Attribute: " ^ msg ^
+                      "\nValid attributes: credits, grade, or category.")
     | InvalidSwap ->
       exceptions sch 
         "Cannot swap course with itself or courses that are in same semester."
