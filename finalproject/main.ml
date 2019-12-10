@@ -3,8 +3,8 @@ open Command
 open ClassRoster
 
 let valid_commands = 
-  "Valid Commands: add | edit | remove | swap | move | save |" ^
-  " print | import | export | delete | clear | close | set | quit "
+  ("Valid commands: add | edit | remove | swap | move | save |" ^
+   " print | import | export | delete | clear | close | settings | quit ")
 
 let read_input () = 
   print_string "\n> ";
@@ -53,13 +53,13 @@ and save_prompt_from_close sch =
 and delete_prompt sch = 
   if get_save_status sch 
   then
-    (ANSITerminal.print_string [Bold] "Warning:";
-     print_endline "You did not make any changes to this schedule yet.";
+    (ANSITerminal.print_string [Bold] "\nWarning: ";
+     print_endline "You did not make any changes to this schedule yet.\n";
      print_endline "Are you sure you still want to delete?";
      match read_input () with
-     | "yes" -> ignore(new_schedule);
+     | "yes" -> ignore(new_schedule (get_name sch));
        ANSITerminal.print_string [Bold] "\nErased!\n";
-       start_prompt ()
+       prompt sch
      | "no" -> prompt sch
      | _ -> 
        print_endline ("Type 'yes' or 'no' to continue."); 
@@ -177,7 +177,8 @@ and load (file_lst: string list) =
   | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
     init_prompt ()
 
-(** [init_prompt]  *)
+(** [init_prompt] asks the user to either create a new schedule or load in a 
+    schedule. *)
 and init_prompt () =
   let split_cmd = String.split_on_char ' ' (read_input ()) in
   match split_cmd with 
@@ -187,15 +188,13 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
-      print_endline("\nThe following commands are available for use. Type in" 
-                    ^ " any command to see usage instructions.\n");
+      print_endline("\nType any command to view usage instructions.");
       ANSITerminal.(print_string [yellow] valid_commands);
-      print_endline("\nThe following are the grade options when adding a " ^
-                    "new course to the schedule.\n");
-      ANSITerminal.(print_string [yellow] ("Valid grades: Letter grade, s/sat, " 
-                                           ^ "u/unsat, w/withdrawn, 
-                                           inc/incomplete, none, transfer\n"));
-      print_string("\n");
+      print_endline("\n\nGrade options when adding a " ^
+                    "new course to the schedule.");
+      ANSITerminal.(print_string [yellow] ("Valid grades: s/sat, u/unsat, " ^
+                                           "w/withdrawn, inc/incomplete, " ^
+                                           "none\n"));
       prompt (new_schedule new_name)
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
@@ -203,13 +202,13 @@ and init_prompt () =
   | _ -> 
     ANSITerminal.(print_string [red] "\nUnrecognized Command Entry!\n");
     print_endline 
-      "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
+      "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
     init_prompt ()
 
 and start_prompt () =
   ANSITerminal.(print_string [cyan] "\nStart Page\n"); 
   print_endline 
-    "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
+    "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
   init_prompt ()
 
 let main () =

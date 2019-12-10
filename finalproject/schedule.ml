@@ -2,6 +2,8 @@ type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string 
 
+type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo | Hist | Lang
+
 type school = ENG | CAS
 
 type sem_id = Spring of int | Fall of int | None
@@ -11,6 +13,7 @@ type course = {
   mutable credits: int;
   mutable grade: grade;
   mutable degree: string;
+  mutable category: category;
 }
 
 type semester = {

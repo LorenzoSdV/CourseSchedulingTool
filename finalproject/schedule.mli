@@ -9,6 +9,9 @@ type sem_id = Spring of int | Fall of int | None
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string 
 
+(** The type representing the category of a course. *)
+type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo | Hist | Lang
+
 (** The type representing which school the CS degree is coming from. *)
 type school = ENG | CAS
 
