@@ -1,8 +1,5 @@
-type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
-           | Letter of string 
-
-type school = ENG | CAS
+           | Letter of string
 
 type sem_id = Spring of int | Fall of int | None
 
@@ -27,6 +24,7 @@ type settings = {
 }
 
 type validation = {
+  sch: string;
   needed: string list;
   needed_cat: (string * int) list;
   needed_subs : string list list
@@ -41,6 +39,7 @@ type schedule = {
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
+  mutable school : string;
   mutable valid : validation option
 }
 
@@ -190,10 +189,13 @@ let get_course_credits course =
 let get_course_cat course =
   course.degree
 
-let rec get_sem sch sems semid = 
-  match sems with 
-  | [] -> raise (UnknownSemester (string_of_semid semid))
-  | h :: t -> if h.id = semid then h else get_sem sch t semid
+let get_sem sch semid = 
+  let rec get_sem_loop sems semid' = 
+    match sems with 
+    | [] -> raise (UnknownSemester (string_of_semid semid'))
+    | h :: t -> if h.id = semid then h else get_sem_loop t semid'
+  in
+  get_sem_loop sch.semesters semid
 
 let get_sems sch = 
   sch.semesters
@@ -334,7 +336,8 @@ let new_schedule name =
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
-    valid = None;
+    school = "ENG";
+    valid = None
   }
 
 let get_save_status sch = 
@@ -345,6 +348,12 @@ let set_save_status sch b =
 
 let get_name sch =
   sch.desc
+
+let get_school sch =
+  sch.school
+
+let set_school sch school =
+  sch.school <- school
 
 let edit_name sch nm =
   sch.desc <- nm;
@@ -447,12 +456,13 @@ module HTML = struct
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
-  (** COMMENT *)
+  (** [html_of_validation v] is a string that represents a validation displayed
+      in valid HTML. *) 
   let html_of_validation (v_opt:validation option) = 
     match v_opt with
     | None -> ""
     | Some v ->
-      "\t<h2>Testing Against CS Engineering Requirements:</h2>\n" ^ 
+      "\t<h2>Testing Against CS " ^ v.sch ^ " Requirements:</h2>\n" ^ 
       "\t\t<ul>\n" ^
       (let req_course c =
          "\t\t\t<li><span>" ^
@@ -563,6 +573,7 @@ module LoadJSON = struct
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
+      school = json |> Yj.member "school" |> Yj.to_string;
       valid = None
     }
 
@@ -570,7 +581,7 @@ end
 
 module SaveJSON = struct
 
-  (** [json_of_course c] is a string repreesentation of [c] that can be 
+  (** [json_of_course c] is a string representation of [c] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_course c = 
     "\t\t\t\t{\n" ^
@@ -580,7 +591,7 @@ module SaveJSON = struct
     "\t\t\t\t\t\"degree\": \"" ^ c.degree ^ "\"\n" ^
     "\t\t\t\t},\n"
 
-  (** [json_of_sem sem] is a string repreesentation of [sem] that can be 
+  (** [json_of_sem sem] is a string representation of [sem] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_sem sem = 
     let reg = Str.regexp "},\n$" in
@@ -594,7 +605,7 @@ module SaveJSON = struct
           "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
-  (** [json_of_settigns set] is a string repreesentation of [set] that can be 
+  (** [json_of_settigns set] is a string representation of [set] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_settings settings = 
     "{\n" ^
@@ -603,7 +614,7 @@ module SaveJSON = struct
     "\t\t\t\"html_square_color\": \"" ^ settings.html_squares ^ "\"\n" ^
     "\t}"
 
-  (** [json_of_schedule sch] is a string repreesentation of [sch] that can be 
+  (** [json_of_schedule sch] is a string representation of [sch] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_schedule sch = 
     let reg = Str.regexp "},\n$" in
@@ -614,6 +625,7 @@ module SaveJSON = struct
     "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
+    "\t\"school\": \"" ^ sch.school ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
     (Str.replace_first reg "}\n" 
        (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem)) 

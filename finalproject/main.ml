@@ -2,6 +2,8 @@ open Schedule
 open Command
 open ClassRoster
 
+(** [valid_commands] is a textual representation of a list of valid commands
+    the user can enter in [prompt] *)
 let valid_commands = 
   ("Valid Commands: add | edit | remove | swap | move | check | save |" ^
    " set | print | import | export | delete | clear | close | quit")
@@ -12,7 +14,7 @@ let read_input () =
   print_string "\n> ";
   read_line ()
 
-(** [save_prompt_helper sch] saves [sch] as a json file. *)
+(** [save_prompt_helper sch] is [sch] after saving [sch] as a json file. *)
 let save_prompt_helper sch =
   print_endline 
     ("\nChoose the name of the JSON file you will save this schedule to:");
@@ -132,9 +134,9 @@ and prompt sch =
     | InvalidFileForExport ->
       exceptions sch "File path cannot be a JSON. Try again."
     | InvalidFileForImport ->
-      exceptions sch "File must be an iCal. Try again."
+      exceptions sch "File must be an iCal in current directory. Try again."
     | InvalidFileForSave -> 
-      exceptions sch "File path must be a JSON. Try again." 
+      exceptions sch "File path must be a JSON in current directory. Try again." 
     | SemesterDoesNotExist ->
       exceptions sch "This semester does not exist in your schedule."
     | MalformedSemId -> 
@@ -145,7 +147,7 @@ and prompt sch =
                       ^ " <category> <semester> | <semester>]")
     | MalformedEdit ->
       exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
-                      "name <new_name>]")
+                      "name <new_name> | school <ENG | CAS> ]")
     | MalformedRemove ->
       exceptions sch "Usage: remove [<course_name> | <semester>]"
     | MalformedExport ->
@@ -160,6 +162,8 @@ and prompt sch =
       exceptions sch "Usage: print [<> | <course_name>]"
     | MalformedSet ->
       exceptions sch "Usage: set <attribute> <new_value>"
+    | MalformedImport -> 
+      exceptions sch "Usage: import <ics_file>"
     | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ valid_commands)
@@ -186,7 +190,7 @@ and load (file_lst: string list) =
   | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
     init_prompt ()
 
-(** [init_prompt ()] is the initiali user prompt and first entry into the 
+(** [init_prompt ()] is the initial user prompt and first entry into the 
     system. *)
 and init_prompt () =
   let split_cmd = String.split_on_char ' ' (read_input ()) in

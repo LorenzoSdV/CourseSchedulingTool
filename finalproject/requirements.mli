@@ -8,11 +8,12 @@ type reqs
 val eng_reqs : reqs
 
 (** The requirements for a CS degree in the College of Arts & Sciences. *)
-(*val arts_reqs : reqs*)
+val cas_reqs : reqs
 
-(** [validate sch] is the validation infromation about [sch] after this
-    information has been stored in [sch]. *)
-val validate : schedule -> validation
+(** [validate sch reqs] is the validation infromation about [sch] after this
+    information has been stored in [sch] based on requirements stated in 
+    [reqs]. *)
+val validate : schedule -> reqs -> validation
 
 (** [print_validation v] is [()] after printing to the terminal the validation
     information about some schedule whos validation info is [v]. *)
