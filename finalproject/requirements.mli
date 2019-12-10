@@ -2,7 +2,7 @@ open Schedule
 
 (** The type representing the requirements of a CS major in either arts or
     engineering. *)
-type recs
+type reqs
 
 (** The requirements for a CS degree in the College of Engineering. *)
 val eng_reqs : reqs
