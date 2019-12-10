@@ -12,6 +12,10 @@ type sem_id = Spring of int | Fall of int | None
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string
 
+(** The type representing the category of a course. *)
+type category = Required | Core | FourThousandPlus | Technical | Specialization
+              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra
+
 (** The type representing a course within a schedule. *)
 type course
 
@@ -49,6 +53,10 @@ exception UnknownSemester of string
     string representation of a grade. *)
 exception UnknownGrade of string
 
+(** [UnknownCategory cat] raised when function attempts to work with an invalid
+    category. *)
+exception UnknownCategory of string
+
 (** [UnknownGrade grd] raised when function attempts to work with invalid 
     setting for schedule. *)
 exception UnknownSetting of string
@@ -74,6 +82,10 @@ exception InvalidSwap
     located. *)
 exception InvalidMove
 
+(** [InvalidAttribute str] is raised when a course it to be edited with an 
+    invalid attribute. *)
+exception InvalidAttribute of string
+
 (** [string_of_list strl] is [strl] flattened into a single string of the form
     "[[ el1, el2, ... ]]" where strl = [["el1"; "el2"; ...]]. *)
 val string_of_list : string list -> string
@@ -86,8 +98,8 @@ val string_of_list : string list -> string
     representation. *)
 val gradify: string -> grade
 
-(** [create_course name cred gr deg] is a new course type with name [name], 
-    number of credits [cred], grade [gr], and degree category [deg]. *)
+(** [create_course name cred gr cat] is a new course type with name [name], 
+    number of credits [cred], grade [gr], and category [cat]. *)
 val create_course : string -> int -> grade -> string -> course
 
 (** [add_course sch c semid] is the schedule with course [c] added to semester
@@ -100,7 +112,7 @@ val add_course : schedule -> course -> sem_id -> schedule
 (** [edit_course sch c attr new_val] is the schedule that results from changing 
     the course field [attr] to [new_val] for course with name [c] in 
     schedule [sch]. 
-    Raises: [Failure] with various error messages if [attr] is not a valid field
+    Raises: [InvalidAttribute] with various error messages if [attr] is not a valid field
     of course record, or [new_val] is not valid. 
     Raises: [UnkownCourse c] if course is not in [sch]. *)
 val edit_course : schedule -> string -> string -> string -> schedule
@@ -128,8 +140,8 @@ val get_course_name : course -> string
 (** [get_course_credits course] is the number of credits of [course]. *)
 val get_course_credits : course -> int
 
-(** [get_course_cat course] is degree requirement category of [course]. *)
-val get_course_cat : course -> string
+(** [get_course_cat course] is the category of [course]. *)
+val get_course_cat : course -> category
 
 (** [get_sem sch semid] is the semester with the semester id [sem_id]
     if found in [sch]. 
@@ -197,7 +209,7 @@ val to_list : schedule -> course list
 val new_schedule : string -> schedule
 
 (** [print_course sch course] is [()] after printing the components of a course: 
-    the name, number of credits, grade, degree category, and semester. *)
+    the name, number of credits, grade, category, and semester. *)
 val print_course : schedule -> course -> unit
 
 (** [print_sem sem] is [()] after printing the components of a semester: 
