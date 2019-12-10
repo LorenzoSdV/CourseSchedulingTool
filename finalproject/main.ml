@@ -115,6 +115,8 @@ and prompt sch =
       exceptions sch ("Invalid/Unknown Grade Value: \n" ^ msg ^ 
                       "Valid grades: Letter grade, s/sat, u/unsat, w/withdrawn, 
                       inc/incomplete, none, transfer")
+    | UnknownSetting msg ->
+      exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 

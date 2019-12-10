@@ -176,6 +176,13 @@ let settings_handler sch str_lst =
   | attr::new_val::[] -> edit_settings sch attr new_val
   | _ -> raise MalformedSet
 
+(** COMMENT *)
+let validate_handler sch = 
+  Requirements.validate sch
+  |> Requirements.print_validation;
+  sch
+
+
 let parse_command sch cmd_str = 
 
   let match_helper first others =
@@ -189,6 +196,7 @@ let parse_command sch cmd_str =
     | "export" -> export_handler sch others
     | "import" -> import_handler sch others
     | "set" -> settings_handler sch others
+    | "validate" -> validate_handler sch
     | _ -> raise Malformed
   in
 

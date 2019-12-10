@@ -21,6 +21,17 @@ type semester
 (** The type representing the available settings. *)
 type settings
 
+(** The type representing what requirements of the schedule are met and what
+    are not met. *)
+type validation = {
+  (** A list of needed courses *)
+  needed: string list;
+  (** A list of categories and how many credits for each is required. *)
+  needed_cat: (string * int) list;
+  (** A list of groups of courses, of which one of each is requried. *)
+  needed_subs : string list list
+}
+
 (** The type representing a whole schedule *)
 type schedule
 
@@ -60,6 +71,9 @@ exception InvalidSwap
     the new semester is equal to the previous semester where that course was 
     located. *)
 exception InvalidMove
+
+(** COMMENT *)
+val string_of_list : string list -> string
 
 (** [gradify str] is the grade representation of [str] where is some grade value 
     represented as a string.
@@ -106,6 +120,12 @@ val get_course : string -> course list -> course
 
 (** [get_course_name course] is the name of [course] *)
 val get_course_name : course -> string
+
+(** COMMENT *)
+val get_course_credits : course -> int
+
+(** COment *)
+val get_course_cat : course -> string
 
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
@@ -206,6 +226,9 @@ val edit_name : schedule -> string -> schedule
     the new value [val].
     Raises: [UnknownSetting attr] is [attr] is not a valid setting *)
 val edit_settings : schedule -> string -> string -> schedule
+
+(** COmment *)
+val set_valid : schedule -> validation option -> unit
 
 module HTML : sig
 

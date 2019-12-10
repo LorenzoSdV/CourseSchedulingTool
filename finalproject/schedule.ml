@@ -28,6 +28,12 @@ type settings = {
   mutable html_squares: string;
 }
 
+type validation = {
+  needed: string list;
+  needed_cat: (string * int) list;
+  needed_subs : string list list
+}
+
 type schedule = {
   mutable desc: string;
   mutable semesters: semester list;
@@ -37,6 +43,7 @@ type schedule = {
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
+  mutable valid : validation option
 }
 
 exception UnknownCourse of string
@@ -48,6 +55,10 @@ exception DuplicateSemester of string
 exception InvalidCredits of string
 exception InvalidSwap
 exception InvalidMove
+
+let string_of_list str_lst = 
+  let str = List.fold_left (fun acc str -> acc ^ str ^ ", ") "[ " str_lst in
+  Str.replace_first (Str.regexp ", $") " ]" str
 
 (** [grade_map gr] matches a letter grade with its associated GPA. *)
 let grade_map gr = 
@@ -174,6 +185,12 @@ let rec get_course name courses =
 
 let get_course_name course =
   course.name
+
+let get_course_credits course = 
+  course.credits
+
+let get_course_cat course =
+  course.degree
 
 let rec get_sem sch sems semid = 
   match sems with 
@@ -319,6 +336,7 @@ let new_schedule name =
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
+    valid = None;
   }
 
 let get_save_status sch = 
@@ -344,6 +362,9 @@ let edit_settings sch attr new_val =
   | "html_tile_color" ->
     sch.settings.html_squares <- new_val; sch
   | _ -> raise (UnknownSetting attr)
+
+let set_valid sch v = 
+  sch.valid <- v
 
 let print_course sch course =
   print_newline ();
@@ -512,7 +533,8 @@ module LoadJSON = struct
       major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
-      settings = json |> Yj.member "settings" |> parse_settings
+      settings = json |> Yj.member "settings" |> parse_settings;
+      valid = None
     }
 
 end
