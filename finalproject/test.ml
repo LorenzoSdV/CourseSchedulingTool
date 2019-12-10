@@ -82,7 +82,7 @@ let load_schedule_tests = [
 ]
 
 let test_suite = [
-  basic_schedule_tests;
+  empty_schedule_tests;
   load_schedule_tests
 ]
 

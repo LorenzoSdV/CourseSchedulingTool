@@ -105,9 +105,11 @@ let is_not_json file =
 (** [export_handler sch str_lst] parses [str_lst] in [sch] for the 
     Export command. *)
 let export_handler sch str_lst = 
+  ignore (Requirements.validate sch);
   match str_lst with
   | file :: [] -> if is_not_json file
-    then (HTML.export_schedule sch file; sch) else raise InvalidFileForExport
+    then (HTML.export_schedule sch file; sch) 
+    else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
 (** [import_handler sch str_lst] parses [str_lst] in [sch] for the Import 

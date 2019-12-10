@@ -6,8 +6,8 @@
 	"major": "",
 	"settings": {
 		"autosave": false,
-		"html_bg_color": "",
-		"html_square_color": ""
+		"html_bg_color": "rgb(255, 224, 198)",
+		"html_square_color": "rgb(206, 225, 231)"
 	},
 	"semesters": [
 		{

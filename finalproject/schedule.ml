@@ -447,6 +447,35 @@ module HTML = struct
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
+  (** COMMENT *)
+  let html_of_validation (v_opt:validation option) = 
+    match v_opt with
+    | None -> ""
+    | Some v ->
+      "\t<h2>Testing Against CS Engineering Requirements:</h2>\n" ^ 
+      "\t\t<ul>\n" ^
+      (let req_course c =
+         "\t\t\t<li><span>" ^
+         "Missing Required Course: </span>" ^ c ^ "</li>\n"
+       in
+       List.fold_left (fun acc c -> acc ^ (req_course c)) "" v.needed) ^ 
+      "\t\t</ul><ul>\n" ^
+      (let required_cat cat =
+         "\t\t\t<li><span>" ^ 
+         "Not enough courses from category: </span>" ^ cat ^ "</li>\n"
+       in
+       List.fold_left 
+         (fun acc (c,_) -> acc ^ (required_cat c)) "" v.needed_cat)^
+      "\t\t</ul><ul>\n" ^
+      (let required_subs c_lst =
+         "\t\t\t<li><span>" ^ 
+         "No course from required group: </span>" ^ 
+         (string_of_list c_lst) ^ "</li>\n"
+       in
+       List.fold_left 
+         (fun acc c -> acc ^ (required_subs c)) "" v.needed_subs) ^
+      "\t\t</ul>\n"
+
   (** [save filename text] creates a file named [filename] and puts [text]
       in it. *)
   let save filename text = 
@@ -458,9 +487,11 @@ module HTML = struct
     let reg1 = Str.regexp "<\\?sch_bg_color>" in
     let reg2 = Str.regexp "<\\?sch_square_color>" in
     let reg3 = Str.regexp "<\\?sch>" in
+    let reg4 = Str.regexp "<\\?sch_validation>" in
     Str.global_replace reg1 sch.settings.html_background template
     |> Str.replace_first reg2 sch.settings.html_squares
     |> Str.replace_first reg3 (html_of_schedule sch)
+    |> Str.replace_first reg4 (html_of_validation sch.valid)
     |> save fl
 
 end
