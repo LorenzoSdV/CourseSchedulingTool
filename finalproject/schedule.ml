@@ -1,5 +1,8 @@
 type sem_status = Past | Present | Future
+
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
+
+type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo | Hist | Lang
 
 type school = ENG | CAS
 
@@ -10,14 +13,13 @@ type course = {
   mutable credits: int;
   mutable grade: grade;
   mutable degree: string;
-  (* subject/category *)
+  mutable category: category;
 }
 
 type semester = {
   mutable id: sem_id;
   mutable courses: course list;
   mutable tot_credits: int;
-  (*mutable sem_status: sem_status;*)
   mutable sem_gpa: float;
 }
 
