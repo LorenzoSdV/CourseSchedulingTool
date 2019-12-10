@@ -87,6 +87,13 @@ let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
   | "name"::new_val::[] -> edit_name sch new_val
+  | "school"::school::[] -> begin
+      let school' = (String.uppercase_ascii school) in
+      if (school' = "CAS" || school' = "ENG") then
+        (set_school sch school'; sch)
+      else
+        raise MalformedEdit
+    end
   | course_name::field::new_val::[] ->
     edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
@@ -111,7 +118,10 @@ let is_not_json file =
 (** [export_handler sch str_lst] parses [str_lst] in [sch] for the 
     Export command. *)
 let export_handler sch str_lst = 
-  ignore (Requirements.validate sch);
+  (if get_school sch = "ENG" then
+     ignore (Requirements.validate sch Requirements.eng_reqs)
+   else
+     ignore (Requirements.validate sch Requirements.cas_reqs));
   match str_lst with
   | file :: [] -> if is_not_json file
     then (HTML.export_schedule sch file; sch) 
@@ -184,11 +194,17 @@ let settings_handler sch str_lst =
   | attr::new_val::[] -> edit_settings sch attr new_val
   | _ -> raise MalformedSet
 
-(** COMMENT *)
+(** [validate_handler sch] is [sch] after chekcing updating validity of 
+    schedule. *)
 let validate_handler sch = 
-  Requirements.validate sch
-  |> Requirements.print_validation;
-  sch
+  if get_school sch = "ENG" then
+    (Requirements.validate sch Requirements.eng_reqs
+     |> Requirements.print_validation;
+     sch)
+  else
+    (Requirements.validate sch Requirements.cas_reqs
+     |> Requirements.print_validation;
+     sch)
 
 
 let parse_command sch cmd_str = 

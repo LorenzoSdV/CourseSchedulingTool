@@ -24,6 +24,8 @@ type settings
 (** The type representing what requirements of the schedule are met and what
     are not met. *)
 type validation = {
+  sch : string;
+  (** Either "ENG" or "CAS" indicating school user is in. *)
   needed: string list;
   (** A list of needed courses *)
   needed_cat: (string * int) list;
@@ -222,6 +224,14 @@ val get_name : schedule -> string
 
 (** [edit_name sch nm] is [sch] but with name set to [nm]  *)
 val edit_name : schedule -> string -> schedule
+
+(** [get_school sch] is either "ENG" or "CAS" depending on school of 
+    schedule. *)
+val get_school : schedule -> string
+
+(** [set_school sch school] is [()] after setting school value for [sch] to 
+    [school] *)
+val set_school : schedule -> string -> unit
 
 (** [edit_settings sch attr val] is [sch] with the setting [attr] updated to 
     the new value [val].

@@ -24,6 +24,7 @@ type settings = {
 }
 
 type validation = {
+  sch: string;
   needed: string list;
   needed_cat: (string * int) list;
   needed_subs : string list list
@@ -38,6 +39,7 @@ type schedule = {
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
+  mutable school : string;
   mutable valid : validation option
 }
 
@@ -334,7 +336,8 @@ let new_schedule name =
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
-    valid = None;
+    school = "ENG";
+    valid = None
   }
 
 let get_save_status sch = 
@@ -345,6 +348,12 @@ let set_save_status sch b =
 
 let get_name sch =
   sch.desc
+
+let get_school sch =
+  sch.school
+
+let set_school sch school =
+  sch.school <- school
 
 let edit_name sch nm =
   sch.desc <- nm;
@@ -447,12 +456,13 @@ module HTML = struct
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
-  (** COMMENT *)
+  (** [html_of_validation v] is a string that represents a validation displayed
+      in valid HTML. *) 
   let html_of_validation (v_opt:validation option) = 
     match v_opt with
     | None -> ""
     | Some v ->
-      "\t<h2>Testing Against CS Engineering Requirements:</h2>\n" ^ 
+      "\t<h2>Testing Against CS " ^ v.sch ^ " Requirements:</h2>\n" ^ 
       "\t\t<ul>\n" ^
       (let req_course c =
          "\t\t\t<li><span>" ^
@@ -563,6 +573,7 @@ module LoadJSON = struct
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
+      school = json |> Yj.member "school" |> Yj.to_string;
       valid = None
     }
 
@@ -614,6 +625,7 @@ module SaveJSON = struct
     "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
+    "\t\"school\": \"" ^ sch.school ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
     (Str.replace_first reg "}\n" 
        (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem)) 

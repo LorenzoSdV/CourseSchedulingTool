@@ -147,7 +147,7 @@ and prompt sch =
                       ^ " <category> <semester> | <semester>]")
     | MalformedEdit ->
       exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
-                      "name <new_name>]")
+                      "name <new_name> | school <ENG | CAS> ]")
     | MalformedRemove ->
       exceptions sch "Usage: remove [<course_name> | <semester>]"
     | MalformedExport ->
