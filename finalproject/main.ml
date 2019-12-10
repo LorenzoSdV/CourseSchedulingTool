@@ -112,9 +112,9 @@ and prompt sch =
     | UnknownSemester msg -> 
       exceptions sch ("Invalid/Unknown Semester: " ^ msg)
     | UnknownGrade msg -> 
-      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg ^ 
-                      "\nValid grades: s/sat, u/unsat, w/withdrawn, 
-                      inc/incomplete")
+      exceptions sch ("Invalid/Unknown Grade Value: \n" ^ msg ^ 
+                      "Valid grades: Letter grade, s/sat, u/unsat, w/withdrawn, 
+                      inc/incomplete, none, transfer")
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
@@ -198,13 +198,12 @@ and init_prompt () =
       print_endline("\nThe following commands are available for use. Type in" 
                     ^ " any command to see usage instructions.");
       ANSITerminal.(print_string [yellow] valid_commands);
-      print_newline ();
-      print_endline 
-        ("\nThe following are the grade options when adding a " ^
-         "new course to the schedule, in addition to standard letter grades.");
+      print_endline("\nThe following are the grade options when adding a " ^
+                    "new course to the schedule.\n");
       ANSITerminal.(print_string [yellow] 
-                      ("Valid grades: s/sat, u/unsat, " ^
-                       "w/withdrawn, inc/incomplete\n"));
+                      ("Valid grades: A Letter grade, s/sat, " 
+                       ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
+                       "none, transfer\n"));
       print_string("\n");
       prompt (new_schedule new_name)
     end

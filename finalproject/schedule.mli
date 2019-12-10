@@ -2,28 +2,27 @@
     semester, a present one, or a future semester. *)
 type sem_status = Past | Present | Future
 
-(** NEEDS COMMENT *)
+(** The type representing the semester, either spring or fall of a year. *)
 type sem_id = Spring of int | Fall of int | None
 
 (** The type representing the grade of a course. *)
-type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
+type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
+           | Letter of string 
 
-(** The type representing the prereqs or coreqs of a course. *)
-(* WILL BE IMPLEMENTED IN SPRINT 3 *)
-(*type reqs *)
+(** The type representing which school the CS degree is coming from. *)
+type school = ENG | CAS
 
-(** Type representing a course *)
+(** The type representing a course *)
 type course
 
-(** Type representing a semester *)
+(** The type representing a semester *)
 type semester
 
-(** Type representing a whole schedule *)
-type schedule
+(** The type representing the available settings. *)
+type settings
 
-(*(** [InvalidCredits] raised when a course is to be added to a schedule with an 
-    invalid number of credits. *)
-  exception InvalidCredits*)
+(** The type representing a whole schedule *)
+type schedule
 
 (** [UnknownCourse nm] raised when course with name [nm] passed as a real course
     but isn't recognized as such. *)
@@ -48,6 +47,10 @@ exception DuplicateCourse of string
 (** [DuplicateSemester sem] raised when semester with string-id [sem] is added 
     to a schedule where a semester with the same id already exists. *)
 exception DuplicateSemester of string
+
+(** [InvalidCredits str] raised when a course is to be added to a schedule with  
+    an invalid number of credits.  *)
+exception InvalidCredits of string
 
 (** [InvalidSwap] is raised when an illegal swap is attempted. Swap is illegal 
     if both courses are in same semester or both are same course. *)
@@ -148,6 +151,9 @@ val remove_sem : schedule -> sem_id -> schedule
     representations are like FA20 or SP18, etc. *)
 val string_of_semid : sem_id -> string
 
+(** [string_of_grade gr] is the string representation of a grade [gr]. *)
+val string_of_grade : grade -> string
+
 (** [sem_ids s] is the list of semester ids from each semester in 
     schedule [sch]. *)
 val sem_ids : schedule -> sem_id list
@@ -164,10 +170,16 @@ val to_list : schedule -> course list
     or semesters. *)
 val new_schedule : string -> schedule
 
-(** COMMENT *)
+(** [print_course sch course] prints out the components of a course: the name,
+    number of credits, grade, degree category, and semester. *)
 val print_course : schedule -> course -> unit
 
-(** COMMENT *)
+(** [print_sem sem] prints out the components of a semester: the semester id,
+    the list of course names, the GPA, and the number of credits. *)
+val print_sem : semester -> unit
+
+(** [print_schedule sch] prints out the components of a schedule: the semesters,
+    the GPA, and the number of credits. *)
 val print_schedule : schedule -> unit
 
 (** [get_save_status sch] is whether or not [sch] has been saved. *)
