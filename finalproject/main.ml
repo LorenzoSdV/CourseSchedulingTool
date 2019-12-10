@@ -180,6 +180,10 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
+      print_endline("The following commands are available for use. Type in " ^
+                    " any command to see usage instructions.\n");
+      ANSITerminal.(print_string [yellow] valid_commands);
+      print_string("\n");
       prompt (new_schedule new_name)
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
