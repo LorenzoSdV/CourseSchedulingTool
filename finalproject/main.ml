@@ -4,12 +4,13 @@ open ClassRoster
 
 let valid_commands = 
   ("Valid Commands: add | edit | remove | swap | move | save |" ^
-   " print | import | export | delete | clear | close | quit ")
+   " print | import | export | delete | clear | close | quit")
 
 let read_input () = 
   print_string "\n> ";
   read_line ()
 
+(** [save_prompt_helper sch] saves [sch] as a json file. *)
 let save_prompt_helper sch =
   print_endline 
     ("\nChoose the name of the JSON file you will save this schedule to:");
@@ -22,12 +23,14 @@ let rec save_prompt_from_quit sch =
   print_endline 
     "You have unsaved changes. Would you like to save now before quitting?";
   match read_input () with
+  | "cancel" -> prompt sch
   | "yes" -> ignore(save_prompt_helper sch); set_save_status sch true; 
     ANSITerminal.print_string [Bold] "\nSaved!\n";
     start_prompt ()
   | "no" -> Stdlib.exit 0
   | _ -> 
-    print_endline ("Type 'yes' or 'no' to continue."); 
+    print_endline ("Type 'yes' or 'no' to continue. 'cancel' to undo this 
+    command."); 
     save_prompt_from_quit sch
 (** [save_prompt_from_close sch] prompts the user whether they want to save 
     [sch] or not after the Close command. *)
@@ -36,12 +39,14 @@ and save_prompt_from_close sch =
   print_endline 
     "You have unsaved changes. Would you like to save now before closing?";
   match read_input () with
+  | "cancel" -> prompt sch
   | "yes" -> ignore(save_prompt_helper sch); set_save_status sch true; 
     ANSITerminal.print_string [Bold] "\nSaved!\n"; 
     start_prompt ()
   | "no" -> start_prompt ()
   | _ -> 
-    print_endline ("Type 'yes' or 'no' to continue."); 
+    print_endline ("Type 'yes' or 'no' to continue. 'cancel' to undo this 
+    command."); 
     save_prompt_from_close sch
 (** [delete_prompt sch] erases [sch] to make it blank, 
     but first asks the user if they are sure they want to delete [sch]. *)
@@ -159,6 +164,7 @@ and exceptions sch err =
   print_endline err;
   prompt sch
 
+(** [load file_lst] checks whether the user loaded a .json file or not. *)
 and load (file_lst: string list) =
   try 
     let file_extra_space = 
@@ -171,6 +177,7 @@ and load (file_lst: string list) =
   | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
     init_prompt ()
 
+(** [init_prompt]  *)
 and init_prompt () =
   let split_cmd = String.split_on_char ' ' (read_input ()) in
   match split_cmd with 
@@ -191,7 +198,7 @@ and init_prompt () =
     init_prompt ()
 
 and start_prompt () =
-  ANSITerminal.(print_string [cyan] "\nSTART PAGE\n"); 
+  ANSITerminal.(print_string [cyan] "\nStart Page\n"); 
   print_endline 
     "Valid Commands: [new <schedule_name>] | [load <json_file>] | quit";
   init_prompt ()
