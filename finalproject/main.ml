@@ -134,9 +134,9 @@ and prompt sch =
     | InvalidFileForExport ->
       exceptions sch "File path cannot be a JSON. Try again."
     | InvalidFileForImport ->
-      exceptions sch "File must be an iCal. Try again."
+      exceptions sch "File must be an iCal in current directory. Try again."
     | InvalidFileForSave -> 
-      exceptions sch "File path must be a JSON. Try again." 
+      exceptions sch "File path must be a JSON in current directory. Try again." 
     | SemesterDoesNotExist ->
       exceptions sch "This semester does not exist in your schedule."
     | MalformedSemId -> 
@@ -162,6 +162,8 @@ and prompt sch =
       exceptions sch "Usage: print [<> | <course_name>]"
     | MalformedSet ->
       exceptions sch "Usage: set <attribute> <new_value>"
+    | MalformedImport -> 
+      exceptions sch "Usage: import <ics_file>"
     | Malformed | Empty -> 
       exceptions sch 
         ("Unrecognized Command Entry!\n" ^ valid_commands)

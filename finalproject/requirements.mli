@@ -10,7 +10,7 @@ val eng_reqs : reqs
 (** The requirements for a CS degree in the College of Arts & Sciences. *)
 (*val arts_reqs : reqs*)
 
-(** [validate sch] is the validation infromation about [sch] after this
+(** [validate sch] is the validation information about [sch] after this
     information has been stored in [sch]. *)
 val validate : schedule -> validation
 
