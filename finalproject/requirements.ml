@@ -39,7 +39,10 @@ let eng_reqs = {
   let _, result = List.filter (fun (c,sub) -> c = course) subs |> List.split
   in result*)
 
-(** COMMENT *)
+(** [check_required sch reqs] is a ist of courses that are required by [reqs] 
+    but not included in [sch]. 
+
+    If [check_required sch reqs] = [] then all course requirments are met. *)
 let check_required sch reqs =
   let rec loop courses required acc =
     match required with 
@@ -53,7 +56,12 @@ let check_required sch reqs =
   loop (List.map get_course_name (to_list sch)) reqs.required []
 
 
-(** COMMENT *)
+(** [check_categories sch reqs] is a list of tuples of categories and credits
+    required for each category that aren't met in [sch]
+
+    For example, if [check_categories sch reqs] = [("CS4000+", 3)], then [sch] 
+    is missing one course satisfying the CS4000+ requirement. If 
+    [check_categories sch reqs] = [] then all category requirment are met. *)
 let check_categories sch reqs =
   let rec loop courses categories acc =
     match categories with 
@@ -69,7 +77,7 @@ let check_categories sch reqs =
   loop (to_list sch) reqs.categories []
 
 
-(** returns true if at least one element of list1 is in list2 *)
+(** [satisfied l1 l2] is [true] if at least one element of [l1] is in [l2]. *)
 let satisfies list1 list2 = 
   let rec loop test ref = 
     match test with
@@ -80,7 +88,11 @@ let satisfies list1 list2 =
   in
   loop list1 list2
 
-(** COMMENT *)
+(** [check_subs sch reqs] is a list of groups (lists) of courses where [sch] is
+    missing at least one course from each group.
+
+    If [check_subs sch reqs] = [] then [sch] contains at least one course from
+    each group as per [reqs] and requirement is satisfied. *)
 let check_subs sch reqs =
   let rec loop courses subs acc =
     match subs with 
