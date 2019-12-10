@@ -121,6 +121,9 @@ let gpa_to_string gpa_float =
     else gpa
   | _ -> Str.first_chars gpa 4
 
+let get_gpa sch = 
+  sch.cumul_gpa
+
 let get_credits sch = 
   sch.sch_credits
 

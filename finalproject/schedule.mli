@@ -150,6 +150,9 @@ val gpa : course list -> float
 (** [gpa_to_string gpa] is the string representation of [gpa]. *)
 val gpa_to_string : float -> string
 
+(** [get_gpa sch] is the cumulative GPA of the schedule [sch]. *)
+val get_gpa : schedule -> float
+
 (** [get_credits sch] is the sum of all the credits in the schedule [sch]. *)
 val get_credits : schedule -> int
 
