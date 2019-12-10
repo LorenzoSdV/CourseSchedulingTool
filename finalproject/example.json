@@ -19,13 +19,13 @@
 					"name": "CS2800",
 					"course credits": 3,
 					"grade": "A-",
-					"degree": "CSCore"
+					"category": "Core"
 				},
 				{
 					"name": "CS3110",
 					"course credits": 4,
 					"grade": "B",
-					"degree": "CScore"
+					"category": "Core"
 				}
 			]
 		},
@@ -38,13 +38,13 @@
 					"name": "PHYS2213",
 					"course credits": 4,
 					"grade": "C+",
-					"degree": "Engineering"
+					"category": "Required"
 				},
 				{
 					"name": "CS4820",
 					"course credits": 4,
 					"grade": "B+",
-					"degree": "CScore"
+					"category": "Core"
 				}
 			]
 		}

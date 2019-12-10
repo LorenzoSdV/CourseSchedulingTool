@@ -3,11 +3,14 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer
 
 type sem_id = Spring of int | Fall of int | None
 
+type category = Required | Core | FourThousandPlus | Technical | Specialization
+              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra
+
 type course = {
   name: string;
   mutable credits: int;
   mutable grade: grade;
-  mutable degree: string;
+  mutable category: category;
 }
 
 type semester = {
@@ -44,12 +47,14 @@ type schedule = {
 exception UnknownCourse of string
 exception UnknownSemester of string
 exception UnknownGrade of string
+exception UnknownCategory of string
 exception UnknownSetting of string
 exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
 exception InvalidSwap
 exception InvalidMove
+exception InvalidAttribute of string
 
 let string_of_list str_lst = 
   let str = List.fold_left (fun acc str -> acc ^ str ^ ", ") "[ " str_lst in
@@ -86,6 +91,23 @@ let gradify str =
     | "NONE" -> None
     | "TRANSFER" -> Transfer
     | _ -> raise (UnknownGrade str)
+
+(** [categorify str] is the category represented by [str]. 
+    Raises: [UnknownCategory str] if [str] is not a valid category 
+    representation. *)
+let categorify str =
+  match str with
+  | "REQ" | "REQUIRED" -> Required
+  | "CORE" -> Core
+  | "4000+" -> FourThousandPlus
+  | "TECH" | "TECHNICAL" -> Technical
+  | "SPCL" | "EXT" -> Specialization
+  | "LIBERAL" -> Liberal
+  | "APRV" | "ADVISOR" -> AdvisorApproved
+  | "MAJ" | "MAJOR" -> MajorApproved
+  | "PROJECT" | "PROJ" | "PRACTICUM" | "PRACT" -> Practicum
+  | "EXTRA" -> Extra
+  | _ -> raise (UnknownCategory str)
 
 let gpa courses =
   let rec fold_credits courses acc =
@@ -148,6 +170,19 @@ let string_of_grade gr =
   | Transfer -> "Transfer"
   | Letter l -> l
 
+let string_of_category cat =
+  match cat with
+  | Required -> "Required"
+  | Core -> "Core"
+  | FourThousandPlus -> "4000+"
+  | Technical -> "Technical ELective"
+  | Specialization -> "External Specialization"
+  | Liberal -> "Liberal Studies"
+  | AdvisorApproved -> "Advisor Approved Elective"
+  | MajorApproved -> "Major Approved Elective"
+  | Practicum -> "Practicum/Project"
+  | Extra -> "Extra Course"
+
 (** [sem_compare s1 s2] is a negative number if [s1] comes before [s2], 
     0 if theyre the same semester, and a positive number if [s1] comes after
     [s2]. *)
@@ -159,7 +194,7 @@ let sem_compare s1 s2 =
   | Spring y1 , Fall y2 -> if y1 = y2 then -1 else Stdlib.compare y1 y2
   | _ -> failwith "Impossible case."
 
-let create_course name cred gr deg = 
+let create_course name cred gr cat = 
   if cred < 0 then 
     raise (InvalidCredits "Credits have to be greater than or equal to zero.")
   else if not (Str.string_match 
@@ -170,7 +205,7 @@ let create_course name cred gr deg =
       name = name;
       credits = cred;
       grade = gr;
-      degree = deg;
+      category = (categorify cat);
     }
 
 let rec get_course name courses = 
@@ -185,7 +220,7 @@ let get_course_credits course =
   course.credits
 
 let get_course_cat course =
-  course.degree
+  course.category
 
 let get_sem sch semid = 
   let rec get_sem_loop sems semid' = 
@@ -245,9 +280,10 @@ let edit_course sch cname attr new_val =
       course.grade <- gradify new_val;
       sem.sem_gpa <- gpa sem.courses;
       sch.cumul_gpa <- gpa (to_list sch); sch.is_saved <- false; sch
-    | "degree" -> 
-      course.degree <- new_val; sch.is_saved <- false; sch
-    | _ -> raise (Failure "Invalid course attribute")
+    | "category" -> 
+      course.category <- categorify (String.uppercase_ascii new_val); 
+      sch.is_saved <- false; sch
+    | _ -> raise (InvalidAttribute attr)
   with
     Not_found -> raise (UnknownCourse cname)
 
@@ -369,7 +405,7 @@ let print_course sch course =
   ANSITerminal.(print_string [Bold] course.name); print_newline ();
   print_endline ( "Credits: " ^ (string_of_int course.credits) );
   print_endline ( "Grade: " ^ (string_of_grade course.grade) );
-  print_endline ( "Degree Category: " ^ course.degree );
+  print_endline ( "Category: " ^ (string_of_category course.category) );
   let semid = (get_sem_from_course sch.semesters course).id in
   print_endline ("Semester: " ^ string_of_semid semid)
 
@@ -412,7 +448,7 @@ module HTML = struct
     "\t\t\t\t\t<h4><strong>" ^ c.name ^ "</strong></h4>\n" ^ 
     "\t\t\t\t\t<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
     "\t\t\t\t\t<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
-    "\t\t\t\t\t<p>Category: " ^ c.degree ^ "</p>\n" ^ 
+    "\t\t\t\t\t<p>Category: " ^ (string_of_category c.category) ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
   (** [html_of_sem sem] returns a string that represents a semester that can be
@@ -527,7 +563,7 @@ module LoadJSON = struct
     name = json |> Yj.member "name" |> Yj.to_string;
     credits = json |> Yj.member "course credits" |> Yj.to_int;
     grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
-    degree = json |> Yj.member "degree" |> Yj.to_string;
+    category = json |> Yj.member "category" |> Yj.to_string |> categorify;
   }
 
   (** [parse_semester json] creates a semester from JSON representation
@@ -577,7 +613,7 @@ module SaveJSON = struct
     "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
     "\t\t\t\t\t\"course credits\": " ^ (string_of_int c.credits) ^ ",\n" ^
     "\t\t\t\t\t\"grade\": \"" ^ (string_of_grade c.grade) ^ "\",\n" ^
-    "\t\t\t\t\t\"degree\": \"" ^ c.degree ^ "\"\n" ^
+    "\t\t\t\t\t\"degree\": \"" ^ (string_of_category c.category) ^ "\"\n" ^
     "\t\t\t\t},\n"
 
   (** [json_of_sem sem] is a string representation of [sem] that can be 
