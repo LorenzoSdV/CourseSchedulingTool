@@ -130,3 +130,27 @@ import <file>.ics
 
 _Notice_ that this command will create a new semester if the semester doesn't
 already exist automatically.
+
+
+We've also added the _swap_ and _move_ commands to swap two courses from semester
+to semester, and to just move a course to another semester:
+
+Assuming you've just loaded example.json, you can use the following command
+to move PHYS2213 to the FA19 semester:
+```
+move PHYS2213 FA19
+```
+
+and the following command to swap the semester-position of CS4820 with CS3110:
+```
+swap CS4820 CS3110
+```
+
+Finally, the best part -- you can now check a schedule against a set of 
+hardcoded requirements! This can be done using the check command (below). The
+system will print any missing courses or credits for you.
+```
+check
+```
+
+This validation is also now included in all exported HTML files.
