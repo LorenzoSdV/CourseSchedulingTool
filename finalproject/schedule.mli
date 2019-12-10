@@ -109,7 +109,7 @@ val edit_course : schedule -> string -> string -> string -> schedule
     Raises: [UnkownCourse c] if [c] is not in [sch]. *)
 val remove_course : schedule -> string -> schedule
 
-(** [swap_courses c1_name c2_name sch] is the [sch] but with [c1_name] and 
+(** [swap_courses c1_name c2_name sch] is [sch] but with [c1_name] and 
     [c2_name] semester's swapped.
     Raises: [InvalidSwap] if [c1_name] and [c2_name] are in same semester. *)
 val swap_courses : string -> string -> schedule -> schedule
@@ -263,7 +263,8 @@ end
 
 module SaveJSON : sig
 
-  (** [save_schedule sch fl] is [()] after *)
+  (** [save_schedule sch fl] is [()] after saving sch as a JSON file into 
+      [fl]. *)
   val save_schedule : schedule -> string -> unit
 
 end

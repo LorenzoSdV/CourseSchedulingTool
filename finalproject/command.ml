@@ -22,14 +22,15 @@ exception InvalidFileForSave
 
 exception SemesterDoesNotExist
 
-(** [is_valid_coursename str] checks if [str] has the correct format of a 
+(** [is_valid_coursename str] is [true] if [str] has the correct format of a 
     Cornell class. *)
 let is_valid_coursename str =
   if (Str.string_match (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") str 0) 
   then true else false 
 
-(** [sem_id_parse sem_id] parses [sem_id] if it is a valid semester type.
-    Raises: Malformed when [sem_id] is not valid. *)
+(** [sem_id_parse semid] is [sem_id] where [semid] is the string 
+    representation of [sem_id]. 
+    Raises: [MalformedSemId] if [semid] is not a proper string rep. *)
 let sem_id_parse sem_id =
   let uppercase_id = String.uppercase_ascii sem_id in
   if Str.string_match (Str.regexp "^SP[0-9][0-9]$") uppercase_id 0 then
@@ -47,12 +48,15 @@ let rec sem_exists sem_id_lst sem_id =
   | sem::others when sem = (String.uppercase_ascii sem_id) -> ()
   | sem::others -> sem_exists others sem_id
 
-(** [format_sem_id sem_id] checks if user is trying to add a semester or not. *)
-let format_sem_id sem_id =
-  let id = String.uppercase_ascii(String.sub sem_id 0 2) in
+(** [format_sem_id str] is [true] if [str] conforms to a string representation
+    of a semester id. *)
+let format_sem_id str =
+  let id = String.uppercase_ascii(String.sub str 0 2) in
   if id = "SP" || id = "FA" then true else false
 
-(** [add_others sch str_lst] parses [str_lst] in [sch] for the Add command. *)
+(** [add_others sch str_lst] is [sch] after parsing [str_lst] and adding a 
+    new course if [str_lst] is properly formatted. 
+    Raises: [MalformedAdd] if [str_lst] not properly formatted. *)
 let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
@@ -82,7 +86,9 @@ let add_others sch str_lst =
                       (Schedule.gradify grade) (guess_deg name)) *)
   | _ -> raise MalformedAdd
 
-(** [edit_others sch str_lst] parses [str_lst] in [sch] for the Edit command. *)
+(** [add_others sch str_lst] is [sch] after parsing [str_lst] and editing a 
+    course value if [str_lst] is properly formatted. 
+    Raises: [MalformedEdit] if [str_lst] not properly formatted. *)
 let edit_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedEdit
@@ -98,8 +104,9 @@ let edit_others sch str_lst =
     edit_course sch (String.uppercase_ascii course_name) field new_val
   | _ -> raise MalformedEdit
 
-(** [remove_others sch str_lst] parses [str_lst] in [sch] for the Remove 
-    command. *)
+(** [remove_others sch str_lst] is [sch] after parsing [str_lst] and removing a 
+    new course if [str_lst] is properly formatted. 
+    Raises: [MalformedRemove] if [str_lst] not properly formatted. *)
 let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
@@ -108,15 +115,17 @@ let remove_others sch str_lst =
   | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
   | _ -> raise MalformedRemove
 
-(** [is_not_json file] checks if [file] has the extension .json.
-    Raises: InvalidFileForExport if [file] is a .json. *)
+(** [is_not_json file] is [false] if [file] has the extension ".json".
+    Raises: [InvalidFileForExport] if [file] is a .json. *)
 let is_not_json file =
   match String.split_on_char '.' file with
   | name::extension::[] when extension <> "json" -> true
   | _ -> raise InvalidFileForExport
 
-(** [export_handler sch str_lst] parses [str_lst] in [sch] for the 
-    Export command. *)
+(** [export_handler sch str_lst] is [sch] after parsing [str_lst] and exporting
+    [sch] as HTML file if [str_lst] is properly formatted. 
+    Raises: [MalformedExport] if [str_lst] not properly formatted.
+    Raises: [InvalidFileForExport] if filenmae given in [str_lst] isnt valid. *)
 let export_handler sch str_lst = 
   (if get_school sch = "ENG" then
      ignore (Requirements.validate sch Requirements.eng_reqs)
@@ -128,8 +137,10 @@ let export_handler sch str_lst =
     else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
-(** [import_handler sch str_lst] parses [str_lst] in [sch] for the Import 
-    command. *)
+(** [import_handler sch str_lst] is [sch] after parsing [str_lst] and importing
+    an iCal file if [str_lst] is properly formatted. 
+    Raises: [MalformedImport] if [str_lst] not properly formatted.
+    Raises: [InvalidFileForImport] if filenmae given in [str_lst] isnt valid. *)
 let import_handler sch str_lst = 
   match str_lst with
   | file :: [] -> begin
@@ -155,15 +166,17 @@ let import_handler sch str_lst =
     end
   | _ -> raise MalformedImport
 
-(** [is_json file] checks if [file] has the extension .json.
+(** [is_json file] is [true] if [file] has the extension .json.
     Raises: InvalidFileForSave if [file] is not a .json. *)
 let is_json file =
   match String.split_on_char '.' file with
   | name::extension::[] when name <> "" && extension = "json" -> true
   | _ -> raise InvalidFileForSave
 
-(** [save_handler sch str_lst] parses [str_lst] in [sch] for the 
-    Save command. *)
+(** [save_handler sch str_lst] is [sch] after parsing [str_lst] and saving [sch]
+    as JSON file if [str_lst] is properly formatted. 
+    Raises: [MalformedSave] if [str_lst] not properly formatted.
+    Raises: [InvalidFileForSave] if filenmae given in [str_lst] isnt valid. *)
 let save_handler sch str_lst = 
   match str_lst with
   | file :: [] -> if is_json file 
@@ -172,7 +185,9 @@ let save_handler sch str_lst =
     else raise InvalidFileForSave
   | _ -> raise MalformedSave
 
-(** [swap_others sch str_lst] parses [str_lst] in [sch] for the Swap command. *)
+(** [swap_others sch str_lst] is [sch] after parsing [str_lst] and swapping
+    courses between semesters if [str_lst] is properly formatted. 
+    Raises: [MalformedSwap] if [str_lst] not properly formatted. *)
 let swap_others sch str_lst =
   match str_lst with
   | course1::course2::[] -> 
@@ -180,15 +195,18 @@ let swap_others sch str_lst =
       (String.uppercase_ascii course2) sch
   | _ -> raise MalformedSwap
 
-(** [move_others sch str_lst] parses [str_lst] in [sch] for the Move command. *)
+(** [move_others sch str_lst] is [sch] after parsing [str_lst] and moving course
+    to a new semester if [str_lst] is properly formatted. 
+    Raises: [MalformedMove] if [str_lst] not properly formatted. *)
 let move_others sch str_lst =
   match str_lst with
   | course::sem::[] -> (sem_exists (sem_ids_to_string sch) sem); 
     move_course (String.uppercase_ascii course) (sem_id_parse sem) sch
   | _ -> raise MalformedMove
 
-(** [settings_handler sch str_lst] parses [str_lst] in [sch] for the Set 
-    command. *)
+(** [settings_handler sch str_lst] is [sch] after parsing [str_lst] and changing
+    settings in [sch] if [str_lst] is properly formatted. 
+    Raises: [MalformedSet] if [str_lst] not properly formatted. *)
 let settings_handler sch str_lst = 
   match str_lst with
   | attr::new_val::[] -> edit_settings sch attr new_val

@@ -4,8 +4,8 @@
    and Lorenzo Scotto di Vettimo (ls769)
 *)
 
-(** [parse_file file] is a the tuple of course names and a semester identifier
-    for an ical schedule [file] downlaoded from Class Roster.
+(** [parse_file file] is the tuple of course names and a string semester 
+    identifier for an ical schedule [file] downlaoded from Class Roster.
 
     Requires: [file] is a .ics file downloaded from Class Roster that has not 
     been modified in any fashion. *)
