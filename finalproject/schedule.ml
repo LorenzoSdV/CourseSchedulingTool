@@ -1,5 +1,6 @@
 type sem_status = Past | Present | Future
-type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
+type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
+           | Letter of string 
 
 type school = ENG | CAS
 
@@ -76,6 +77,7 @@ let gradify str =
     | "SAT" | "S" -> Sat
     | "UNSAT" | "U" -> Unsat
     | "NONE" -> None
+    | "TRANSFER" -> Transfer
     | _ -> raise (UnknownGrade str)
 
 let gpa courses =

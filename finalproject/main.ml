@@ -3,12 +3,8 @@ open Command
 open ClassRoster
 
 let valid_commands = 
-  ("Valid Commands: add | edit | remove | swap | move | save |" ^
-<<<<<<< HEAD
-   " print | import | export | delete | clear | close | quit")
-=======
-   " print | import | export | delete | clear | close | settings | quit ")
->>>>>>> 1ebaf0d85a64b590136ddd0f56baf70759592ee1
+  "Valid Commands: add | edit | remove | swap | move | save |" ^
+  " print | import | export | delete | clear | close | settings | quit "
 
 let read_input () = 
   print_string "\n> ";
@@ -111,9 +107,9 @@ and prompt sch =
     | UnknownSemester msg -> 
       exceptions sch ("Invalid/Unknown Semester: " ^ msg)
     | UnknownGrade msg -> 
-      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg ^ 
-                      "\nValid grades: s/sat, u/unsat, w/withdrawn, 
-                      inc/incomplete")
+      exceptions sch ("Invalid/Unknown Grade Value: \n" ^ msg ^ 
+                      "Valid grades: Letter grade, s/sat, u/unsat, w/withdrawn, 
+                      inc/incomplete, none, transfer")
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
@@ -196,8 +192,9 @@ and init_prompt () =
       ANSITerminal.(print_string [yellow] valid_commands);
       print_endline("\nThe following are the grade options when adding a " ^
                     "new course to the schedule.\n");
-      ANSITerminal.(print_string [yellow] ("Valid grades: s/sat, u/unsat, " ^
-                                           "w/withdrawn, inc/incomplete\n"));
+      ANSITerminal.(print_string [yellow] ("Valid grades: Letter grade, s/sat, " 
+                                           ^ "u/unsat, w/withdrawn, 
+                                           inc/incomplete, none, transfer\n"));
       print_string("\n");
       prompt (new_schedule new_name)
     end

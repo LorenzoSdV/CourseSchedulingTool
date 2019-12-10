@@ -6,7 +6,10 @@ type sem_status = Past | Present | Future
 type sem_id = Spring of int | Fall of int | None
 
 (** The type representing the grade of a course. *)
-type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
+type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
+           | Letter of string 
+
+type school = ENG | CAS
 
 (** The type representing the prereqs or coreqs of a course. *)
 (* WILL BE IMPLEMENTED IN SPRINT 3 *)
