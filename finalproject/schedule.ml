@@ -11,14 +11,12 @@ type course = {
   mutable credits: int;
   mutable grade: grade;
   mutable degree: string;
-  (* subject/category *)
 }
 
 type semester = {
   mutable id: sem_id;
   mutable courses: course list;
   mutable tot_credits: int;
-  (*mutable sem_status: sem_status;*)
   mutable sem_gpa: float;
 }
 
