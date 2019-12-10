@@ -1,3 +1,9 @@
+(**
+   Data Types and Functions to store and work with degree requirements
+   @author Chris O'Brian (co253), Radha (rdp89), 
+   and Lorenzo Scotto di Vettimo (ls769)
+*)
+
 open Schedule
 
 (** The type representing the requirements of a CS major in either arts or
