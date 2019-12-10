@@ -160,4 +160,6 @@ edit school ENG
 edit school CAS
 ```
 
+By default, a new schedule uses the ENG requirements.
+
 This validation is also now included in all exported HTML files.
