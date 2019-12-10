@@ -27,6 +27,7 @@ type settings = {
 }
 
 type validation = {
+  sch: string;
   needed: string list;
   needed_cat: (string * int) list;
   needed_subs : string list list
@@ -41,6 +42,7 @@ type schedule = {
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
+  mutable school : string;
   mutable valid : validation option
 }
 
@@ -60,7 +62,8 @@ let string_of_list str_lst =
   let str = List.fold_left (fun acc str -> acc ^ str ^ ", ") "[ " str_lst in
   Str.replace_first (Str.regexp ", $") " ]" str
 
-(** [grade_map gr] matches a letter grade with its associated GPA. *)
+(** [grade_map gr] is the grade point value for [gr] if [gr] is a letter grade.
+    Is -1.0 otherwise. *)
 let grade_map gr = 
   match gr with
   | Letter "A+" -> 4.3
@@ -127,7 +130,6 @@ let gpa courses =
   in
   (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
 
-(** [gpa_to_string gpa_float] converts a GPA of type float to a string. *)
 let gpa_to_string gpa_float = 
   let gpa = string_of_float gpa_float in
   match String.length gpa with
@@ -140,6 +142,9 @@ let gpa_to_string gpa_float =
     if gpa = "-nan" then "0.00"
     else gpa
   | _ -> Str.first_chars gpa 4
+
+let get_gpa sch = 
+  sch.cumul_gpa
 
 let get_credits sch = 
   sch.sch_credits
@@ -253,9 +258,9 @@ let add_course sch c semid =
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-(** [get_sem_from_course sems course] takes in [sems], a list of semesters in a 
-    schedule and a course [course] and finds the semester that the course is 
-    in. *)
+(** [get_sem_from_course sems course] is the semester that [course] belongs to
+    given list of semesters [sems]. 
+    Raises: [UnkownCourse] if no sem found. *)
 let rec get_sem_from_course sems course = 
   match sems with 
   | [] -> raise (UnknownCourse course.name)
@@ -370,7 +375,8 @@ let new_schedule name =
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
-    valid = None;
+    school = "ENG";
+    valid = None
   }
 
 let get_save_status sch = 
@@ -381,6 +387,12 @@ let set_save_status sch b =
 
 let get_name sch =
   sch.desc
+
+let get_school sch =
+  sch.school
+
+let set_school sch school =
+  sch.school <- school
 
 let edit_name sch nm =
   sch.desc <- nm;
@@ -431,7 +443,7 @@ let print_schedule sch =
 
 module HTML = struct
 
-  (** [template] inputs data from a created HTML into a template. *)
+  (** [template] is the string of raw HTML text from temp.html template file. *)
   let template =
     let rec input_file acc chan = 
       try
@@ -441,8 +453,8 @@ module HTML = struct
     in
     input_file "" (open_in "temp.html")
 
-  (** [html_of_course c] returns a string that represents a course that can be
-      converted into an HTML. *) 
+  (** [html_of_course c] is a string representation of [c] in raw, 
+      valid HTML form. *) 
   let html_of_course c =
     "\t\t\t\t<td>\n" ^ 
     "\t\t\t\t\t<h4><strong>" ^ c.name ^ "</strong></h4>\n" ^ 
@@ -451,8 +463,8 @@ module HTML = struct
     "\t\t\t\t\t<p>Category: " ^ (string_of_category c.category) ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
-  (** [html_of_sem sem] returns a string that represents a semester that can be
-      converted into an HTML. *) 
+  (** [html_of_sem sem] is a string representation of [sem] in raw, 
+      valid HTML form. *)  
   let html_of_sem sem =
     match sem.courses with
     | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ 
@@ -466,8 +478,8 @@ module HTML = struct
            "" sem.courses) ^ 
         "\t\t\t</tr>\n" end
 
-  (** [html_of_schedule sch] returns a string that represents a schedule that 
-      can be converted into an HTML. *) 
+  (** [html_of_schedule sch] is a string representation of [sch] in raw, 
+      valid HTML form. *) 
   let html_of_schedule sch =
     match (get_sems sch) with
     | [] -> "<p>Schedule is empty!</p>\n"
@@ -483,12 +495,13 @@ module HTML = struct
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
-  (** COMMENT *)
+  (** [html_of_validation v] is a string that represents a validation displayed
+      in valid HTML. *) 
   let html_of_validation (v_opt:validation option) = 
     match v_opt with
     | None -> ""
     | Some v ->
-      "\t<h2>Testing Against CS Engineering Requirements:</h2>\n" ^ 
+      "\t<h2>Testing Against CS " ^ v.sch ^ " Requirements:</h2>\n" ^ 
       "\t\t<ul>\n" ^
       (let req_course c =
          "\t\t\t<li><span>" ^
@@ -512,8 +525,7 @@ module HTML = struct
          (fun acc c -> acc ^ (required_subs c)) "" v.needed_subs) ^
       "\t\t</ul>\n"
 
-  (** [save filename text] creates a file named [filename] and puts [text]
-      in it. *)
+  (** [save filename text] is [()] after saving [text] in file [filename]. *)
   let save filename text = 
     let chan = open_out filename in
     output_string chan text;
@@ -539,7 +551,7 @@ module LoadJSON = struct
   (** [form_sem_id semid] is the semester id formed from its string 
       representation [semid]. 
       Requires: [semid] is "None" or of form "FAYY" or "SPYY" where YY
-      is a valid year. *)
+      is a valid year code. *)
   let form_sem_id semid = 
     match Str.first_chars semid 2 with
     | "FA" -> let year = Str.last_chars semid 2 |> int_of_string in
@@ -549,7 +561,7 @@ module LoadJSON = struct
     | "No" -> None
     | _ -> raise (UnknownSemester semid)
 
-  (** [form_grade grade] returns the grade represented by [grade]. *)
+  (** [form_grade grade] is the grade represented by [grade]. *)
   let form_grade grade = 
     match grade with 
     | "Sat" -> Sat
@@ -558,7 +570,8 @@ module LoadJSON = struct
     | "Incomplete" -> Incomplete
     | _ -> Letter grade
 
-  (** [parse_course json] creates courses by parsing [json]. *)
+  (** [parse_course json] is a course generated from info found by 
+      parsing [json]. *)
   let parse_course json = {
     name = json |> Yj.member "name" |> Yj.to_string;
     credits = json |> Yj.member "course credits" |> Yj.to_int;
@@ -566,8 +579,8 @@ module LoadJSON = struct
     category = json |> Yj.member "category" |> Yj.to_string |> categorify;
   }
 
-  (** [parse_semester json] creates a semester from JSON representation
-      of a semester [json]. *)
+  (** [parse_semester json] is a semester generated from info found by 
+      parsing [json]. *)
   let parse_semester json = 
     {
       id = json |> Yj.member "semester id" |> Yj.to_string |> form_sem_id;
@@ -577,8 +590,8 @@ module LoadJSON = struct
       sem_gpa = json |> Yj.member "semester gpa" |> Yj.to_float;
     }
 
-  (** [parse_settings json] creates a settings value from JSON representation
-      of settigns [json]. *)
+  (** [parse_settings json] is a settings type generated from info found by 
+      parsing [json]. *)
   let parse_settings json = 
     {
       autosave = json |> Yj.member "autosave" |> Yj.to_bool;
@@ -599,6 +612,7 @@ module LoadJSON = struct
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
+      school = json |> Yj.member "school" |> Yj.to_string;
       valid = None
     }
 
@@ -650,6 +664,7 @@ module SaveJSON = struct
     "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
     "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
+    "\t\"school\": \"" ^ sch.school ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
     (Str.replace_first reg "}\n" 
        (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem)) 

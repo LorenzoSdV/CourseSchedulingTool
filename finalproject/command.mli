@@ -1,3 +1,9 @@
+(**
+   Functions to handle parsing and executing user commands.
+   @author Chris O'Brian (co253), Radha (rdp89), 
+   and Lorenzo Scotto di Vettimo (ls769)
+*)
+
 open Schedule
 
 (** Raised when command is missing verb as the first word. *)
@@ -51,10 +57,11 @@ exception InvalidFileForSave
 (** Raised when Add command is given a semester that has not been added. *)
 exception SemesterDoesNotExist
 
-(** [save_handler sch str_lst] parses [str_lst] in [sch] for the Save command.*)
+(** [save_handler sch str_lst] is [sch] after parsing [str_lst] and saving
+    schedule to file based on args in [str_lst]. *)
 val save_handler : schedule -> string list -> schedule
 
-(** [parse_command cmd_str sch] parses [cmd_str] to be an action performed on
+(** [parse_command sch cmd_str] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 
     of non-space characters) of [str] becomes the verb. The rest of the words,
     if any, become the string list of words.

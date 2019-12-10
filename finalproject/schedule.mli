@@ -28,6 +28,8 @@ type settings
 (** The type representing what requirements of the schedule are met and what
     are not met. *)
 type validation = {
+  sch : string;
+  (** Either "ENG" or "CAS" indicating school user is in. *)
   needed: string list;
   (** A list of needed courses *)
   needed_cat: (string * int) list;
@@ -119,7 +121,7 @@ val edit_course : schedule -> string -> string -> string -> schedule
     Raises: [UnkownCourse c] if [c] is not in [sch]. *)
 val remove_course : schedule -> string -> schedule
 
-(** [swap_courses c1_name c2_name sch] is the [sch] but with [c1_name] and 
+(** [swap_courses c1_name c2_name sch] is [sch] but with [c1_name] and 
     [c2_name] semester's swapped.
     Raises: [InvalidSwap] if [c1_name] and [c2_name] are in same semester. *)
 val swap_courses : string -> string -> schedule -> schedule
@@ -159,6 +161,9 @@ val gpa : course list -> float
 
 (** [gpa_to_string gpa] is the string representation of [gpa]. *)
 val gpa_to_string : float -> string
+
+(** [get_gpa sch] is the cumulative GPA of the schedule [sch]. *)
+val get_gpa : schedule -> float
 
 (** [get_credits sch] is the sum of all the credits in the schedule [sch]. *)
 val get_credits : schedule -> int
@@ -235,6 +240,14 @@ val get_name : schedule -> string
 (** [edit_name sch nm] is [sch] but with name set to [nm]  *)
 val edit_name : schedule -> string -> schedule
 
+(** [get_school sch] is either "ENG" or "CAS" depending on school of 
+    schedule. *)
+val get_school : schedule -> string
+
+(** [set_school sch school] is [()] after setting school value for [sch] to 
+    [school] *)
+val set_school : schedule -> string -> unit
+
 (** [edit_settings sch attr val] is [sch] with the setting [attr] updated to 
     the new value [val].
     Raises: [UnknownSetting attr] is [attr] is not a valid setting *)
@@ -262,7 +275,8 @@ end
 
 module SaveJSON : sig
 
-  (** [save_schedule sch fl] is [()] after *)
+  (** [save_schedule sch fl] is [()] after saving sch as a JSON file into 
+      [fl]. *)
   val save_schedule : schedule -> string -> unit
 
 end

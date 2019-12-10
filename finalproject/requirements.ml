@@ -7,37 +7,35 @@ type reqs = {
 }
 
 let eng_reqs = {
-  required = ["MATH1910"; "MATH1920"; "MATH2940"; "CS3110"; "CS4410"; "CS4280"];
+  required = ["MATH1910"; "MATH1920"; "MATH2940"; "CS3110"; "CS4410"; "CS4820"];
 
   categories = [("Technical", 9); ("Ext Spec", 9); ("4000+", 9); 
                 ("Lib Studies", 18); ("FWS", 6); ("PE", 2); 
                 ("Advisor-Approved Elective", 6); ("Free Elective", 3);
                 ("Practicum", 2); ("ENGRI", 3); ("ENGRD", 3)];
 
-  subs = [["CS1110"; "CS1112"]; ["CS2110"; "CS2112"]; ["CS2800"; "CS2802"];
+  subs = [["PHYS112"; "PHYS1116"]; ["PHYS2213"; "PHYS2217"]; 
+          ["CS1110"; "CS1112"]; ["CS2110"; "CS2112"]; ["CS2800"; "CS2802"];
           ["CHEM2080"; "BTRY3080"; "ECON3130"; "MATH2930"; "MATH4710"; 
            "PHYS2214"; "PHYS2218"]; ["CS3410"; "CS3420"; "ECE3140"];
           ["ENGRD2700"; "BTRY3080"; "CS4850"; "ECE3100"; "ECON3130"; 
            "MATH4710"]; ["CHEM2090"; "CHEM2150"]]
 }
 
-(*let arts_reqs = {
-  required = ["MATH1110"; "MATH1120"; "MATH2210"; "CS1110"; "CS2110"; "CS3110";
-              "CS3410"; "CS2800"; "CS4410"; "CS4820"; "Project Course";
-              "Free Elective"; "ENGRD2700"];
-  categories = [("4000+", 9); ("Technical", 9); ("Ext Spec", 9); ("FWS", 6);
-                ("PE", 2); ("Lang", 11); ("GB", 3); ("HB", 3)];
-  subs = [("MATH1110", "MATH1910"); ("MATH1120", "MATH1220"); 
-          ("MATH1120", "MATH1920"); ("MATH2210", "MATH2940"); ("CS1110", "CS1112");
-          ("CS2110", "CS2112"); ("CS2800", "CS2802"); ("CS3410", "CS3420");
-          ("ENGRD2700", "BTRY3080");
-          ("ENGRD2700", "CS4850"); ("ENGRD2700", "ECE3100"); ("ENGRD2700", "ECON3130");
-          ("ENGRD2700", "MATH4710"); ("GB", "GHB"); ("HB", "GHB")];
-  }*)
+let cas_reqs = {
+  required = ["CS3110"; "CS4410"; "CS4820"];
 
-(*let substitutes course subs = 
-  let _, result = List.filter (fun (c,sub) -> c = course) subs |> List.split
-  in result*)
+  categories = [("Technical", 9); ("Ext Spec", 9); ("4000+", 9); 
+                ("Practicum", 2);("FWS", 6); ("PE", 2);
+                ("Lib Studies", 15); ("Breadth Requirement", 6); 
+                ("Foreign Lang", 6); ("2 PBS Courses", 6)];
+
+  subs = [["MATH1910"; "MATH1110"]; ["MATH1120"; "MATH1220"; "MATH1920"]; 
+          ["MATH2210"; "MATH2940"]; ["CS3410"; "CS3420"; "ECE3140"];
+          ["CS1110"; "CS1112"]; ["CS2110"; "CS2112"]; ["CS2800"; "CS2802"];
+          ["ENGRD2700"; "BTRY3080"; "CS4850"; "ECE3100"; "ECON3130"; 
+           "MATH4710"];]
+}
 
 (** [check_required sch reqs] is a ist of courses that are required by [reqs] 
     but not included in [sch]. 
@@ -105,18 +103,19 @@ let check_subs sch reqs =
   in
   loop (List.map get_course_name (to_list sch)) reqs.subs []
 
-let validate sch =
+let validate sch reqs =
   let validness = 
-    { 
-      needed = check_required sch eng_reqs;
-      needed_cat = check_categories sch eng_reqs;
-      needed_subs = check_subs sch eng_reqs
+    {
+      sch = get_school sch;
+      needed = check_required sch reqs;
+      needed_cat = check_categories sch reqs;
+      needed_subs = check_subs sch reqs
     } 
   in set_valid sch (Some validness); validness
 
 let print_validation v = 
   ANSITerminal.(print_string [Bold] 
-                  "\nNOW CHECKING CS Engineering Requirements:\n");
+                  ("\nNOW CHECKING CS " ^ v.sch ^ " Requirements:\n"));
 
   let print_required_course c =
     ANSITerminal.(print_string [red] "\nMissing Required Course: ");
