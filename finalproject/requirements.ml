@@ -15,7 +15,7 @@ let eng_reqs = {
                 ("Practicum", 2); ("ENGRI", 3); ("ENGRD", 3)];
 
   subs = [["CS1110"; "CS1112"]; ["CS2110"; "CS2112"]; ["CS2800"; "CS2802"];
-          ["CHEM2080"; "BTRY 2080"; "ECON3130"; "MATH2930"; "MATH4710"; 
+          ["CHEM2080"; "BTRY3080"; "ECON3130"; "MATH2930"; "MATH4710"; 
            "PHYS2214"; "PHYS2218"]; ["CS3410"; "CS3420"; "ECE3140"];
           ["ENGRD2700"; "BTRY3080"; "CS4850"; "ECE3100"; "ECON3130"; 
            "MATH4710"]; ["CHEM2090"; "CHEM2150"]]
@@ -103,6 +103,9 @@ let validate sch =
   in set_valid sch (Some validness); validness
 
 let print_validation v = 
+  ANSITerminal.(print_string [Bold] 
+                  "\nNOW CHECKING CS Engineering Requirements:\n");
+
   let print_required_course c =
     ANSITerminal.(print_string [red] "\nMissing Required Course: ");
     print_string c 
