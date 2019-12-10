@@ -153,4 +153,11 @@ system will print any missing courses or credits for you.
 check
 ```
 
+Now, we've only hardcoded the CS requirements for both ENG and A&S students. 
+You can set which "school" you're in by entering one of the two commands:
+```
+edit school ENG
+edit school CAS
+```
+
 This validation is also now included in all exported HTML files.
