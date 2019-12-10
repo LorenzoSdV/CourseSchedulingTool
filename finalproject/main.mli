@@ -1,3 +1,4 @@
 
-(** [main ()] prompts for the game to run the scheduler, then starts it. *)
+(** [main ()] is the entry point into the system and the first function 
+    evaluated. *)
 val main : unit -> unit

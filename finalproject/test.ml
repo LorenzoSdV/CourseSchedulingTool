@@ -28,7 +28,7 @@ let make_string_test
     (actual_output: string) : test = 
   name >:: (fun _ -> assert_equal expected_output actual_output)        
 
-let sch = new_schedule "TEST-SUITE"
+let empty_sch = new_schedule "TEST-SUITE"
 let fall19 = create_sem (Fall 19)
 
 (*let sch2 = add_sem sch fall_sem
@@ -47,12 +47,13 @@ let fall19 = create_sem (Fall 19)
   let sch10 = edit_course sch9 "CS2800" "credits" "4"*)
 
 
-let basic_schedule_tests = [
-  (*(** Schedule tests *)
-    make_int_test "total credits of sch10" 11 (get_credits sch10);
-    make_sch_creds_tests "total credits with removed class" sch8 11;
-    make_sch_creds_tests "total credits with edited class, raised # credits"
-    sch10 11;*)
+let empty_schedule_tests = [
+  (** Empty Schedule tests *)
+  make_int_test "0 credits in empty schedule" 0 (get_credits empty_sch);
+  make_int_test "empty course list in empty schedule" 0 
+    (List.length (to_list empty_sch));
+  make_string_test "0.00 gpa of empty sched" "0.00" 
+    (to_list empty_sch |> gpa |> gpa_to_string)
 ]
 
 let example_sch = LoadJSON.parse_json "example.json"
@@ -81,7 +82,7 @@ let load_schedule_tests = [
 ]
 
 let test_suite = [
-  basic_schedule_tests;
+  empty_schedule_tests;
   load_schedule_tests
 ]
 

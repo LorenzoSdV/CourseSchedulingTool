@@ -9,10 +9,6 @@ type sem_id = Spring of int | Fall of int | None
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string 
 
-(** The type representing the category of a course. *)
-type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo 
-              | Hist | Lang
-
 (** The type representing which school the CS degree is coming from. *)
 type school = ENG | CAS
 
@@ -24,6 +20,17 @@ type semester
 
 (** The type representing the available settings. *)
 type settings
+
+(** The type representing what requirements of the schedule are met and what
+    are not met. *)
+type validation = {
+  (** A list of needed courses *)
+  needed: string list;
+  (** A list of categories and how many credits for each is required. *)
+  needed_cat: (string * int) list;
+  (** A list of groups of courses, of which one of each is requried. *)
+  needed_subs : string list list
+}
 
 (** The type representing a whole schedule *)
 type schedule
@@ -64,6 +71,9 @@ exception InvalidSwap
     the new semester is equal to the previous semester where that course was 
     located. *)
 exception InvalidMove
+
+(** COMMENT *)
+val string_of_list : string list -> string
 
 (** [gradify str] is the grade representation of [str] where is some grade value 
     represented as a string.
@@ -110,6 +120,12 @@ val get_course : string -> course list -> course
 
 (** [get_course_name course] is the name of [course] *)
 val get_course_name : course -> string
+
+(** COMMENT *)
+val get_course_credits : course -> int
+
+(** COment *)
+val get_course_cat : course -> string
 
 (** [get_sem sch sems semid] returns the semester with the semester id [sem_id]
     in schedule [sch]. 
@@ -189,8 +205,15 @@ val print_schedule : schedule -> unit
 (** [get_save_status sch] is whether or not [sch] has been saved. *)
 val get_save_status : schedule -> bool
 
-(** [set_save_status sch] sets save status of [sch] to [bool]. *)
+(** [set_save_status sch] is [unit] after setting the save status of 
+    [sch]. *)
 val set_save_status : schedule -> bool -> unit
+
+(** [autosave sch] is [()] after autosaving [sch] if autosave is asserted.
+
+    Autosave files are saved in working directory with schedule name as 
+    file name. *)
+val autosave : schedule -> unit
 
 (** [get_name sch] is the user-defined name of schedule [sch]. *)
 val get_name : schedule -> string
@@ -203,6 +226,9 @@ val edit_name : schedule -> string -> schedule
     the new value [val].
     Raises: [UnknownSetting attr] is [attr] is not a valid setting *)
 val edit_settings : schedule -> string -> string -> schedule
+
+(** COmment *)
+val set_valid : schedule -> validation option -> unit
 
 module HTML : sig
 

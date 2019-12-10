@@ -8,10 +8,12 @@ type reqs
 val eng_reqs : reqs
 
 (** The requirements for a CS degree in the College of Arts & Sciences. *)
-val arts_reqs : reqs
+(*val arts_reqs : reqs*)
 
-(** NEEDS COMMENT *)
-val check_required : schedule -> string list -> string list
+(** [validate sch] is the validation infromation about [sch] after this
+    information has been stored in [sch]. *)
+val validate : schedule -> validation
 
-(** NEEDS COMMENT *)
-val check_categories : schedule -> (string * int) list -> (string * int) list
+(** [print_validation v] is [()] after printing to the terminal the validation
+    information about some schedule whos validation info is [v]. *)
+val print_validation : validation -> unit

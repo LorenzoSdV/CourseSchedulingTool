@@ -105,9 +105,11 @@ let is_not_json file =
 (** [export_handler sch str_lst] parses [str_lst] in [sch] for the 
     Export command. *)
 let export_handler sch str_lst = 
+  ignore (Requirements.validate sch);
   match str_lst with
   | file :: [] -> if is_not_json file
-    then (HTML.export_schedule sch file; sch) else raise InvalidFileForExport
+    then (HTML.export_schedule sch file; sch) 
+    else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
 (** [import_handler sch str_lst] parses [str_lst] in [sch] for the Import 
@@ -176,6 +178,13 @@ let settings_handler sch str_lst =
   | attr::new_val::[] -> edit_settings sch attr new_val
   | _ -> raise MalformedSet
 
+(** COMMENT *)
+let validate_handler sch = 
+  Requirements.validate sch
+  |> Requirements.print_validation;
+  sch
+
+
 let parse_command sch cmd_str = 
 
   let match_helper first others =
@@ -189,6 +198,7 @@ let parse_command sch cmd_str =
     | "export" -> export_handler sch others
     | "import" -> import_handler sch others
     | "set" -> settings_handler sch others
+    | "check" -> validate_handler sch
     | _ -> raise Malformed
   in
 
@@ -202,5 +212,7 @@ let parse_command sch cmd_str =
       (get_course nm (to_list sch) |> print_course sch; sch)
     else
       raise MalformedPrint
-  | fst::others -> match_helper fst others
+  | fst::others -> 
+    let new_sch = match_helper fst others in
+    autosave new_sch; new_sch
 

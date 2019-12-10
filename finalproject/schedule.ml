@@ -2,9 +2,6 @@ type sem_status = Past | Present | Future
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string 
 
-type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo 
-              | Hist | Lang
-
 type school = ENG | CAS
 
 type sem_id = Spring of int | Fall of int | None
@@ -14,7 +11,6 @@ type course = {
   mutable credits: int;
   mutable grade: grade;
   mutable degree: string;
-  mutable category: category;
 }
 
 type semester = {
@@ -30,6 +26,12 @@ type settings = {
   mutable html_squares: string;
 }
 
+type validation = {
+  needed: string list;
+  needed_cat: (string * int) list;
+  needed_subs : string list list
+}
+
 type schedule = {
   mutable desc: string;
   mutable semesters: semester list;
@@ -39,6 +41,7 @@ type schedule = {
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
+  mutable valid : validation option
 }
 
 exception UnknownCourse of string
@@ -50,6 +53,10 @@ exception DuplicateSemester of string
 exception InvalidCredits of string
 exception InvalidSwap
 exception InvalidMove
+
+let string_of_list str_lst = 
+  let str = List.fold_left (fun acc str -> acc ^ str ^ ", ") "[ " str_lst in
+  Str.replace_first (Str.regexp ", $") " ]" str
 
 (** [grade_map gr] matches a letter grade with its associated GPA. *)
 let grade_map gr = 
@@ -176,6 +183,12 @@ let rec get_course name courses =
 
 let get_course_name course =
   course.name
+
+let get_course_credits course = 
+  course.credits
+
+let get_course_cat course =
+  course.degree
 
 let rec get_sem sch sems semid = 
   match sems with 
@@ -321,12 +334,13 @@ let new_schedule name =
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
+    valid = None;
   }
 
 let get_save_status sch = 
   sch.is_saved
 
-let set_save_status sch b =
+let set_save_status sch b = 
   sch.is_saved <- b
 
 let get_name sch =
@@ -346,6 +360,9 @@ let edit_settings sch attr new_val =
   | "html_tile_color" ->
     sch.settings.html_squares <- new_val; sch
   | _ -> raise (UnknownSetting attr)
+
+let set_valid sch v = 
+  sch.valid <- v
 
 let print_course sch course =
   print_newline ();
@@ -430,6 +447,35 @@ module HTML = struct
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
+  (** COMMENT *)
+  let html_of_validation (v_opt:validation option) = 
+    match v_opt with
+    | None -> ""
+    | Some v ->
+      "\t<h2>Testing Against CS Engineering Requirements:</h2>\n" ^ 
+      "\t\t<ul>\n" ^
+      (let req_course c =
+         "\t\t\t<li><span>" ^
+         "Missing Required Course: </span>" ^ c ^ "</li>\n"
+       in
+       List.fold_left (fun acc c -> acc ^ (req_course c)) "" v.needed) ^ 
+      "\t\t</ul><ul>\n" ^
+      (let required_cat cat =
+         "\t\t\t<li><span>" ^ 
+         "Not enough courses from category: </span>" ^ cat ^ "</li>\n"
+       in
+       List.fold_left 
+         (fun acc (c,_) -> acc ^ (required_cat c)) "" v.needed_cat)^
+      "\t\t</ul><ul>\n" ^
+      (let required_subs c_lst =
+         "\t\t\t<li><span>" ^ 
+         "No course from required group: </span>" ^ 
+         (string_of_list c_lst) ^ "</li>\n"
+       in
+       List.fold_left 
+         (fun acc c -> acc ^ (required_subs c)) "" v.needed_subs) ^
+      "\t\t</ul>\n"
+
   (** [save filename text] creates a file named [filename] and puts [text]
       in it. *)
   let save filename text = 
@@ -441,9 +487,11 @@ module HTML = struct
     let reg1 = Str.regexp "<\\?sch_bg_color>" in
     let reg2 = Str.regexp "<\\?sch_square_color>" in
     let reg3 = Str.regexp "<\\?sch>" in
+    let reg4 = Str.regexp "<\\?sch_validation>" in
     Str.global_replace reg1 sch.settings.html_background template
     |> Str.replace_first reg2 sch.settings.html_squares
     |> Str.replace_first reg3 (html_of_schedule sch)
+    |> Str.replace_first reg4 (html_of_validation sch.valid)
     |> save fl
 
 end
@@ -514,7 +562,8 @@ module LoadJSON = struct
       major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
-      settings = json |> Yj.member "settings" |> parse_settings
+      settings = json |> Yj.member "settings" |> parse_settings;
+      valid = None
     }
 
 end
@@ -578,3 +627,8 @@ module SaveJSON = struct
     close_out chan
 
 end
+
+let autosave sch = 
+  if sch.settings.autosave && (not sch.is_saved) then
+    SaveJSON.save_schedule sch (sch.desc ^ ".json")
+  else ()

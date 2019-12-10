@@ -1,4 +1,4 @@
-MODULES=schedule classRoster iCalParser command main authors
+MODULES=schedule classRoster iCalParser requirements command main authors
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
@@ -30,7 +30,7 @@ bisect: clean test
 	bisect-ppx-report -I _build -html report bisect0001.out
 
 zip:
-	zip scheduler_src.zip *.ml* *.sh* temp.html example.json _tags Makefile INSTALL.md .ocamlinit LOC.txt
+	zip scheduler_src.zip *.ml* *.sh* temp.html example.json _tags Makefile INSTALL.md .ocamlinit LOC.txt example.ics
 	
 docs: docs-public docs-private
 	
