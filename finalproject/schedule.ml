@@ -1,6 +1,6 @@
 type sem_status = Past | Present | Future
-
-type grade = Sat | Unsat | Withdrawn | Incomplete | None | Letter of string 
+type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
+           | Letter of string 
 
 type category = FWS | PE | Tech | Ext | FourThousandPlus | Elective | Geo | Hist | Lang
 
@@ -50,6 +50,7 @@ exception InvalidCredits of string
 exception InvalidSwap
 exception InvalidMove
 
+(** [grade_map gr] matches a letter grade with its associated GPA. *)
 let grade_map gr = 
   match gr with
   | Letter "A+" -> 4.3
@@ -78,6 +79,7 @@ let gradify str =
     | "SAT" | "S" -> Sat
     | "UNSAT" | "U" -> Unsat
     | "NONE" -> None
+    | "TRANSFER" -> Transfer
     | _ -> raise (UnknownGrade str)
 
 let gpa courses =
@@ -98,7 +100,7 @@ let gpa courses =
   in
   (fold_gps courses 0.) /. (float_of_int (fold_credits courses 0))
 
-(** NEEDS COMMENT *)
+(** [gpa_to_string gpa_float] converts a GPA of type float to a string. *)
 let gpa_to_string gpa_float = 
   let gpa = string_of_float gpa_float in
   match String.length gpa with
@@ -138,6 +140,7 @@ let string_of_grade gr =
   | Withdrawn -> "Withdrawn"
   | Incomplete -> "Incomplete"
   | None -> "None"
+  | Transfer -> "Transfer"
   | Letter l -> l
 
 (** [sem_compare s1 s2] is a negative number if [s1] comes before [s2], 
@@ -201,7 +204,9 @@ let add_course sch c semid =
   with
     Not_found -> raise (UnknownSemester (string_of_semid semid))
 
-(** Needs comment *)
+(** [get_sem_from_course sems course] takes in [sems], a list of semesters in a 
+    schedule and a course [course] and finds the semester that the course is 
+    in. *)
 let rec get_sem_from_course sems course = 
   match sems with 
   | [] -> raise (UnknownCourse course.name)
@@ -350,7 +355,6 @@ let print_course sch course =
   let semid = (get_sem_from_course sch.semesters course).id in
   print_endline ("Semester: " ^ string_of_semid semid)
 
-(** COMMENT *)
 let print_sem sem =
   print_string ((string_of_semid sem.id) ^ ": [ ");
   List.fold_right 
