@@ -129,8 +129,8 @@ and prompt sch =
       exceptions sch ("Incorrect Semester Entry Format: " ^
                       "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")
     | MalformedAdd ->
-      exceptions sch ("Usage: add [<course_name> [(optional: <credits>) <grade>"
-                      ^ " <category> <semester>] | <semester>]")
+      exceptions sch ("Usage: add [<course_name> (optional: <credits>) <grade>"
+                      ^ " <category> <semester> | <semester>]")
     | MalformedEdit ->
       exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
                       "name <new_name>]")

@@ -162,17 +162,18 @@ let swap_others sch str_lst =
       (String.uppercase_ascii course2) sch
   | _ -> raise MalformedSwap
 
-(** COMMENT! *)
+(** [move_others sch str_lst] parses [str_lst] in [sch] for the Move command. *)
 let move_others sch str_lst =
   match str_lst with
   | course::sem::[] -> (sem_exists (sem_ids_to_string sch) sem); 
     move_course (String.uppercase_ascii course) (sem_id_parse sem) sch
   | _ -> raise MalformedMove
 
-(** COMMENT *)
-let settings_handler sch args = 
-  match args with
-  | attr :: new_val :: [] -> edit_settings sch attr new_val
+(** [settings_handler sch str_lst] parses [str_lst] in [sch] for the Set 
+    command. *)
+let settings_handler sch str_lst = 
+  match str_lst with
+  | attr::new_val::[] -> edit_settings sch attr new_val
   | _ -> raise MalformedSet
 
 let parse_command sch cmd_str = 
