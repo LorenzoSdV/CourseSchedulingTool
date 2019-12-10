@@ -570,7 +570,7 @@ end
 
 module SaveJSON = struct
 
-  (** [json_of_course c] is a string repreesentation of [c] that can be 
+  (** [json_of_course c] is a string representation of [c] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_course c = 
     "\t\t\t\t{\n" ^
@@ -580,7 +580,7 @@ module SaveJSON = struct
     "\t\t\t\t\t\"degree\": \"" ^ c.degree ^ "\"\n" ^
     "\t\t\t\t},\n"
 
-  (** [json_of_sem sem] is a string repreesentation of [sem] that can be 
+  (** [json_of_sem sem] is a string representation of [sem] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_sem sem = 
     let reg = Str.regexp "},\n$" in
@@ -594,7 +594,7 @@ module SaveJSON = struct
           "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
-  (** [json_of_settigns set] is a string repreesentation of [set] that can be 
+  (** [json_of_settigns set] is a string representation of [set] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_settings settings = 
     "{\n" ^
@@ -603,7 +603,7 @@ module SaveJSON = struct
     "\t\t\t\"html_square_color\": \"" ^ settings.html_squares ^ "\"\n" ^
     "\t}"
 
-  (** [json_of_schedule sch] is a string repreesentation of [sch] that can be 
+  (** [json_of_schedule sch] is a string representation of [sch] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
   let json_of_schedule sch = 
     let reg = Str.regexp "},\n$" in

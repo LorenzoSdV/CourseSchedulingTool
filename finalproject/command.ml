@@ -74,6 +74,12 @@ let add_others sch str_lst =
                       (int_of_string credits) 
                       (Schedule.gradify grade) degree) 
       (sem_id_parse sem_id)
+  | course_name::credits::grade::sem_id::[] ->
+    (sem_exists (sem_ids_to_string sch) sem_id); 
+    let name = String.uppercase_ascii course_name in
+    add_course sch (create_course name
+                      (int_of_string credits)
+                      (Schedule.gradify grade) (guess_deg name))
   | _ -> raise MalformedAdd
 
 (** [edit_others sch str_lst] parses [str_lst] in [sch] for the Edit command. *)

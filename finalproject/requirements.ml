@@ -54,7 +54,7 @@ let check_required sch reqs =
 
 
 (** COMMENT *)
-let check_catgeories sch reqs =
+let check_categories sch reqs =
   let rec loop courses categories acc =
     match categories with 
     | [] -> acc
@@ -97,7 +97,7 @@ let validate sch =
   let validness = 
     { 
       needed = check_required sch eng_reqs;
-      needed_cat = check_catgeories sch eng_reqs;
+      needed_cat = check_categories sch eng_reqs;
       needed_subs = check_subs sch eng_reqs
     } 
   in set_valid sch (Some validness); validness
