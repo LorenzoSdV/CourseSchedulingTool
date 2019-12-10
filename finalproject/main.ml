@@ -3,13 +3,8 @@ open Command
 open ClassRoster
 
 let valid_commands = 
-<<<<<<< HEAD
   ("Valid commands: add | edit | remove | swap | move | save |" ^
    " print | import | export | delete | clear | close | settings | quit ")
-=======
-  "Valid Commands: add | edit | remove | swap | move | save |" ^
-  " print | import | export | delete | clear | close | set | quit "
->>>>>>> 70a3cb43cd7accc72c379c3bfdce396426546ddb
 
 let read_input () = 
   print_string "\n> ";
@@ -195,20 +190,11 @@ and init_prompt () =
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
       print_endline("\nType any command to view usage instructions.");
       ANSITerminal.(print_string [yellow] valid_commands);
-<<<<<<< HEAD
       print_endline("\n\nGrade options when adding a " ^
                     "new course to the schedule.");
       ANSITerminal.(print_string [yellow] ("Valid grades: s/sat, u/unsat, " ^
                                            "w/withdrawn, inc/incomplete, " ^
                                            "none\n"));
-=======
-      print_endline("\nThe following are the grade options when adding a " ^
-                    "new course to the schedule.\n");
-      ANSITerminal.(print_string [yellow] ("Valid grades: Letter grade, s/sat, " 
-                                           ^ "u/unsat, w/withdrawn, 
-                                           inc/incomplete, none, transfer\n"));
-      print_string("\n");
->>>>>>> 70a3cb43cd7accc72c379c3bfdce396426546ddb
       prompt (new_schedule new_name)
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
