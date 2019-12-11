@@ -99,7 +99,7 @@ let gradify str =
     Raises: [UnknownCategory str] if [str] is not a valid category 
     representation. *)
 let categorify str =
-  match str with
+  match String.uppercase_ascii str with
   | "REQ" | "REQUIRED" -> Required
   | "CORE" -> Core
   | "4000+" -> FourThousandPlus
@@ -202,7 +202,7 @@ let sem_compare s1 s2 =
 let create_course name cred gr cat = 
   if cred < 0 then 
     raise (InvalidCredits "Credits have to be greater than or equal to zero.")
-  else if not (Str.string_match 
+  else if not (Str.string_match
                  (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") name 0) then
     raise (UnknownCourse ("Invalid Course name - " ^ name))
   else
@@ -210,7 +210,7 @@ let create_course name cred gr cat =
       name = name;
       credits = cred;
       grade = gr;
-      category = (categorify cat);
+      category = cat;
     }
 
 let rec get_course name courses = 

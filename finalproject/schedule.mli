@@ -94,13 +94,21 @@ val string_of_list : string list -> string
     value represented as a string.
     Requires: [str] is a valid string rep of a grade, like: 
     "A+" or "b" or "unsat" or "w". 
-    Raises: [Unknown Grade str] if [str] is not a valid grade 
+    Raises: [UnknownGrade str] if [str] is not a valid grade 
     representation. *)
 val gradify : string -> grade
 
+(** [categorify str] is the category represented by [str] where [str] is some 
+    category value represented as a string.
+    Requires: [str] is a valid string rep of a category, like: 
+    "CORE" or "REQUIRED". 
+    Raises: [UnknownCategory str] if [str] is not a valid grade 
+    representation. *)
+val categorify : string -> category
+
 (** [create_course name cred gr cat] is a new course type with name [name], 
     number of credits [cred], grade [gr], and category [cat]. *)
-val create_course : string -> int -> grade -> string -> course
+val create_course : string -> int -> grade -> category -> course
 
 (** [add_course sch c semid] is the schedule with course [c] added to semester
     with id [sem_id].
@@ -191,6 +199,10 @@ val string_of_semid : sem_id -> string
 
 (** [string_of_grade gr] is the string representation of a grade [gr]. *)
 val string_of_grade : grade -> string
+
+(** [string_of_category cat] is the string representation of a category 
+    [cat]. *)
+val string_of_category : category -> string
 
 (** [sem_ids sch] is the list of semester ids from each semester in 
     schedule [sch]. *)

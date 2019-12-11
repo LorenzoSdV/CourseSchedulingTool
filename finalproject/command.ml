@@ -57,27 +57,27 @@ let format_sem_id str =
 (** [guess_deg c_name] is the calculated estimate of a c_name's category 
     based on c_name. *)
 let guess_deg c_name = 
-  if String.sub c_name 0 2 = "PE" then "PE"
-  else if String.sub c_name 0 5 = "ENGRI" then "ENGRI"
+  if String.sub c_name 0 2 = "PE" then Required
+  else if String.sub c_name 0 5 = "ENGRI" then Required
   else if String.sub c_name 0 5 = "ENGRD" || c_name = "CS2110" || 
-          c_name = "CS2112" then "ENGRD"
-  else if String.sub c_name ((String.length c_name) - 1) 1 = "1" then "PRACT"
+          c_name = "CS2112" then Required
+  else if String.sub c_name ((String.length c_name) - 1) 1 = "1" then Practicum
   else if c_name = "CS1110" || c_name = "CS1112" || c_name = "MATH1910" ||
           c_name = "MATH1920" || c_name = "MATH2940" || c_name = "CHEM2090" ||
           c_name = "CHEM2080" || c_name = "CHEM2150" || c_name = "BTRY3080" || 
           c_name = "ECON3130" || c_name = "MATH2930" || c_name = "MATH4710" || 
           c_name = "PHYS2214" || c_name = "PHYS2218" || c_name = "PHYS1112" ||
           c_name = "PHYS116" || c_name = "PHYS2213" || c_name = "PHYS2217" 
-  then "REQUIRED"
+  then Required
   else if c_name = "CS2800" || c_name = "CS2802" || c_name = "CS3110" || 
           c_name = "CS3410" || c_name = "CS3420" || c_name = "ECE3140" || 
           c_name = "CS4410" || c_name = "CS4280"
-  then "CORE"
+  then Core
   else if 
     (String.sub c_name 0 3 = "CS4" && (c_name <> "CS4090") 
      && (c_name <> "CS4998") && (c_name <> "CS4999")) 
     || String.sub c_name 0 3 = "CS5" 
-  then "4000+" 
+  then FourThousandPlus
   else if String.sub c_name 0 5 = "ECON3" || String.sub c_name 0 5 = "ECON4" 
           || String.sub c_name 0 5 = "ECON5" || String.sub c_name 0 5 = "MATH3" 
           || String.sub c_name 0 5 = "MATH4" || String.sub c_name 0 5 = "MATH5"
@@ -86,12 +86,12 @@ let guess_deg c_name =
           || String.sub c_name 0 4 = "BIO4" || String.sub c_name 0 4 = "BIO5"
           || String.sub c_name 0 3 = "CS3" || c_name = "ENGRD2700" 
           || c_name = "MATH2930"
-  then "TECH"
+  then Technical
   else 
   if not(Str.string_match 
            (Str.regexp "^[A-Z][A-Z]+[0-2][0-9][0-9][0-9]$") c_name 0)
-  then "SPCL"
-  else "LIBERAL"
+  then Specialization
+  else Liberal
 
 (** [add_others sch str_lst] is [sch] after parsing [str_lst] and adding a 
     new course if [str_lst] is properly formatted. 
@@ -105,22 +105,22 @@ let add_others sch str_lst =
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
     let guessed_deg = guess_deg name in
-    print_endline ("Category Estimation: " ^ guessed_deg);
+    print_endline ("Category Estimation: " ^ (string_of_category guessed_deg));
     add_course sch 
       (create_course name 
          (get_course_creds name 
             (sem_id_parse sem_id)) 
-         (Schedule.gradify grade) (guess_deg name)) 
+         (gradify grade) (guess_deg name)) 
       (sem_id_parse sem_id)
   | course_name::credits::grade::sem_id::[] 
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
     (sem_exists (sem_ids_to_string sch) sem_id); 
     let name = String.uppercase_ascii course_name in
     let guessed_deg = guess_deg name in
-    print_endline ("Category Estimation: " ^ guessed_deg);
+    print_endline ("Category Estimation: " ^ (string_of_category guessed_deg));
     add_course sch (create_course name
                       (int_of_string credits)
-                      (Schedule.gradify grade) guessed_deg)
+                      (gradify grade) guessed_deg)
       (sem_id_parse sem_id)
   | course_name::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
@@ -129,15 +129,15 @@ let add_others sch str_lst =
       (create_course name 
          (get_course_creds name 
             (sem_id_parse sem_id)) 
-         (Schedule.gradify grade) (String.uppercase_ascii category)) 
+         (gradify grade) (String.uppercase_ascii category |> categorify)) 
       (sem_id_parse sem_id)
   | course_name::credits::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
     add_course sch (create_course name 
                       (int_of_string credits) 
-                      (Schedule.gradify grade) 
-                      (String.uppercase_ascii category)) 
+                      (gradify grade) 
+                      (String.uppercase_ascii category |> categorify)) 
       (sem_id_parse sem_id)
   | _ -> raise MalformedAdd
 

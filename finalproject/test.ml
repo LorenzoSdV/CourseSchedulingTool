@@ -81,10 +81,10 @@ let make_list_test
 let fall19 = create_sem (Fall 19)
 let sp20 = create_sem (Spring 20)
 
-let cs2800 = create_course "CS2800" 3 (Letter "C") "CORE"
-let cs4820 = create_course "CS4820" 4 (Letter "C+") "CORE"
-let phys2213 = create_course "PHYS2213" 4 (Letter "A-") "REQUIRED"
-let cs3110 = create_course "CS3110" 4 (Letter "B") "CORE"
+let cs2800 = create_course "CS2800" 3 (Letter "C") Core
+let cs4820 = create_course "CS4820" 4 (Letter "C+") Core
+let phys2213 = create_course "PHYS2213" 4 (Letter "A-") Required
+let cs3110 = create_course "CS3110" 4 (Letter "B") Core
 
 (*
     Schedule module tests
@@ -197,8 +197,20 @@ let ical_tests = [
     These tests work by saving and then re-loading a schedule.
 *)
 
+(* Uses basic schedule from Schedule Tests *)
+let _ = SaveJSON.save_schedule sch "test_case_save.json"
+let test_saved_sch = LoadJSON.parse_json "test_case_save.json"
 
-
+let saved_schedule_tests = [
+  make_int_test "Credits of saved schedule" 15 (get_credits example_sch);
+  make_string_test
+    "Cumulative GPA for saved sched" "2.80" 
+    (gpa (to_list example_sch) |> gpa_to_string);
+  make_string_test 
+    "Desc for example.json schedule" "Sch1" (get_name test_saved_sch);
+  make_string_test "Sch is correct in example.json" 
+    "CS2800CS3110CS4820PHYS2213" (string_of_sch test_saved_sch)
+]
 
 (* 
     END Test Cases!
