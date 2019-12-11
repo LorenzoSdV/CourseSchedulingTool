@@ -203,8 +203,7 @@ and load (file_lst: string list) =
     let sch = LoadJSON.parse_json file in
     prompt sch
   with
-  | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
-    init_prompt ()
+  | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); init_prompt ()
 
 (** [init_prompt ()] is the initial user prompt and first entry into the 
     system. *)

@@ -9,9 +9,11 @@ type reqs = {
 let eng_reqs = {
   required = ["MATH1910"; "MATH1920"; "MATH2940"; "CS3110"; "CS4410"; "CS4820"];
 
-  categories = [("Technical", 9); ("Ext Spec", 9); ("4000+", 9); 
-                ("Lib Studies", 18); ("FWS", 6); ("PE", 2); 
-                ("Advisor-Approved Elective", 6); ("Free Elective", 3);
+  categories = [("Technical Elective", 9); 
+                ("External Specialization", 9); ("4000+", 9); 
+                ("Liberal Studies", 18); ("FWS", 6); ("PE", 2); 
+                ("Advisor-Approved Elective", 6); 
+                ("Major-Approved Elective", 3);
                 ("Practicum", 2); ("ENGRI", 3); ("ENGRD", 3)];
 
   subs = [["PHYS112"; "PHYS1116"]; ["PHYS2213"; "PHYS2217"]; 
@@ -25,10 +27,11 @@ let eng_reqs = {
 let cas_reqs = {
   required = ["CS3110"; "CS4410"; "CS4820"];
 
-  categories = [("Technical", 9); ("Ext Spec", 9); ("4000+", 9); 
-                ("Practicum", 2);("FWS", 6); ("PE", 2);
-                ("Lib Studies", 15); ("Breadth Requirement", 6); 
-                ("Foreign Lang", 6); ("2 PBS Courses", 6)];
+  categories = [("Technical Elective", 9); 
+                ("External Specialization", 9); ("4000+", 9); 
+                ("Liberal Studies", 15); ("FWS", 6); ("PE", 2); 
+                ("Foreign Language", 6); ("GB", 3); ("HB", 3);
+                ("Practicum", 2); ("PBS", 6)];
 
   subs = [["MATH1910"; "MATH1110"]; ["MATH1120"; "MATH1220"; "MATH1920"]; 
           ["MATH2210"; "MATH2940"]; ["CS3410"; "CS3420"; "ECE3140"];

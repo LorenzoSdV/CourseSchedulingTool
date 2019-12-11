@@ -12,12 +12,12 @@ type sem_id = Spring of int | Fall of int | None
 type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer 
            | Letter of string
 
-(** The type representing the category of a course. *)
+(** The type representing the category of a course as per CS degree 
+    requirements. *)
 type category = PE | FWS | ENGRI | ENGRD | Required | Core | FourThousandPlus | 
                 Technical | Specialization| Liberal | AdvisorApproved | 
-                MajorApproved | Practicum | Extra | ForeignLanguage | PBS_AS |
-                PBSS_AS | MQR_AS | CA_AS | HA_AS | KCM_AS | LA_AS | SBA_AS | 
-                GB | HB | GHB
+                MajorApproved | Practicum | Extra | ForeignLanguage | 
+                PBS | GB | HB
 
 (** The type representing a course within a schedule. *)
 type course
@@ -118,7 +118,7 @@ val check_school : string -> bool
     "Core" or "Required". 
     Raises: [UnknownCategory str] if [str] is not a valid grade 
     representation. *)
-val categorify : schedule -> string -> category
+val categorify : string -> category
 
 (** [create_course name cred gr cat] is a new course type with name [name], 
     number of credits [cred], grade [gr], and category [cat]. *)
@@ -216,7 +216,7 @@ val string_of_grade : grade -> string
 
 (** [string_of_category cat sch] is the string representation of a category 
     [cat] in [sch]. *)
-val string_of_category : category -> schedule -> string
+val string_of_category : category -> string
 
 (** [sem_ids sch] is the list of semester ids from each semester in 
     schedule [sch]. *)

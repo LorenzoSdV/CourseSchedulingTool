@@ -154,14 +154,14 @@ let guess_catCAS c_name sem_id =
   else if language_check c_name then ForeignLanguage
   else if breadth_category c_name sem_id = "(GB)" then GB
   else if breadth_category c_name sem_id = "(HB)" then HB
-  else if breadth_category c_name sem_id = "(GHB)" then GHB
-  else if distribution = "(CA-AS)" then CA_AS
-  else if distribution = "(HA-AS)" then HA_AS
-  else if distribution = "(KCM-AS)" then KCM_AS
-  else if distribution = "(LA-AS)" then LA_AS
-  else if distribution = "(SBA-AS)" then SBA_AS
-  else if distribution = "(PBS-AS)" then PBS_AS
-  else if distribution = "(PBSS-AS)" then PBSS_AS
+  else if breadth_category c_name sem_id = "(GHB)" then GB
+  else if distribution = "(CA-AS)" then Liberal
+  else if distribution = "(HA-AS)" then Liberal
+  else if distribution = "(KCM-AS)" then Liberal
+  else if distribution = "(LA-AS)" then Liberal
+  else if distribution = "(SBA-AS)" then Liberal
+  else if distribution = "(PBS-AS)" then PBS
+  else if distribution = "(PBSS-AS)" then PBS
   else Specialization
 
 (** [add_others sch str_lst] is [sch] after parsing [str_lst] and adding a 
@@ -186,7 +186,7 @@ let add_others sch str_lst =
            (Schedule.gradify grade) (guessed_cat)) 
         (sem_id_parse sem_id) 
     in print_endline("Category Estimation: " ^ 
-                     (string_of_category guessed_cat sch));
+                     (string_of_category guessed_cat));
     print_endline("Added " ^ name); sch' 
   | course_name::credits::grade::sem_id::[] 
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
@@ -201,7 +201,7 @@ let add_others sch str_lst =
                                  (Schedule.gradify grade) guessed_cat)
         (sem_id_parse sem_id)
     in print_endline ("Category Estimation: " ^ 
-                      (string_of_category guessed_cat sch)); 
+                      (string_of_category guessed_cat)); 
     print_endline("Added " ^ name); sch'
   | course_name::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
@@ -210,7 +210,7 @@ let add_others sch str_lst =
         (create_course name 
            (get_course_creds name 
               (sem_id_parse sem_id)) 
-           (gradify grade) (String.uppercase_ascii category |> categorify sch)) 
+           (gradify grade) (String.uppercase_ascii category |> categorify)) 
         (sem_id_parse sem_id)
     in print_endline("Added " ^ name); sch'
   | course_name::credits::grade::category::sem_id::[] ->
@@ -220,7 +220,7 @@ let add_others sch str_lst =
         (create_course name 
            (int_of_string credits) 
            (gradify grade) 
-           (String.uppercase_ascii category |> categorify sch)) 
+           (String.uppercase_ascii category |> categorify)) 
         (sem_id_parse sem_id)
     in print_endline("Added " ^ name); sch'
   | _ -> raise MalformedAdd
