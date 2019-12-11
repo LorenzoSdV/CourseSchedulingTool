@@ -128,7 +128,7 @@ and prompt sch =
                       "\nValid ENG Categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, lang/language/foreign, "^
-                      "PBS, PBSS, MQR, CA, HA, KCM, LA, SBA, GB, HB, GHB, "^
+                      "PBS/PBSS, MQR/CA/HA/KCM/LA/SBA/liberal, GB, HB, "^
                       "extra")
     | UnknownSetting msg ->
       exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
