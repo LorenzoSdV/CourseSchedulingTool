@@ -225,7 +225,7 @@ and init_prompt () =
           print_endline("\nThe following are the grade options when adding a " ^
                         "new course to the schedule.");
           ANSITerminal.(print_string [yellow] 
-                          ("Valid grades: A Letter grade, s/sat, " 
+                          ("Valid grades: <letter_grade>, s/sat, " 
                            ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
                            "none, transfer\n"));
           print_string("\n");
