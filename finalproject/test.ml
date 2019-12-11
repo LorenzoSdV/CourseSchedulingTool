@@ -150,10 +150,8 @@ let basic_schedule_tests = [
 ]
 
 let example_sch = LoadJSON.parse_json "example.json"
-let fa19_courses = 
-  get_sem example_sch (Fall 19) |> get_sem_courses
-let sp20_courses = 
-  get_sem example_sch (Spring 20) |> get_sem_courses
+let fa19_courses = get_sem example_sch (Fall 19) |> get_sem_courses
+let sp20_courses = get_sem example_sch (Spring 20) |> get_sem_courses
 
 let load_schedule_tests = [
   make_int_test "Credits of example.json schedule" 15 (get_credits example_sch);
