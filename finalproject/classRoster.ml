@@ -86,5 +86,28 @@ let dist_category name sem =
   else
     raise (UnknownCourse name)
 
-let has_distribution_category name sem = 
+let get_distribution_status name sem = 
   String.length (dist_category name sem) <> 0
+
+(** [parse_breadth html] is the string containing the breadth categories
+    as listed for a course whose class roster page is [html]. *)
+let parse_breadth html =
+  let reg = Str.regexp_string {|<span class="catalog-breadth">|} in
+  let reg2 = Str.regexp_string {|</span>|} in
+  try
+    let srt = Str.search_forward reg2 html (Str.search_forward reg html 0) in
+    let ed = Str.search_forward reg2 html (srt + 7) in
+    String.sub html srt ed
+  with
+  | _ -> ""
+
+let breadth_category name sem = 
+  let n_upper = String.uppercase_ascii name in
+  let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
+  if (Str.string_match reg n_upper 0) then
+    parse_breadth (course_html n_upper sem)
+  else
+    raise (UnknownCourse name)
+
+let get_breadth_status name sem = 
+  String.length (breadth_category name sem) <> 0
