@@ -54,7 +54,7 @@ let make_float_test
   name >:: (fun _ -> assert_equal expected_output actual_output
                ~printer:string_of_float)              
 
-(** [make_string_tests name expected_output actual_output] constructs an OUnit
+(** [make_string_test name expected_output actual_output] constructs an OUnit
     test named [name] that asserts the quality of [expected_output] with
     [actual_output] for strings. *)
 let make_string_test
@@ -63,7 +63,7 @@ let make_string_test
     (actual_output: string) : test = 
   name >:: (fun _ -> assert_equal expected_output actual_output) 
 
-(** [make_list_tests name expected_output actual_output] constructs an OUnit
+(** [make_list_test name expected_output actual_output] constructs an OUnit
     test named [name] that asserts the quality of [expected_output] with
     [actual_output] for lists. *)
 let make_list_test
@@ -73,6 +73,73 @@ let make_list_test
   name >:: (fun _ -> assert_equal (List.sort_uniq compare expected_output)
                (List.sort_uniq compare actual_output)
                ~printer:Schedule.string_of_list)   
+
+(** [make_exn_test name expected_output actual_output] constructs an OUnit
+    test named [name] that asserts the quality of [expected_output] with
+    [actual_output] for exceptions. 
+    let make_exn_test
+    (name: string)
+    (expected_output: exn)
+    (actual_output: schedule) : test =
+    name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> actual_output))*)
+
+(** [make_add_sem_test name sch sem expected_output] constructs an OUnit
+    test named [name] that asserts the quality of [expected_output] with
+    [add_sem sch sem]. *)
+let make_add_sem_test
+    (name: string)
+    (sch: schedule)
+    (sem: semester)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output (fun () -> add_sem sch sem))
+
+(** [make_rem_sem_test name sch semid expected_output] constructs an OUnit
+    test named [name] that asserts the quality of [expected_output] with
+    [rem_sem sch semid]. *)
+let make_rem_sem_test
+    (name: string)
+    (sch: schedule)
+    (semid: sem_id)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> remove_sem sch semid))
+
+(** [make_add_course_test name sch course semid expected_output] constructs an 
+    OUnit test named [name] that asserts the quality of [expected_output] with
+    [add_course sch course semid]. *)
+let make_add_course_test
+    (name: string)
+    (sch: schedule)
+    (course: course)
+    (semid: sem_id)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> add_course sch course semid))
+
+(** [make_rem_course_test name sch cname expected_output] constructs an OUnit
+    test named [name] that asserts the quality of [expected_output] with
+    [rem_course sch cname]. *)
+let make_rem_course_test
+    (name: string)
+    (sch: schedule)
+    (cname: string)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> remove_course sch cname))
+
+(** [make_edit_course_test name sch cname attr new_val expected_output] 
+    constructs an OUnit test named [name] that asserts the quality of 
+    [expected_output] with [edit_course sch cname attr new_val]. *)
+let make_edit_course_test
+    (name: string)
+    (sch: schedule)
+    (cname: string)
+    (attr: string)
+    (new_val: string)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> edit_course sch cname attr new_val))
 
 (* 
     Code used in all test cases:
@@ -85,16 +152,15 @@ let cs2800 = create_course "CS2800" 3 (Letter "C") Core
 let cs4820 = create_course "CS4820" 4 (Letter "C+") Core
 let phys2213 = create_course "PHYS2213" 4 (Letter "A-") Required
 let cs3110 = create_course "CS3110" 4 (Letter "B") Core
+let btry3080 = create_course "BTRY3080" 4 (Letter "A") Required
 
 (*
     Schedule module tests
 *)
 
 let sch = new_schedule "Sch1"
-
 let _ = add_sem sch fall19
 let _ = add_sem sch sp20
-
 let _ = add_course sch cs2800 (Fall 19)
 let _ = add_course sch cs4820 (Spring 20)
 let _ = add_course sch cs3110 (Fall 19)
@@ -104,7 +170,6 @@ let sch_rem_sem = new_schedule "Sch2"
 let _ = add_sem sch_rem_sem (create_sem (Fall 19))
 let _ = add_sem sch_rem_sem (create_sem (Spring 20))
 let _ = remove_sem sch_rem_sem (Fall 19)
-
 let _ = add_course sch_rem_sem cs2800 (Spring 20)
 let _ = add_course sch_rem_sem cs3110 (Spring 20)
 let _ = add_course sch_rem_sem cs4820 (Spring 20)
@@ -132,6 +197,21 @@ let _ = add_sem swapped (create_sem (Spring 21))
 let _ = add_course swapped cs2800 (Spring 21)
 let _ = add_course swapped cs3110 (Fall 20)
 let _ = swap_courses "CS2800" "CS3110" swapped
+
+let unmoved = new_schedule "Sch7"
+let _ = add_sem unmoved (create_sem (Fall 20))
+let _ = add_sem unmoved (create_sem (Spring 21))
+let _ = add_course unmoved cs2800 (Spring 21)
+let _ = add_course unmoved cs3110 (Fall 20)
+let _ = add_course unmoved cs4820 (Spring 21)
+
+let moved = new_schedule "Sch8"
+let _ = add_sem moved (create_sem (Fall 20))
+let _ = add_sem moved (create_sem (Spring 21))
+let _ = add_course moved cs2800 (Spring 21)
+let _ = add_course moved cs3110 (Fall 20)
+let _ = add_course moved cs4820 (Spring 21)
+let _ = move_course "CS2800" (Fall 20) moved
 
 let basic_schedule_tests = [
   make_list_test "Semesters are added to schedule successfully"
@@ -164,7 +244,24 @@ let basic_schedule_tests = [
     "CS3110CS2800" (string_of_sch unswapped);
   make_string_test "Schedule swapped the two courses in the previous test
   successfully" "CS2800CS3110" (string_of_sch swapped);
-
+  make_string_test "Schedule added three courses successfully"
+    "CS3110CS4820CS2800" (string_of_sch unmoved);
+  make_string_test "Schedule moved CS2800 successfully from the previous test"
+    "CS2800CS3110CS4820" (string_of_sch moved);
+  make_add_sem_test "Schedule added a semester that already exists"
+    sch fall19 (DuplicateSemester "FA19");
+  make_rem_sem_test "Schedule removed a semester that doesn't exist"
+    sch (Fall 20) (UnknownSemester "FA20");
+  make_add_course_test "Schedule adds a course that already exists"
+    sch cs2800 (Fall 19) (DuplicateCourse "CS2800 already in schedule.");
+  make_add_course_test "Schedule adds a course to a semester that doesn't 
+  exist" sch btry3080 (Fall 20) (UnknownSemester "FA20");
+  make_rem_course_test "Schedule removes a course that doesn't exist"
+    sch "BTRY3080" (UnknownCourse "BTRY3080");
+  make_edit_course_test "Schedule edits a course with an invalid attribute"
+    sch "CS2800" "location" "Hollister" (InvalidAttribute "location");
+  make_edit_course_test "Schedule edits a course that doesn't exist"
+    sch "BTRY3080" "credits" "3" (UnknownCourse "BTRY3080");
 ]
 
 (*
