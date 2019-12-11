@@ -78,7 +78,7 @@ let parse_dist html =
   with
   | _ -> ""
 
-let dist_category name sem = 
+let distribution_category name sem = 
   let n_upper = String.uppercase_ascii name in
   let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
   if (Str.string_match reg n_upper 0) then
@@ -87,7 +87,7 @@ let dist_category name sem =
     raise (UnknownCourse name)
 
 let get_distribution_status name sem = 
-  String.length (dist_category name sem) <> 0
+  String.length (distribution_category name sem) <> 0
 
 (** [parse_breadth html] is the string containing the breadth categories
     as listed for a course whose class roster page is [html]. *)
