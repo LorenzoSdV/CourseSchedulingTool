@@ -444,7 +444,7 @@ let print_course sch course =
 let print_sem sem =
   print_string ((string_of_semid sem.id) ^ ": ");
   print_endline (string_of_list (List.map (fun x -> x.name) sem.courses));
-  print_string (" ]\nSemester GPA: " ^ (gpa_to_string sem.sem_gpa));
+  print_string ("\nSemester GPA: " ^ (gpa_to_string sem.sem_gpa));
   print_endline (" | Semester Credits: " ^ string_of_int sem.tot_credits);
   print_newline ()
 
