@@ -44,6 +44,16 @@ let make_int_test
   name >:: (fun _ -> assert_equal expected_output actual_output
                ~printer:string_of_int)
 
+(** [make_bool_test name expected_output actual_output] constructs an OUnit
+    test named [name] that asserts the quality of [expected_output] with
+    [actual_output] for booleans. *)
+let make_bool_test
+    (name: string)
+    (expected_output: bool) 
+    (actual_output: bool) : test = 
+  name >:: (fun _ -> assert_equal expected_output actual_output
+               ~printer:string_of_bool)
+
 (** [make_float_test name expected_output actual_output] constructs an OUnit
     test named [name] that asserts the quality of [expected_output] with
     [actual_output] for floats. *)
@@ -61,7 +71,8 @@ let make_string_test
     (name: string)
     (expected_output: string) 
     (actual_output: string) : test = 
-  name >:: (fun _ -> assert_equal expected_output actual_output) 
+  name >:: (fun _ -> assert_equal expected_output actual_output
+               ~printer:(fun x -> x)) 
 
 (** [make_list_tests name expected_output actual_output] constructs an OUnit
     test named [name] that asserts the quality of [expected_output] with
@@ -194,18 +205,6 @@ let load_schedule_tests = [
     "CS2800CS3110PHYS2213CS4820" (string_of_sch example_sch)
 ]
 
-let (ical_courses,ical_sem) = ICalParser.parse_file "example.ics"
-
-let ical_tests = [
-  make_string_test "Sem in example.ics is SP20" "SP20" ical_sem;
-  make_int_test 
-    "There are 6 courses in example.ics" 6 (List.length ical_courses);
-  make_list_test "Courses in iCal file"
-    [ "PSYCH1102"; "ECE4450"; "CS4820"; "CS4411"; "CS3300"; "BTRY3080" ]
-    ical_courses
-]
-
-
 (*
     SaveJSON Tests
     These tests work by saving and then re-loading a schedule.
@@ -217,13 +216,57 @@ let test_saved_sch = LoadJSON.parse_json "test_case_save.json"
 
 let saved_schedule_tests = [
   make_int_test "Credits of saved schedule" 15 (get_credits example_sch);
+  make_int_test "correct # of courses" 4 (List.length (to_list test_saved_sch));
   make_string_test
-    "Cumulative GPA for saved sched" "2.80" 
-    (gpa (to_list example_sch) |> gpa_to_string);
+    "Cumulative GPA for saved sched" "2.80"
+    (get_gpa test_saved_sch |> gpa_to_string);
   make_string_test 
     "Desc for example.json schedule" "Sch1" (get_name test_saved_sch);
-  make_string_test "Sch is correct in example.json" 
-    "CS2800CS3110CS4820PHYS2213" (string_of_sch test_saved_sch)
+  make_string_test "Sch is correct in saved JSON" 
+    "CS3110CS2800PHYS2213CS4820" (string_of_sch test_saved_sch)
+]
+
+(* 
+    iCalParser tests
+*)
+
+let (ical_courses,ical_sem) = ICalParser.parse_file "example.ics"
+
+let ical_tests = [
+  make_string_test "Sem in example.ics is SP20" "SP20" ical_sem;
+  make_int_test 
+    "There are 6 courses in example.ics" 6 (List.length ical_courses);
+  make_list_test "Courses in iCal file"
+    [ "PSYCH1102"; "ECE4450"; "CS4820"; "CS4411"; "CS3300"; "BTRY3080" ]
+    ical_courses
+]
+
+(* 
+    ClassRoster Test Cases
+*)
+
+let creds_3110 = ClassRoster.get_course_creds "CS3110" (Fall 19)
+let creds_2110 = ClassRoster.get_course_creds "CS2110" (Fall 19)
+let not_fws =  ClassRoster.get_FWS_status "CS3110" (Fall 19)
+let real_fws = ClassRoster.get_FWS_status "ENGL1105" (Fall 19)
+let d_cat = ClassRoster.distribution_category "BIOMI1120" (Fall 19)
+let has_d_cat = ClassRoster.get_distribution_status "BIOMI1120" (Fall 19)
+let no_d_cat = ClassRoster.get_distribution_status "ENGL1105" (Fall 19)
+let b_cat = ClassRoster.breadth_category "AMST1500" (Fall 19)
+let has_b_cat = ClassRoster.get_breadth_status "AMST1500" (Fall 19)
+let no_b_cat = ClassRoster.get_breadth_status "ENGL1105" (Fall 19)
+
+let class_roster_tests = [
+  make_int_test "3110 is for 4 credits" 4 creds_3110;
+  make_int_test "2110 is for 3 credits" 3 creds_2110;
+  make_bool_test "CS3110 is not an FWS" false not_fws;
+  make_bool_test "ENGL1105 is an FWS" true real_fws;
+  make_bool_test "BIOMI1120 has a disttrib cat" true has_d_cat;
+  make_string_test "BIOMI1120 dist cat" "(BIONLS-AG, OPHLS-AG, PBS-AS)" d_cat;
+  make_bool_test "ENGL1105 does not have distrib cat" false no_d_cat;
+  make_bool_test "ENGL1105 does not have breadth cat" false no_b_cat;
+  make_bool_test "AMST1500 has a breadth cat" true has_b_cat;
+  make_string_test "AMST1500 breadth cat" "(GB)" b_cat;
 ]
 
 (* 
@@ -233,7 +276,9 @@ let saved_schedule_tests = [
 let test_suite = [
   basic_schedule_tests;
   load_schedule_tests;
-  ical_tests
+  saved_schedule_tests;
+  ical_tests;
+  class_roster_tests
 ]
 
 let suite = "Main Test Suite" >::: List.flatten test_suite
