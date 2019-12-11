@@ -36,6 +36,28 @@ let parse_credits html =
   with
     _ -> raise InvalidURL
 
+(** [parse_title html] is [true] if title of the course whose class 
+    roster webpage is stored as plain text in [html] begins with "FWS".
+    Raises: [InvalidURL] if [html] doesn't contain this information. *)
+let parse_title html =
+  let reg1 = Str.regexp_string {|<div class="title-coursedescr">|} in
+  let reg2 = Str.regexp_string {|>|} in
+  try
+    let idx = 
+      (Str.search_forward reg1 html 0) + 31 |> Str.search_forward reg2 html
+    in
+    (String.sub html idx 3) = "FWS"
+  with
+    _ -> raise InvalidURL
+
+let get_FWS_status name sem =
+  let n_upper = String.uppercase_ascii name in
+  let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
+  if (Str.string_match reg n_upper 0) then
+    parse_title (course_html n_upper sem)
+  else
+    raise (UnknownCourse name)
+
 let get_course_creds name sem =
   let n_upper = String.uppercase_ascii name in
   let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
