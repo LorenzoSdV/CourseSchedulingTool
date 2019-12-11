@@ -58,6 +58,26 @@ let get_FWS_status name sem =
   else
     raise (UnknownCourse name)
 
+(** [parse_dist html] is [true] if the course whose class 
+    roster webpage is stored as plain text in [html] has a distrbution 
+    category listed.
+    Raises: [InvalidURL] if [html] doesn't contain this information. *)
+let parse_dist html =
+  let reg1 = Str.regexp_string {|<span class="catalog-distr">|} in
+  try
+    ignore (Str.search_forward reg1 html 0); true
+  with
+  | Not_found -> false
+  |  _ -> raise InvalidURL
+
+let has_distribution_category name sem = 
+  let n_upper = String.uppercase_ascii name in
+  let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
+  if (Str.string_match reg n_upper 0) then
+    parse_dist (course_html n_upper sem)
+  else
+    raise (UnknownCourse name)
+
 let get_course_creds name sem =
   let n_upper = String.uppercase_ascii name in
   let reg = Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$" in
