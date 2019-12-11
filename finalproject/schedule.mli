@@ -232,9 +232,9 @@ val sem_ids_to_string : schedule -> string list
     [sch]. *)
 val to_list : schedule -> course list
 
-(** [new_schedule nm] is a new empty schedule with name [nm] but no courses 
-    or semesters. *)
-val new_schedule : string -> schedule
+(** [new_schedule name] is a new empty schedule with name [name] and school 
+    [school] but no courses or semesters. *)
+val new_schedule : string -> string -> schedule
 
 (** [print_course sch course] is [()] after printing the components of a course: 
     the name, number of credits, grade, category, and semester. *)
