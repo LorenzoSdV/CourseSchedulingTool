@@ -160,14 +160,10 @@ let basic_schedule_tests = [
     (get_gpa edit_creds_sch |> gpa_to_string);
   make_string_test "Edited course grade - check GPA" "3.00"
     (get_gpa edit_grade |> gpa_to_string);
-  make_string_tests "Schedule added two courses successfully" 
+  make_string_test "Schedule added two courses successfully" 
     "CS3110CS2800" (string_of_sch unswapped);
-  make_string_tests "Schedule swapped the two courses in the previous test
+  make_string_test "Schedule swapped the two courses in the previous test
   successfully" "CS2800CS3110" (string_of_sch swapped);
-
-]
-
-let command_tests = [
 
 ]
 
@@ -237,8 +233,7 @@ let saved_schedule_tests = [
 let test_suite = [
   basic_schedule_tests;
   load_schedule_tests;
-  ical_tests;
-  command_tests;
+  ical_tests
 ]
 
 let suite = "Main Test Suite" >::: List.flatten test_suite
