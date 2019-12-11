@@ -216,9 +216,10 @@ let test_saved_sch = LoadJSON.parse_json "test_case_save.json"
 
 let saved_schedule_tests = [
   make_int_test "Credits of saved schedule" 15 (get_credits example_sch);
-  (*make_string_test
+  make_int_test "correct # of courses" 4 (List.length (to_list test_saved_sch));
+  make_string_test
     "Cumulative GPA for saved sched" "2.80"
-    (gpa (to_list test_saved_sch) |> gpa_to_string);*)
+    (get_gpa test_saved_sch |> gpa_to_string);
   make_string_test 
     "Desc for example.json schedule" "Sch1" (get_name test_saved_sch);
   make_string_test "Sch is correct in saved JSON" 
