@@ -210,7 +210,6 @@ and init_prompt () =
                             ("Valid grades: <letter_grade>, s/sat, " 
                              ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
                              "none, transfer\n"));
-            print_string("\n");
             prompt (new_schedule sch_name school)
           end
         else 
