@@ -380,7 +380,7 @@ let remove_sem sch semid =
     sch.is_saved <- false;
     sch end
 
-let new_schedule name =
+let new_schedule name school =
   let default_settings = {
     autosave = false;
     html_background = "rgb(255, 224, 198)";
@@ -395,7 +395,7 @@ let new_schedule name =
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
-    school = "ENG";
+    school = school;
     valid = None
   }
 

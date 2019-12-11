@@ -126,21 +126,22 @@ val create_course : string -> int -> grade -> category -> course
 
 (** [add_course sch c semid] is the schedule with course [c] added to semester
     with id [sem_id].
-    Raises: [DuplicateCourse c.name] if course already exists in the 
-    semester. 
-    Raises: [UnkownSemester semid] if semid is not in [sch]. *)
+    Raises: [DuplicateCourse c.name "already in schedule."] if course already 
+    exists in the semester. 
+    Raises: [UnknownSemester semid] if semid is not in [sch]. *)
 val add_course : schedule -> course -> sem_id -> schedule
 
 (** [edit_course sch c attr new_val] is the schedule that results from changing 
     the course field [attr] to [new_val] for course with name [c] in 
     schedule [sch]. 
-    Raises: [InvalidAttribute] with various error messages if [attr] is not a 
-    valid field of course record, or [new_val] is not valid. 
-    Raises: [UnkownCourse c] if course is not in [sch]. *)
+    Raises: [InvalidAttribute attr] with various error messages if [attr] is not  
+    a valid field of course record, or [new_val] is not valid. 
+    Raises: [UnknownCourse c.name] if course is not in [sch]. *)
 val edit_course : schedule -> string -> string -> string -> schedule
 
 (** [add_course sch c] is the schedule with course name [c] removed. 
-    Raises: [UnkownCourse c] if [c] is not in [sch]. *)
+    Raises: [UnknownCourse c.name] if [c] is not in 
+    [sch].*)
 val remove_course : schedule -> string -> schedule
 
 (** [swap_courses c1_name c2_name sch] is [sch] but with [c1_name] and 
@@ -148,7 +149,8 @@ val remove_course : schedule -> string -> schedule
     Raises: [InvalidSwap] if [c1_name] and [c2_name] are in same semester. *)
 val swap_courses : string -> string -> schedule -> schedule
 
-(** [move_course c_name sem sch] is [sch] but with [c_name] moved to [sem] *)
+(** [move_course c_name sem sch] is [sch] but with [c_name] moved to [sem].
+    Raises: [InvalidMove] if [sem] is the semester the course is already in. *)
 val move_course : string -> sem_id -> schedule -> schedule
 
 (** [get_course name courses] is the course with name [name]
@@ -198,13 +200,13 @@ val create_sem : sem_id -> semester
 
 (** [add_sem sch sem] is [sch] but with semester [sem] added to its
     list of semesters, and GPA updated.
-    Raises: [DuplicateSemester semid] if semester with the same idalready 
+    Raises: [DuplicateSemester semid] if semester with the same id already 
     exists in [sch]. *)
 val add_sem : schedule -> semester -> schedule
 
 (** [remove_sem sch sem] is [sch] with the semester [sem] removed from list of 
     semesters. Updates GPA/credits accordingly.
-    Raises: [UnkownSemester] if semester doesn't exists in the [sch]. *)
+    Raises: [UnkownSemester semid] if semester doesn't exists in the [sch]. *)
 val remove_sem : schedule -> sem_id -> schedule
 
 (** [string_of_semid s] is the string representation of semester id [s]. String
@@ -230,9 +232,9 @@ val sem_ids_to_string : schedule -> string list
     [sch]. *)
 val to_list : schedule -> course list
 
-(** [new_schedule nm] is a new empty schedule with name [nm] but no courses 
-    or semesters. *)
-val new_schedule : string -> schedule
+(** [new_schedule name] is a new empty schedule with name [name] and school 
+    [school] but no courses or semesters. *)
+val new_schedule : string -> string -> schedule
 
 (** [print_course sch course] is [()] after printing the components of a course: 
     the name, number of credits, grade, category, and semester. *)

@@ -43,7 +43,7 @@ let cas_reqs = {
 (** [check_required sch reqs] is a ist of courses that are required by [reqs] 
     but not included in [sch]. 
 
-    If [check_required sch reqs] = [] then all course requirments are met. *)
+    If [check_required sch reqs] = [] then all course requirements are met. *)
 let check_required sch reqs =
   let rec loop courses required acc =
     match required with 
@@ -62,7 +62,7 @@ let check_required sch reqs =
 
     For example, if [check_categories sch reqs] = [("4000+", 3)], then [sch] 
     is missing one course satisfying the 4000+ requirement. If 
-    [check_categories sch reqs] = [] then all category requirment are met. *)
+    [check_categories sch reqs] = [] then all category requirements are met. *)
 let check_categories sch reqs =
   let rec loop courses categories acc =
     match categories with 

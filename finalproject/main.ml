@@ -6,13 +6,29 @@ open ClassRoster
     the user can enter in [prompt] *)
 let valid_commands = 
   ("Valid Commands: add | edit | remove | swap | move | check | save |" ^
-   " set | print | import | export | delete | clear | close | quit")
+   " set | print | import | export | close | quit")
 
 (** [read_input ()] is [read_line ()] after displaying helpful text prompt
     indicator. *)
 let read_input () = 
   print_string "\n> ";
   read_line ()
+
+(** [check_last_word str_lst] is the tuple with the first element as schedule 
+    name that is not only whitespaces and the second element as the school 
+    ("ENG" or "CAS"). Tuple has both elements as empty strings if the schedule 
+    name is the empty string.
+    Raises: [UnknownSchool str] if school is not "ENG" nor "CAS". *)
+let rec check_last_word str_lst str_acc = 
+  match str_lst with
+  | [] -> ("", "")
+  | last::[] -> let upper_last = String.uppercase_ascii last in
+    let trimmed_str = String.trim str_acc in
+    if trimmed_str = "" then ("", "")
+    else if upper_last = "CAS" then (trimmed_str, "CAS") 
+    else if upper_last = "ENG" then (trimmed_str, "ENG") 
+    else raise (UnknownSchool upper_last)
+  | h::t -> check_last_word t (str_acc ^ h ^ " ")
 
 (** [save_prompt_helper sch] is [sch] after saving [sch] as a json file. *)
 let save_prompt_helper sch =
@@ -54,37 +70,6 @@ and save_prompt_from_close sch =
                    "command."); 
     save_prompt_from_close sch
 
-(** [delete_prompt sch] is [prompt sch'] where [sch'] is either [sch] or a 
-    new empty schedule depending on user's response to prompt. *)
-and delete_prompt sch = 
-  if get_save_status sch 
-  then
-    (ANSITerminal.print_string [Bold] "\nWarning: ";
-     print_endline "You did not make any changes to this schedule yet.\n";
-     print_endline "Are you sure you still want to delete?";
-     match read_input () with
-     | "yes" ->
-       ANSITerminal.print_string [Bold] "\nErased!\n";
-       prompt (new_schedule (get_name sch))
-     | "no" -> prompt sch
-     | _ -> 
-       print_endline ("Type 'yes' or 'no' to continue."); 
-       delete_prompt sch)
-  else
-    begin
-      ANSITerminal.print_string [Bold] "\nAre you sure?\n";
-      print_endline 
-        "This will erase all information from the current schedule.";
-      match read_input () with
-      | "yes" -> 
-        ANSITerminal.print_string [Bold] "\nErased!\n";
-        prompt (new_schedule (get_name sch))
-      | "no" -> prompt sch
-      | _ -> 
-        print_endline ("Type 'yes' or 'no' to continue."); 
-        delete_prompt sch
-    end
-
 (** [prompt sch] is the user's interface with our system. This function handles 
     execution of user commands pertaining to [sch]. Also handles any exceptions 
     raised during the execution of any commands. *)
@@ -92,11 +77,9 @@ and prompt sch =
   ANSITerminal.(print_string [green] ("\n" ^ (get_name sch) ^ ": "));
   match read_line () with 
   | exception End_of_file -> ()
-  | "clear" -> ignore (Sys.command "clear"); prompt sch
   | "quit" -> 
     if get_save_status sch then Stdlib.exit 0 
     else save_prompt_from_quit sch
-  | "delete" -> delete_prompt sch
   | "close" -> 
     if get_save_status sch then start_prompt ()
     else save_prompt_from_close sch; init_prompt ()
@@ -128,7 +111,7 @@ and prompt sch =
                       "\nValid ENG Categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, lang/language/foreign, "^
-                      "PBS, PBSS, MQR, CA, HA, KCM, LA, SBA, GB, HB, GHB, "^
+                      "PBS/PBSS, MQR/CA/HA/KCM/LA/SBA/liberal, GB, HB, "^
                       "extra")
     | UnknownSetting msg ->
       exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
@@ -211,42 +194,49 @@ and init_prompt () =
   let split_cmd = String.split_on_char ' ' (read_input ()) in
   match split_cmd with 
   | [] -> raise Empty
-  | "new"::sch_name when sch_name <> [] -> begin
-      let sch_extra_space = 
-        List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
-      let new_name = 
-        String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
-      if not(Str.string_match (Str.regexp "^\\s+$") new_name 0)  
-      then 
-        begin
-          print_endline("\nThe following commands are available for use. Type" 
-                        ^ " in any command to see usage instructions.");
-          ANSITerminal.(print_string [yellow] valid_commands);
-          print_endline("\nThe following are the grade options when adding a " ^
-                        "new course to the schedule.");
-          ANSITerminal.(print_string [yellow] 
-                          ("Valid grades: A Letter grade, s/sat, " 
-                           ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
-                           "none, transfer\n"));
-          print_string("\n");
-          prompt (new_schedule new_name)
-        end
-      else 
-        begin
-          ANSITerminal.(print_string [red] 
-                          ("\nSchedule name cannot contain only"
-                           ^" whitespaces!\n"));
-          print_endline 
-            "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
-          init_prompt ()
-        end
+  | "new"::sch_name_and_school -> begin
+      try
+        let (sch_name, school) = 
+          if List.length sch_name_and_school < 2 
+          then ("", "") 
+          else check_last_word sch_name_and_school "" in
+        if sch_name <> "" then 
+          begin
+            print_endline("\nThe following commands are available for use. Type" 
+                          ^ " in any command to see usage instructions.");
+            ANSITerminal.(print_string [yellow] valid_commands);
+            print_endline("\nThe following are the grade options when adding a " ^
+                          "new course to the schedule.");
+            ANSITerminal.(print_string [yellow] 
+                            ("Valid grades: <letter_grade>, s/sat, " 
+                             ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
+                             "none, transfer\n"));
+            print_string("\n");
+            prompt (new_schedule sch_name school)
+          end
+        else 
+          begin
+            ANSITerminal.(print_string [red] 
+                            ("Schedule name cannot contain only"
+                             ^" whitespaces!\n"));
+            print_endline 
+              ("Valid commands: [new <schedule_name> <school>] | " ^
+               "[load <json_file>] | quit");
+            init_prompt ()
+          end
+      with
+      | _ -> ANSITerminal.(print_string [red] ("Not a valid school!\n"));
+        print_endline
+          "Valid schools: eng/ENG, cas/CAS"; 
+        init_prompt ()
     end
   | "load"::json_lst when json_lst <> [] -> load json_lst
   | "quit"::[] -> Stdlib.exit 0
   | _ -> 
     ANSITerminal.(print_string [red] "\nUnrecognized Command Entry!\n");
     print_endline 
-      "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
+      ("Valid commands: [new <schedule_name> <school>] | " ^
+       "[load <json_file>] | quit");
     init_prompt ()
 
 (** [start_prompt ()] is the low-level prompt the user is taken to when not
@@ -254,7 +244,8 @@ and init_prompt () =
 and start_prompt () =
   ANSITerminal.(print_string [cyan] "\nStart Page\n"); 
   print_endline 
-    "Valid commands: [new <schedule_name>] | [load <json_file>] | quit";
+    ("Valid commands: [new <schedule_name> <school>] | " ^
+     "[load <json_file>] | quit");
   init_prompt ()
 
 let main () =
@@ -264,7 +255,9 @@ let main () =
   print_endline 
     "If you want to open an already existing schedule, type [load <json_file>]";
   print_endline 
-    "Or type [new <schedule_name>] to create a new schedule.";
+    "Or type [new <schedule_name> <school>] to create a new schedule.";
+  print_endline
+    "Valid schools: eng/ENG, cas/CAS";
   init_prompt ()
 
 (* Starts system *)
