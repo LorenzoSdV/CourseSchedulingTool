@@ -54,7 +54,7 @@ let parse_title html =
     let idx = 
       (Str.search_forward reg1 html 0) + 31 |> Str.search_forward reg2 html
     in
-    (String.sub html idx 3) = "FWS"
+    (String.sub html (idx + 1) 3) = "FWS"
   with
     _ -> raise InvalidURL
 
@@ -74,7 +74,7 @@ let parse_dist html =
   try
     let srt = Str.search_forward reg2 html (Str.search_forward reg html 0) in
     let ed = Str.search_forward reg2 html (srt + 7) in
-    String.sub html srt ed
+    String.sub html (srt + 7) (ed - 7 - srt) |> String.trim
   with
   | _ -> ""
 
@@ -97,7 +97,7 @@ let parse_breadth html =
   try
     let srt = Str.search_forward reg2 html (Str.search_forward reg html 0) in
     let ed = Str.search_forward reg2 html (srt + 7) in
-    String.sub html srt ed
+    String.sub html (srt + 7) (ed - 7 - srt) |> String.trim
   with
   | _ -> ""
 
