@@ -19,6 +19,7 @@ report
 *~
 \#*\#
 .DS_Store
+*test_case_save.json
 
 #VS Code settings
 *.vscode*/

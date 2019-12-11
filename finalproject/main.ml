@@ -117,9 +117,19 @@ and prompt sch =
       exceptions sch ("Invalid/Unknown Grade: " ^ msg ^ 
                       "\nValid grades: <letter_grade>, s/sat, u/unsat, "^
                       "w/withdrawn, inc/incomplete, none, transfer")
-    | UnknownCategory msg ->
-      exceptions sch ("Invalid/Unknown Category: " ^ msg ^
-                      "\nValid Categories: ")
+    | UnknownCategoryCAS msg ->
+      exceptions sch ("Invalid/Unknown CAS Category: " ^ msg ^
+                      "\nValid CAS Categories: PE, FWS, req/required, core, " ^ 
+                      "4000+, tech/technical, spcl/ext, maj/major, " ^ 
+                      "project/proj/practicum/pract, ENGRD, ENGRI, liberal, "^
+                      "aprv/advisor, extra")
+    | UnknownCategoryENG msg ->
+      exceptions sch ("Invalid/Unknown ENG Category: " ^ msg ^
+                      "\nValid ENG Categories: PE, FWS, req/required, core, " ^ 
+                      "4000+, tech/technical, spcl/ext, maj/major, " ^ 
+                      "project/proj/practicum/pract, lang/language/foreign, "^
+                      "PBS, PBSS, MQR, CA, HA, KCM, LA, SBA, GB, HB, GHB, "^
+                      "extra")
     | UnknownSetting msg ->
       exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
     | DuplicateCourse msg -> 
@@ -193,8 +203,7 @@ and load (file_lst: string list) =
     let sch = LoadJSON.parse_json file in
     prompt sch
   with
-  | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); 
-    init_prompt ()
+  | _ -> print_string ("\nInvalid/Unknown JSON file.\n"); init_prompt ()
 
 (** [init_prompt ()] is the initial user prompt and first entry into the 
     system. *)

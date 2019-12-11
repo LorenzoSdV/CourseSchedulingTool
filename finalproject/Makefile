@@ -47,4 +47,4 @@ docs-private: build
 
 clean:
 	ocamlbuild -clean
-	rm -rf doc.public doc.private report scheduler_src.zip bisect*.out
+	rm -rf doc.public doc.private report scheduler_src.zip bisect*.out test_case_save.json

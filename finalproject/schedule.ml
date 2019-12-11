@@ -3,8 +3,10 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer
 
 type sem_id = Spring of int | Fall of int | None
 
-type category = Required | Core | FourThousandPlus | Technical | Specialization
-              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra 
+type category = PE | FWS | ENGRI | ENGRD | Required | Core | FourThousandPlus | 
+                Technical | Specialization| Liberal | AdvisorApproved | 
+                MajorApproved | Practicum | Extra | ForeignLanguage | 
+                PBS | GB | HB
 
 type course = {
   name: string;
@@ -38,7 +40,6 @@ type schedule = {
   mutable semesters: semester list;
   mutable cumul_gpa: float;
   mutable exp_grad: sem_id;
-  mutable major: string;
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
@@ -49,8 +50,10 @@ type schedule = {
 exception UnknownCourse of string
 exception UnknownSemester of string
 exception UnknownGrade of string
-exception UnknownCategory of string
+exception UnknownCategoryENG of string
+exception UnknownCategoryCAS of string
 exception UnknownSetting of string
+exception UnknownSchool of string
 exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
@@ -95,19 +98,32 @@ let gradify str =
     | "TRANSFER" -> Transfer
     | _ -> raise (UnknownGrade str)
 
+let check_school school =
+  match school with
+  | "CAS" | "ENG" -> true
+  | _ -> raise (UnknownSchool school)
+
 let categorify str =
   match String.uppercase_ascii str with
+  | "PE" -> PE
+  | "FWS" -> FWS
+  | "ENGRI" -> ENGRI
+  | "ENGRD" -> ENGRD
   | "REQ" | "REQUIRED" -> Required
   | "CORE" -> Core
   | "4000+" -> FourThousandPlus
   | "TECH" | "TECHNICAL" -> Technical
   | "SPCL" | "EXT" -> Specialization
-  | "LIBERAL" -> Liberal
+  | "LIBERAL" | "MQR" | "CA" | "HA" | "KCM" | "LA" | "SBA" -> Liberal
   | "APRV" | "ADVISOR" -> AdvisorApproved
   | "MAJ" | "MAJOR" -> MajorApproved
   | "PROJECT" | "PROJ" | "PRACTICUM" | "PRACT" -> Practicum
   | "EXTRA" -> Extra
-  | _ -> raise (UnknownCategory str)
+  | "LANG" | "LANGUAGE" | "FOREIGN" -> ForeignLanguage
+  | "PBS" | "PBSS" -> PBS
+  | "GB" -> GB
+  | "HB" -> HB
+  | _ -> raise (UnknownCategoryENG str)
 
 let gpa courses =
   let rec fold_credits courses acc =
@@ -174,15 +190,23 @@ let string_of_grade gr =
 
 let string_of_category cat =
   match cat with
+  | PE -> "PE"
+  | FWS -> "FWS"
+  | ENGRI -> "ENGRI"
+  | ENGRD -> "ENGRD"
   | Required -> "Required"
   | Core -> "Core"
   | FourThousandPlus -> "4000+"
   | Technical -> "Technical Elective"
   | Specialization -> "External Specialization"
   | Liberal -> "Liberal Studies"
-  | AdvisorApproved -> "Advisor Approved Elective"
-  | MajorApproved -> "Major Approved Elective"
-  | Practicum -> "Practicum/Project"
+  | AdvisorApproved -> "Advisor-Approved Elective"
+  | MajorApproved -> "Major-Approved Elective"
+  | Practicum -> "Practicum"
+  | ForeignLanguage -> "Foreign Language"
+  | GB -> "GB"
+  | HB -> "HB"
+  | PBS -> "PBS"
   | Extra -> "Extra Course"
 
 (** [sem_compare s1 s2] is a negative number if [s1] comes before [s2], 
@@ -221,7 +245,7 @@ let get_course_name course =
 let get_course_credits course = 
   course.credits
 
-let get_course_cat course =
+let get_course_cat course sch =
   string_of_category course.category
 
 let get_sem sch semid = 
@@ -368,7 +392,6 @@ let new_schedule name =
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = None;
-    major = "";
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
@@ -414,7 +437,7 @@ let print_course sch course =
   ANSITerminal.(print_string [Bold] course.name); print_newline ();
   print_endline ( "Credits: " ^ (string_of_int course.credits) );
   print_endline ( "Grade: " ^ (string_of_grade course.grade) );
-  print_endline ( "Category: " ^ (string_of_category course.category) );
+  print_endline ( "Category: " ^ (string_of_category course.category));
   let semid = (get_sem_from_course sch.semesters course).id in
   print_endline ("Semester: " ^ string_of_semid semid)
 
@@ -560,39 +583,24 @@ module LoadJSON = struct
 
   (** [form_grade grade] is the grade represented by [grade]. *)
   let form_grade grade = 
-    match grade with 
-    | "Sat" -> Sat
-    | "Unsat" -> Unsat
-    | "Withdrawn" -> Withdrawn
-    | "Incomplete" -> Incomplete
-    | _ -> Letter grade
+    gradify grade
 
-  (** [form_category cat] is the category represented by [category]. *)
+  (** [form_category cat] is the category represented by [cat]  *)
   let form_category cat =
-    match cat with
-    | "Required" -> Required
-    | "Core" -> Core
-    | "4000+" -> FourThousandPlus
-    | "Technical Elective" -> Technical
-    | "External Specialization" -> Specialization
-    | "Liberal Studies" -> Liberal
-    | "Advisor Approved Elective" -> AdvisorApproved
-    | "Major Approved Elective" -> MajorApproved
-    | "Practicum/Project" -> Practicum
-    | "Extra Course" -> Extra
-    | _ -> raise (UnknownCategory cat)
+    categorify cat
 
   (** [parse_course json] is a course generated from info found by 
       parsing [json]. *)
-  let parse_course json = {
-    name = json |> Yj.member "name" |> Yj.to_string;
-    credits = json |> Yj.member "course credits" |> Yj.to_int;
-    grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
-    category = json |> Yj.member "category" |> Yj.to_string |> form_category;
-  }
+  let parse_course json = 
+    {
+      name = json |> Yj.member "name" |> Yj.to_string;
+      credits = json |> Yj.member "course credits" |> Yj.to_int;
+      grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
+      category = json |> Yj.member "category" |> Yj.to_string |> form_category;
+    }
 
   (** [parse_semester json] is a semester generated from info found by 
-      parsing [json]. *)
+      parsing [json] when schedule is for school [school]. *)
   let parse_semester json = 
     {
       id = json |> Yj.member "semester id" |> Yj.to_string |> form_sem_id;
@@ -620,7 +628,6 @@ module LoadJSON = struct
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
       exp_grad = 
         json |> Yj.member "expected grad year" |> Yj.to_string |> form_sem_id;
-      major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
@@ -639,7 +646,7 @@ module SaveJSON = struct
     "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
     "\t\t\t\t\t\"course credits\": " ^ (string_of_int c.credits) ^ ",\n" ^
     "\t\t\t\t\t\"grade\": \"" ^ (string_of_grade c.grade) ^ "\",\n" ^
-    "\t\t\t\t\t\"category\": \"" ^ (string_of_category c.category) ^ "\"\n" ^
+    "\t\t\t\t\t\"category\": \"" ^ (string_of_category c.category) ^ "\"\n"^
     "\t\t\t\t},\n"
 
   (** [json_of_sem sem] is a string representation of [sem] that can be 
@@ -674,7 +681,6 @@ module SaveJSON = struct
     "\t\"cumul gpa\": "  ^ (gpa_to_string sch.cumul_gpa) ^ ",\n" ^
     "\t\"sch credits\": "  ^ (string_of_int sch.sch_credits) ^ ",\n" ^
     "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
-    "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
     "\t\"school\": \"" ^ sch.school ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
