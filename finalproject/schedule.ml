@@ -691,7 +691,7 @@ module LoadJSON = struct
       end
   (** [parse_course fl json] is a course generated from info found by 
       parsing [json]. *)
-  let parse_course json = 
+  let parse_course school json = 
     {
       name = json |> Yj.member "name" |> Yj.to_string;
       credits = json |> Yj.member "course credits" |> Yj.to_int;
@@ -700,12 +700,12 @@ module LoadJSON = struct
     }
 
   (** [parse_semester json] is a semester generated from info found by 
-      parsing [json]. *)
-  let parse_semester json = 
+      parsing [json] when schedule is for school [school]. *)
+  let parse_semester school json = 
     {
       id = json |> Yj.member "semester id" |> Yj.to_string |> form_sem_id;
       courses = json |> Yj.member "courses" |> Yj.to_list |> 
-                List.map parse_course;
+                List.map (parse_course school);
       tot_credits = json |> Yj.member "semester credits" |> Yj.to_int;
       sem_gpa = json |> Yj.member "semester gpa" |> Yj.to_float;
     }
@@ -721,17 +721,18 @@ module LoadJSON = struct
 
   let parse_json fl = 
     let json = Yojson.Basic.from_file fl in
+    let school = json |> Yj.member "school" |> Yj.to_string in
     {
       desc = json |> Yj.member "description" |> Yj.to_string;
       semesters = json |> Yj.member "semesters" |> Yj.to_list |> 
-                  List.map parse_semester;
+                  List.map (parse_semester school);
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
       exp_grad = 
         json |> Yj.member "expected grad year" |> Yj.to_string |> form_sem_id;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
-      school = json |> Yj.member "school" |> Yj.to_string;
+      school = school;
       valid = None
     }
 
