@@ -11,7 +11,7 @@
     MS1, our system was more complicated and simpler to test manually by
     running it. Manual testing was better for checking if courses and semesters
     were being added, edited, and removed correctly because a lot of our fields
-    were mutable -- which made them diffiuclt to test with OUnit cases.
+    were mutable -- which made them difficult to test with OUnit cases.
 
     Most of the testing was done after the function being tested was written,
     however, the person testing the function was not the same person who
@@ -120,9 +120,18 @@ let _ = add_sem edit_grade (create_sem (Fall 20))
 let _ = add_course edit_grade phys2213 (Fall 20)
 let _ = edit_course edit_grade "PHYS2213" "grade" "B"
 
-let missing_elts = new_schedule "Sch5"
-let _ = add_sem missing_elts (create_sem (Fall 20))
-let _ = add_sem missing_elts (create_sem (Spring 21))
+let unswapped = new_schedule "Sch5"
+let _ = add_sem unswapped (create_sem (Fall 20))
+let _ = add_sem unswapped (create_sem (Spring 21))
+let _ = add_course unswapped cs2800 (Spring 21)
+let _ = add_course unswapped cs3110 (Fall 20)
+
+let swapped = new_schedule "Sch6"
+let _ = add_sem swapped (create_sem (Fall 20))
+let _ = add_sem swapped (create_sem (Spring 21))
+let _ = add_course swapped cs2800 (Spring 21)
+let _ = add_course swapped cs3110 (Fall 20)
+let _ = swap_courses "CS2800" "CS3110" swapped
 
 let basic_schedule_tests = [
   make_list_test "Semesters are added to schedule successfully"
@@ -151,6 +160,15 @@ let basic_schedule_tests = [
     (get_gpa edit_creds_sch |> gpa_to_string);
   make_string_test "Edited course grade - check GPA" "3.00"
     (get_gpa edit_grade |> gpa_to_string);
+  make_string_tests "Schedule added two courses successfully" 
+    "CS3110CS2800" (string_of_sch unswapped);
+  make_string_tests "Schedule swapped the two courses in the previous test
+  successfully" "CS2800CS3110" (string_of_sch swapped);
+
+]
+
+let command_tests = [
+
 ]
 
 (*
@@ -219,7 +237,8 @@ let saved_schedule_tests = [
 let test_suite = [
   basic_schedule_tests;
   load_schedule_tests;
-  ical_tests
+  ical_tests;
+  command_tests;
 ]
 
 let suite = "Main Test Suite" >::: List.flatten test_suite

@@ -54,9 +54,9 @@ let format_sem_id str =
   let id = String.uppercase_ascii(String.sub str 0 2) in
   if id = "SP" || id = "FA" then true else false
 
-(** [guess_deg c_name] is the calculated estimate of a c_name's category 
+(** [guess_cat c_name] is the calculated estimate of a c_name's category 
     based on c_name. *)
-let guess_deg c_name = 
+let guess_cat c_name = 
   if String.sub c_name 0 2 = "PE" then Required
   else if String.sub c_name 0 5 = "ENGRI" then Required
   else if String.sub c_name 0 5 = "ENGRD" || c_name = "CS2110" || 
@@ -104,23 +104,23 @@ let add_others sch str_lst =
   | course_name::grade::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
-    let guessed_deg = guess_deg name in
-    print_endline ("Category Estimation: " ^ (string_of_category guessed_deg));
+    let guessed_cat = guess_cat name in
+    print_endline ("Category Estimation: " ^ (string_of_category guessed_cat));
     add_course sch 
       (create_course name 
          (get_course_creds name 
             (sem_id_parse sem_id)) 
-         (gradify grade) (guess_deg name)) 
+         (Schedule.gradify grade) (guessed_cat)) 
       (sem_id_parse sem_id)
   | course_name::credits::grade::sem_id::[] 
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
     (sem_exists (sem_ids_to_string sch) sem_id); 
     let name = String.uppercase_ascii course_name in
-    let guessed_deg = guess_deg name in
-    print_endline ("Category Estimation: " ^ (string_of_category guessed_deg));
+    let guessed_cat = guess_cat name in
+    print_endline ("Category Estimation: " ^ (string_of_category guessed_cat));
     add_course sch (create_course name
                       (int_of_string credits)
-                      (gradify grade) guessed_deg)
+                      (Schedule.gradify grade) guessed_cat)
       (sem_id_parse sem_id)
   | course_name::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
@@ -215,7 +215,7 @@ let import_handler sch str_lst =
                  (create_course name
                     (get_course_creds name 
                        (sem_id_parse semid))
-                    (gradify "none") (guess_deg name)) 
+                    (gradify "none") (guess_cat name)) 
                  (sem_id_parse semid) 
            with DuplicateCourse _ -> acc) sch' courses
     end
@@ -310,4 +310,3 @@ let parse_command sch cmd_str =
   | fst::others -> 
     let new_sch = match_helper fst others in
     autosave new_sch; new_sch
-
