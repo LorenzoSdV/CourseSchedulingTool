@@ -200,24 +200,24 @@ let export_handler sch str_lst =
 let import_handler sch str_lst = 
   match str_lst with
   | file :: [] -> begin
-      let courses, semid = 
+      let courses, sem_id = 
         try ICalParser.parse_file file 
         with Sys_error _ -> 
           raise InvalidFileForImport 
       in 
       let sch' = 
-        try (sem_exists (sem_ids_to_string sch) semid); sch
+        try (sem_exists (sem_ids_to_string sch) sem_id); sch
         with SemesterDoesNotExist -> 
-          add_sem sch (create_sem (sem_id_parse semid))
+          add_sem sch (create_sem (sem_id_parse sem_id))
       in
       List.fold_left 
         (fun acc name -> 
            try add_course acc 
                  (create_course name
                     (get_course_creds name 
-                       (sem_id_parse semid))
-                    (gradify "none") (guess_cat name)) 
-                 (sem_id_parse semid) 
+                       (sem_id_parse sem_id))
+                    (gradify "none") (guess_cat name (sem_id_parse sem_id))) 
+                 (sem_id_parse sem_id) 
            with DuplicateCourse _ -> acc) sch' courses
     end
   | _ -> raise MalformedImport
