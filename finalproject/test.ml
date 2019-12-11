@@ -152,6 +152,30 @@ let make_edit_course_test
   name >:: (fun _ -> assert_raises expected_output 
                (fun () -> edit_course sch cname attr new_val))
 
+(** [make_swap_courses_test name sch cname1 cname2 expected_output] 
+    constructs an OUnit test named [name] that asserts the quality of 
+    [expected_output] with [swap_courses cname1 cname2 sch]. *)
+let make_swap_courses_test
+    (name: string)
+    (sch: schedule)
+    (cname1: string)
+    (cname2: string)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> swap_courses cname1 cname2 sch))
+
+(** [make_move_course_test name sch cname semid expected_output] 
+    constructs an OUnit test named [name] that asserts the quality of 
+    [expected_output] with [move_course cname semid sch]. *)
+let make_move_course_test
+    (name: string)
+    (sch: schedule)
+    (cname: string)
+    (semid: sem_id)
+    (expected_output: exn) : test = 
+  name >:: (fun _ -> assert_raises expected_output 
+               (fun () -> move_course cname semid sch))
+
 (* 
     Code used in all test cases:
 *)
@@ -273,6 +297,10 @@ let basic_schedule_tests = [
     sch "CS2800" "location" "Hollister" (InvalidAttribute "location");
   make_edit_course_test "Schedule edits a course that doesn't exist"
     sch "BTRY3080" "credits" "3" (UnknownCourse "BTRY3080");
+  make_swap_courses_test "Schedule swaps courses in the same semester"
+    sch "CS2800" "CS3110" (InvalidSwap);
+  make_move_course_test "Schedule moves course to the semester its already in"
+    sch "CS2800" (Fall 19) (InvalidMove);
 ]
 
 (*

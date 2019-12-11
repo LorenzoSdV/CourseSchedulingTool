@@ -149,7 +149,8 @@ val remove_course : schedule -> string -> schedule
     Raises: [InvalidSwap] if [c1_name] and [c2_name] are in same semester. *)
 val swap_courses : string -> string -> schedule -> schedule
 
-(** [move_course c_name sem sch] is [sch] but with [c_name] moved to [sem] *)
+(** [move_course c_name sem sch] is [sch] but with [c_name] moved to [sem].
+    Raises: [InvalidMove] if [sem] is the semester the course is already in. *)
 val move_course : string -> sem_id -> schedule -> schedule
 
 (** [get_course name courses] is the course with name [name]
