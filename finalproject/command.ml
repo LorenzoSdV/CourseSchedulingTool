@@ -137,7 +137,9 @@ let add_others sch str_lst =
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
     (sem_exists (sem_ids_to_string sch) sem_id); 
     let name = String.uppercase_ascii course_name in
-    let guessed_cat = guess_cat name (sem_id_parse sem_id) in
+    let guessed_cat = if get_school sch = "ENG" 
+      then guess_catENG name (sem_id_parse sem_id) 
+      else guess_catCAS name (sem_id_parse sem_id) in
 
     let sch' = add_course sch (create_course name
                                  (int_of_string credits)
@@ -247,7 +249,10 @@ let import_handler sch str_lst =
                    (create_course name
                       (get_course_creds name 
                          (sem_id_parse sem_id))
-                      (gradify "none") (guess_cat name (sem_id_parse sem_id))) 
+                      (gradify "none") 
+                      (if get_school sch = "ENG" 
+                       then guess_catENG name (sem_id_parse sem_id) 
+                       else guess_catCAS name (sem_id_parse sem_id))) 
                    (sem_id_parse sem_id) 
              with DuplicateCourse _ -> acc) sch' courses 
       in ANSITerminal.print_string [Bold] "\nSuccessfully imported!\n";
