@@ -216,7 +216,7 @@ let import_handler sch str_lst =
                  (create_course name
                     (get_course_creds name 
                        (sem_id_parse semid))
-                    (gradify "none") "None") 
+                    (gradify "none") (guess_deg name)) 
                  (sem_id_parse semid) 
            with DuplicateCourse _ -> acc) sch' courses
     end

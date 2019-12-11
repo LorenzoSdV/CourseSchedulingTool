@@ -225,7 +225,7 @@ let get_course_credits course =
   course.credits
 
 let get_course_cat course =
-  (string_of_category course.category)
+  string_of_category course.category
 
 let get_sem sch semid = 
   let rec get_sem_loop sems semid' = 
