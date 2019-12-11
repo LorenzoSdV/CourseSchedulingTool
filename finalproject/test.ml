@@ -1,19 +1,28 @@
 (** TEST PLAN: 
-    We tested the functions in the Schedule and LoadJSON modules using OUnit
-    testing because these were the basic functions. Manual testing
-    was done once was the main.ml file was created and make run worked. 
+
+    We tested the functions in the Schedule, LoadJSON, SaveJSON, iCalParser, 
+    and classRoster modules using OUnit testing because these were the basic 
+    functions. For the rest of the code (main.ml, command.ml, requirements.ml),
+    we used manual/interactive testing. Obviously, this could only be done once
+    main.ml was funcitonal and "make run" worked. 
+
     Manual testing made sure loading and saving JSON files worked, exporting
     to HTML worked, the settings worked, and the basic functionality. After
     MS1, our system was more complicated and simpler to test manually by
     running it. Manual testing was better for checking if courses and semesters
     were being added, edited, and removed correctly because a lot of our fields
-    were mutable.
+    were mutable -- which made them diffiuclt to test with OUnit cases.
 
     Most of the testing was done after the function being tested was written,
     however, the person testing the function was not the same person who
     wrote it, therefore, most of the testing was black-box. The testing
     was based off of functions in schedule.mli and their documentation and 
-    not based on the implementation of the function.*)
+    not based on the implementation of the function.
+
+    We believe that (primarily) manual testing was a sufficient strategy for
+    this system because this is an interactive tool, and we felt the best way
+    to ensure its success was to thoroughly test it as the user would use it.
+*)
 
 open OUnit2
 open Schedule
@@ -78,7 +87,7 @@ let sch_rem_sem1 = remove_sem sch_rem_sem (Fall 19)
 let cs2800 = create_course "CS2800" 3 (Letter "C") "core"
 let cs4820 = create_course "CS4820" 4 (Letter "C+") "core"
 let phys2213 = create_course "PHYS2213" 4 (Letter "A-") "requirements"
-let cs3110 = create_course "CS3110" 4 (Letter "B") "core"
+let cs3110 = create_course "CS3110" 4 (Letter "B") "CORE"
 let add_course1 = add_course sch cs2800 (Fall 19)
 let add_course2 = add_course sch cs4820 (Spring 20)
 let add_course3 = add_course sch cs3110 (Fall 19)
