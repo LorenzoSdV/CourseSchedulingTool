@@ -57,7 +57,7 @@ let make_float_test
 (** [make_string_tests name expected_output actual_output] constructs an OUnit
     test named [name] that asserts the quality of [expected_output] with
     [actual_output] for strings. *)
-let make_string_tests
+let make_string_test
     (name: string)
     (expected_output: string) 
     (actual_output: string) : test = 
@@ -66,12 +66,13 @@ let make_string_tests
 (** [make_list_tests name expected_output actual_output] constructs an OUnit
     test named [name] that asserts the quality of [expected_output] with
     [actual_output] for lists. *)
-let make_list_tests
+let make_list_test
     (name: string)
     (expected_output: string list)
     (actual_output: string list) : test = 
   name >:: (fun _ -> assert_equal (List.sort_uniq compare expected_output)
-               (List.sort_uniq compare actual_output))   
+               (List.sort_uniq compare actual_output)
+               ~printer:Schedule.string_of_list)   
 
 (* 
     Code used in all test cases:
@@ -133,31 +134,31 @@ let _ = add_course swapped cs3110 (Fall 20)
 let _ = swap_courses "CS2800" "CS3110" swapped
 
 let basic_schedule_tests = [
-  make_list_tests "Semesters are added to schedule successfully"
+  make_list_test "Semesters are added to schedule successfully"
     ["FA19"; "SP20"] (sem_ids_to_string sch);
-  make_list_tests "Semester removed from schedule successfully" ["SP20"]
+  make_list_test "Semester removed from schedule successfully" ["SP20"]
     (sem_ids_to_string sch_rem_sem);
   make_int_test "Courses added to schedule successfully (number)" 
     4 (to_list sch |> List.length);
-  make_string_tests "Courses added to schedule successfully (print)"
+  make_string_test "Courses added to schedule successfully (print)"
     "CS3110CS2800PHYS2213CS4820" (string_of_sch sch);
   make_int_test "Schedule has correct number of credits" 15
     (get_credits sch);
-  make_string_tests "Schedule has correct GPA" "2.80"
+  make_string_test "Schedule has correct GPA" "2.80"
     (get_gpa sch |> gpa_to_string);
-  make_string_tests "Schedule correctly removed course (print)"
+  make_string_test "Schedule correctly removed course (print)"
     "CS4820CS3110" (string_of_sch sch_rem_sem);
   make_int_test "Schedule correctly removed course (number)"
     2 (to_list sch_rem_sem |> List.length);
   make_int_test "Removed course schedule has correct number of credits"
     8 (get_credits sch_rem_sem);
-  make_string_tests "Removed course schedule has correct GPA"
+  make_string_test "Removed course schedule has correct GPA"
     "2.65" (get_gpa sch_rem_sem |> gpa_to_string);
   make_int_test "Edited course credits - check num credits" 3 
     (get_credits edit_creds_sch);
-  make_string_tests "Edited course credits - check GPA" "3.70"
+  make_string_test "Edited course credits - check GPA" "3.70"
     (get_gpa edit_creds_sch |> gpa_to_string);
-  make_string_tests "Edited course grade - check GPA" "3.00"
+  make_string_test "Edited course grade - check GPA" "3.00"
     (get_gpa edit_grade |> gpa_to_string);
   make_string_tests "Schedule added two courses successfully" 
     "CS3110CS2800" (string_of_sch unswapped);
@@ -180,27 +181,32 @@ let sp20_courses = get_sem example_sch (Spring 20) |> get_sem_courses
 
 let load_schedule_tests = [
   make_int_test "Credits of example.json schedule" 15 (get_credits example_sch);
-  make_string_tests
+  make_string_test
     "Cumulative GPA for example.json" "3.03" 
     (gpa (to_list example_sch) |> gpa_to_string);
-  make_string_tests 
+  make_string_test 
     "Desc for example.json schedule" "Example Schedule" (get_name example_sch);
-  make_string_tests 
+  make_string_test 
     "FA19 GPA for example.json sch" "3.30" (gpa fa19_courses |> gpa_to_string);
   make_int_test "Correct number of courses in FA19 in example.json" 2
     (List.length fa19_courses);
-  make_string_tests 
+  make_string_test
     "SP20 GPA for example.json sch" "2.80" (gpa sp20_courses |> gpa_to_string);
   make_int_test "Correct number of courses in SP20 in example.json" 2
     (List.length sp20_courses);
-  make_string_tests "Sch is correct in example.json" 
+  make_string_test "Sch is correct in example.json" 
     "CS2800CS3110PHYS2213CS4820" (string_of_sch example_sch)
 ]
 
-let ical = ICalParser.parse_file "example.ics"
+let (ical_courses,ical_sem) = ICalParser.parse_file "example.ics"
 
 let ical_tests = [
-
+  make_string_test "Sem in example.ics is SP20" "SP20" ical_sem;
+  make_int_test 
+    "There are 6 courses in example.ics" 6 (List.length ical_courses);
+  make_list_test "Courses in iCal file"
+    [ "PSYCH1102"; "ECE4450"; "CS4820"; "CS4411"; "CS3300"; "BTRY3080" ]
+    ical_courses
 ]
 
 
