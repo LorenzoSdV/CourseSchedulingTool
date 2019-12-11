@@ -120,8 +120,8 @@ val add_course : schedule -> course -> sem_id -> schedule
 (** [edit_course sch c attr new_val] is the schedule that results from changing 
     the course field [attr] to [new_val] for course with name [c] in 
     schedule [sch]. 
-    Raises: [InvalidAttribute] with various error messages if [attr] is not a valid field
-    of course record, or [new_val] is not valid. 
+    Raises: [InvalidAttribute] with various error messages if [attr] is not a 
+    valid field of course record, or [new_val] is not valid. 
     Raises: [UnkownCourse c] if course is not in [sch]. *)
 val edit_course : schedule -> string -> string -> string -> schedule
 
