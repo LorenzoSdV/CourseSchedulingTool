@@ -114,9 +114,22 @@ and prompt sch =
     | UnknownSemester msg -> 
       exceptions sch ("Invalid/Unknown Semester: " ^ msg)
     | UnknownGrade msg -> 
-      exceptions sch ("Invalid/Unknown Grade Value: " ^ msg ^ 
-                      "\nValid grades: Letter grade, s/sat, u/unsat, 
-                      w/withdrawn, inc/incomplete, none, transfer")
+      exceptions sch ("Invalid/Unknown Grade: " ^ msg ^ 
+                      "\nValid grades: <letter_grade>, s/sat, u/unsat, "^
+                      "w/withdrawn, inc/incomplete, none, transfer")
+    | UnknownCategoryCAS msg ->
+      exceptions sch ("Invalid/Unknown CAS Category: " ^ msg ^
+                      "\nValid CAS Categories: PE, FWS, reqs/required, core, " ^ 
+                      "4000+, tech/technical, spcl/ext, maj/major, " ^ 
+                      "project/proj/practicum/pract, ENGRD, ENGRI, liberal, "^
+                      "aprv/advisor, extra")
+    | UnknownCategoryENG msg ->
+      exceptions sch ("Invalid/Unknown ENG Category: " ^ msg ^
+                      "\nValid ENG Categories: PE, FWS, reqs/required, core, " ^ 
+                      "4000+, tech/technical, spcl/ext, maj/major, " ^ 
+                      "project/proj/practicum/pract, lang/language/foreign, "^
+                      "PBS, PBSS, MQR, CA, HA, KCM, LA, SBA, GB, HB, GHB, "^
+                      "extra")
     | UnknownSetting msg ->
       exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
     | DuplicateCourse msg -> 
@@ -124,7 +137,7 @@ and prompt sch =
     | DuplicateSemester msg -> 
       exceptions sch ("Duplicate Semester Already Exists: " ^ msg)
     | InvalidAttribute msg ->
-      exceptions sch ("Invalid/Unknown Attribute: " ^ msg ^
+      exceptions sch ("Invalid/Unknown Edit Attribute: " ^ msg ^
                       "\nValid attributes: credits, grade, or category.")
     | InvalidSwap ->
       exceptions sch 

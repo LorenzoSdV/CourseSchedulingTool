@@ -13,8 +13,11 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer
            | Letter of string
 
 (** The type representing the category of a course. *)
-type category = Required | Core | FourThousandPlus | Technical | Specialization
-              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra
+type category = PE | FWS | ENGRI | ENGRD | Required | Core | FourThousandPlus | 
+                Technical | Specialization| Liberal | AdvisorApproved | 
+                MajorApproved | Practicum | Extra | ForeignLanguage | PBS_AS |
+                PBSS_AS | MQR_AS | CA_AS | HA_AS | KCM_AS | LA_AS | SBA_AS | 
+                GB | HB | GHB
 
 (** The type representing a course within a schedule. *)
 type course
@@ -53,13 +56,21 @@ exception UnknownSemester of string
     string representation of a grade. *)
 exception UnknownGrade of string
 
-(** [UnknownCategory cat] raised when function attempts to work with an invalid
-    category. *)
-exception UnknownCategory of string
+(** [UnknownCategory cat] raised when function attempts to work with invalid
+    category of an ENG schedule. *)
+exception UnknownCategoryENG of string
+
+(** [UnknownCategory cat] raised when function attempts to work with invalid
+    category of a CAS schedule. *)
+exception UnknownCategoryCAS of string
 
 (** [UnknownGrade grd] raised when function attempts to work with invalid 
     setting for schedule. *)
 exception UnknownSetting of string
+
+(** [UnknownSchool school] raised when function attempts to work with invalid 
+    school. *)
+exception UnknownSchool of string
 
 (** [DuplicateCourse nm] raised when course with name [nm] is added to a
     semester where a course with same name already exists. *)
@@ -98,13 +109,16 @@ val string_of_list : string list -> string
     representation. *)
 val gradify : string -> grade
 
-(** [categorify str] is the category represented by [str] where [str] is some 
-    category value represented as a string.
+(** [check_school school] is whether or not school is CAS/ENG. *)
+val check_school : string -> bool
+
+(** [categorify str sch] is the category represented by [str] in [sch] where 
+    [str] is some category value represented as a string.
     Requires: [str] is a valid string rep of a category, like: 
     "Core" or "Required". 
     Raises: [UnknownCategory str] if [str] is not a valid grade 
     representation. *)
-val categorify : string -> category
+val categorify : string -> schedule -> category
 
 (** [create_course name cred gr cat] is a new course type with name [name], 
     number of credits [cred], grade [gr], and category [cat]. *)
@@ -200,9 +214,9 @@ val string_of_semid : sem_id -> string
 (** [string_of_grade gr] is the string representation of a grade [gr]. *)
 val string_of_grade : grade -> string
 
-(** [string_of_category cat] is the string representation of a category 
-    [cat]. *)
-val string_of_category : category -> string
+(** [string_of_category cat sch] is the string representation of a category 
+    [cat] in [sch]. *)
+val string_of_category : category -> schedule -> string
 
 (** [sem_ids sch] is the list of semester ids from each semester in 
     schedule [sch]. *)

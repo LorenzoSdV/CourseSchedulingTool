@@ -3,8 +3,11 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer
 
 type sem_id = Spring of int | Fall of int | None
 
-type category = Required | Core | FourThousandPlus | Technical | Specialization
-              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra 
+type category = PE | FWS | ENGRI | ENGRD | Required | Core | FourThousandPlus | 
+                Technical | Specialization| Liberal | AdvisorApproved | 
+                MajorApproved | Practicum | Extra | ForeignLanguage | PBS_AS |
+                PBSS_AS | MQR_AS | CA_AS | HA_AS | KCM_AS | LA_AS | SBA_AS | 
+                GB | HB | GHB 
 
 type course = {
   name: string;
@@ -38,7 +41,6 @@ type schedule = {
   mutable semesters: semester list;
   mutable cumul_gpa: float;
   mutable exp_grad: sem_id;
-  mutable major: string;
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
@@ -49,8 +51,10 @@ type schedule = {
 exception UnknownCourse of string
 exception UnknownSemester of string
 exception UnknownGrade of string
-exception UnknownCategory of string
+exception UnknownCategoryENG of string
+exception UnknownCategoryCAS of string
 exception UnknownSetting of string
+exception UnknownSchool of string
 exception DuplicateCourse of string
 exception DuplicateSemester of string
 exception InvalidCredits of string
@@ -95,19 +99,57 @@ let gradify str =
     | "TRANSFER" -> Transfer
     | _ -> raise (UnknownGrade str)
 
-let categorify str =
-  match String.uppercase_ascii str with
-  | "REQ" | "REQUIRED" -> Required
-  | "CORE" -> Core
-  | "4000+" -> FourThousandPlus
-  | "TECH" | "TECHNICAL" -> Technical
-  | "SPCL" | "EXT" -> Specialization
-  | "LIBERAL" -> Liberal
-  | "APRV" | "ADVISOR" -> AdvisorApproved
-  | "MAJ" | "MAJOR" -> MajorApproved
-  | "PROJECT" | "PROJ" | "PRACTICUM" | "PRACT" -> Practicum
-  | "EXTRA" -> Extra
-  | _ -> raise (UnknownCategory str)
+let check_school school =
+  match school with
+  | "CAS" | "ENG" -> true
+  | _ -> raise (UnknownSchool school)
+
+let categorify str sch =
+  if sch.school = "ENG" then begin
+    match str with
+    | "PE" -> PE
+    | "FWS" -> FWS
+    | "ENGRI" -> ENGRI
+    | "ENGRD" -> ENGRD
+    | "REQ" | "REQUIRED" -> Required
+    | "CORE" -> Core
+    | "4000+" -> FourThousandPlus
+    | "TECH" | "TECHNICAL" -> Technical
+    | "SPCL" | "EXT" -> Specialization
+    | "LIBERAL" -> Liberal
+    | "APRV" | "ADVISOR" -> AdvisorApproved
+    | "MAJ" | "MAJOR" -> MajorApproved
+    | "PROJECT" | "PROJ" | "PRACTICUM" | "PRACT" -> Practicum
+    | "EXTRA" -> Extra
+    | _ -> raise (UnknownCategoryENG str)
+  end
+  else 
+    begin
+      match str with
+      | "PE" -> PE
+      | "FWS" -> FWS
+      | "REQ" | "REQUIRED" -> Required
+      | "CORE" -> Core
+      | "4000+" -> FourThousandPlus
+      | "TECH" | "TECHNICAL" -> Technical
+      | "SPCL" | "EXT" -> Specialization
+      | "MAJ" | "MAJOR" -> MajorApproved
+      | "PROJECT" | "PROJ" | "PRACTICUM" | "PRACT" -> Practicum
+      | "EXTRA" -> Extra
+      | "LANG" | "LANGUAGE" | "FOREIGN" -> ForeignLanguage
+      | "PBS" -> PBS_AS
+      | "PBSS" -> PBSS_AS
+      | "MQR" -> MQR_AS
+      | "CA" -> CA_AS
+      | "HA" -> HA_AS
+      | "KCM" -> KCM_AS
+      | "LA" -> LA_AS
+      | "SBA" -> SBA_AS
+      | "GB" -> GB
+      | "HB" -> HB
+      | "GHB" -> GHB
+      | _ -> raise (UnknownCategoryCAS str)
+    end
 
 let gpa courses =
   let rec fold_credits courses acc =
@@ -172,18 +214,52 @@ let string_of_grade gr =
   | Transfer -> "Transfer"
   | Letter l -> l
 
-let string_of_category cat =
-  match cat with
-  | Required -> "Required"
-  | Core -> "Core"
-  | FourThousandPlus -> "4000+"
-  | Technical -> "Technical Elective"
-  | Specialization -> "External Specialization"
-  | Liberal -> "Liberal Studies"
-  | AdvisorApproved -> "Advisor Approved Elective"
-  | MajorApproved -> "Major Approved Elective"
-  | Practicum -> "Practicum/Project"
-  | Extra -> "Extra Course"
+let string_of_category cat sch =
+  if sch.school = "ENG" then begin
+    match cat with
+    | PE -> "PE"
+    | FWS -> "FWS"
+    | ENGRI -> "ENGRI"
+    | ENGRD -> "ENGRD"
+    | Required -> "Required"
+    | Core -> "Core"
+    | FourThousandPlus -> "4000+"
+    | Technical -> "Technical Elective"
+    | Specialization -> "External Specialization"
+    | Liberal -> "Liberal Studies"
+    | AdvisorApproved -> "Advisor Approved Elective"
+    | MajorApproved -> "Major Approved Elective"
+    | Practicum -> "Practicum/Project"
+    | Extra -> "Extra Course"
+    | _ -> raise (UnknownCategoryENG "")
+  end
+  else 
+    begin
+      match cat with
+      | PE -> "PE"
+      | FWS -> "FWS"
+      | Required -> "Required"
+      | Core -> "Core"
+      | FourThousandPlus -> "4000+"
+      | Technical -> "Technical Elective"
+      | Specialization -> "External Specialization"
+      | MajorApproved -> "Major Approved Elective"
+      | Practicum -> "Practicum/Project"
+      | Extra -> "Extra Course"
+      | ForeignLanguage -> "Foreign Language"
+      | PBS_AS -> "PBS-AS"
+      | PBSS_AS -> "PBSS-AS"
+      | MQR_AS -> "MQR-AS"
+      | CA_AS -> "CA-AS"
+      | HA_AS -> "HA-AS"
+      | KCM_AS -> "KCM-AS"
+      | LA_AS -> "LA-AS"
+      | SBA_AS -> "SBA-AS"
+      | GB -> "GB"
+      | HB -> "HB"
+      | GHB -> "GHB"
+      | _ -> raise (UnknownCategoryCAS "")
+    end
 
 (** [sem_compare s1 s2] is a negative number if [s1] comes before [s2], 
     0 if theyre the same semester, and a positive number if [s1] comes after
@@ -283,7 +359,7 @@ let edit_course sch cname attr new_val =
       sem.sem_gpa <- gpa sem.courses;
       sch.cumul_gpa <- gpa (to_list sch); sch.is_saved <- false; sch
     | "category" -> 
-      course.category <- categorify (String.uppercase_ascii new_val); 
+      course.category <- categorify (String.uppercase_ascii new_val) sch; 
       sch.is_saved <- false; sch
     | _ -> raise (InvalidAttribute attr)
   with
@@ -368,7 +444,6 @@ let new_schedule name =
     semesters = [];
     cumul_gpa = 0.;
     exp_grad = None;
-    major = "";
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
@@ -414,7 +489,7 @@ let print_course sch course =
   ANSITerminal.(print_string [Bold] course.name); print_newline ();
   print_endline ( "Credits: " ^ (string_of_int course.credits) );
   print_endline ( "Grade: " ^ (string_of_grade course.grade) );
-  print_endline ( "Category: " ^ (string_of_category course.category) );
+  print_endline ( "Category: " ^ (string_of_category course.category sch) );
   let semid = (get_sem_from_course sch.semesters course).id in
   print_endline ("Semester: " ^ string_of_semid semid)
 
@@ -450,19 +525,19 @@ module HTML = struct
     in
     input_file "" (open_in "temp.html")
 
-  (** [html_of_course c] is a string representation of [c] in raw, 
+  (** [html_of_course c sch] is a string representation of [c] in raw, 
       valid HTML form. *) 
-  let html_of_course c =
+  let html_of_course c sch =
     "\t\t\t\t<td>\n" ^ 
     "\t\t\t\t\t<h4><strong>" ^ c.name ^ "</strong></h4>\n" ^ 
     "\t\t\t\t\t<p>Credits: " ^ (string_of_int c.credits) ^ "</p>\n" ^
     "\t\t\t\t\t<p>Grade: " ^ (string_of_grade c.grade) ^ "</p>\n" ^ 
-    "\t\t\t\t\t<p>Category: " ^ (string_of_category c.category) ^ "</p>\n" ^ 
+    "\t\t\t\t\t<p>Category: " ^ (string_of_category c.category sch) ^ "</p>\n" ^ 
     "\t\t\t\t</td>\n"
 
-  (** [html_of_sem sem] is a string representation of [sem] in raw, 
+  (** [html_of_sem sem sch] is a string representation of [sem] in raw, 
       valid HTML form. *)  
-  let html_of_sem sem =
+  let html_of_sem sem sch =
     match sem.courses with
     | [] -> "\t\t\t<tr><td class=\"noborder\"><h3>" ^ (string_of_semid sem.id) ^ 
             "</h3></td></tr>\n"
@@ -471,7 +546,7 @@ module HTML = struct
         "</h3>\n" ^
         "\t\t\t<p>Semester GPA: <strong>" ^ (gpa_to_string sem.sem_gpa) ^ 
         "</strong></p></td>\n" ^ 
-        (List.fold_left (fun acc course -> acc ^ (html_of_course course)) 
+        (List.fold_left (fun acc course -> acc ^ (html_of_course course sch)) 
            "" sem.courses) ^ 
         "\t\t\t</tr>\n" end
 
@@ -488,7 +563,7 @@ module HTML = struct
         "\t\t<h2>Total Credits: <strong style=\"color:red;\">" ^ 
         (string_of_int sch.sch_credits) ^ "</strong></h2>\n" ^ 
         "\t\t<table>\n" ^ 
-        (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem)) 
+        (List.fold_left (fun acc sem -> acc ^ (html_of_sem sem sch)) 
            "" (get_sems sch)) ^ 
         "\t\t</table>\n" end
 
@@ -567,8 +642,9 @@ module LoadJSON = struct
     | "Incomplete" -> Incomplete
     | _ -> Letter grade
 
-  (** [form_category cat] is the category represented by [category]. *)
-  let form_category cat =
+  (** [form_category school cat] is the category represented by [category] 
+      of [school]. *)
+  let form_category school cat =
     match cat with
     | "Required" -> Required
     | "Core" -> Core
@@ -580,16 +656,20 @@ module LoadJSON = struct
     | "Major Approved Elective" -> MajorApproved
     | "Practicum/Project" -> Practicum
     | "Extra Course" -> Extra
-    | _ -> raise (UnknownCategory cat)
+    | _ -> raise (UnknownCategoryENG cat)
 
   (** [parse_course json] is a course generated from info found by 
       parsing [json]. *)
-  let parse_course json = {
-    name = json |> Yj.member "name" |> Yj.to_string;
-    credits = json |> Yj.member "course credits" |> Yj.to_int;
-    grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
-    category = json |> Yj.member "category" |> Yj.to_string |> form_category;
-  }
+  let parse_course fl json = 
+    let school = Yj.to_string (Yj.member "school" (Yojson.Basic.from_file fl)) 
+    in
+    {
+      name = json |> Yj.member "name" |> Yj.to_string;
+      credits = json |> Yj.member "course credits" |> Yj.to_int;
+      grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
+      category = json |> Yj.member "category" |> Yj.to_string |> 
+                 form_category school;
+    }
 
   (** [parse_semester json] is a semester generated from info found by 
       parsing [json]. *)
@@ -620,7 +700,6 @@ module LoadJSON = struct
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
       exp_grad = 
         json |> Yj.member "expected grad year" |> Yj.to_string |> form_sem_id;
-      major = json |> Yj.member "major" |> Yj.to_string;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
@@ -632,19 +711,19 @@ end
 
 module SaveJSON = struct
 
-  (** [json_of_course c] is a string representation of [c] that can be 
+  (** [json_of_course c sch] is a string representation of [c] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
-  let json_of_course c = 
+  let json_of_course c sch = 
     "\t\t\t\t{\n" ^
     "\t\t\t\t\t\"name\": \"" ^ c.name ^ "\",\n" ^
     "\t\t\t\t\t\"course credits\": " ^ (string_of_int c.credits) ^ ",\n" ^
     "\t\t\t\t\t\"grade\": \"" ^ (string_of_grade c.grade) ^ "\",\n" ^
-    "\t\t\t\t\t\"category\": \"" ^ (string_of_category c.category) ^ "\"\n" ^
+    "\t\t\t\t\t\"category\": \"" ^ (string_of_category c.category sch) ^ "\"\n"^
     "\t\t\t\t},\n"
 
   (** [json_of_sem sem] is a string representation of [sem] that can be 
       stored in a JSON file and later interpreted by Yojson.Basic *)
-  let json_of_sem sem = 
+  let json_of_sem sem sch = 
     let reg = Str.regexp "},\n$" in
     "\t\t{\n" ^
     "\t\t\t\"semester id\": \"" ^ (string_of_semid sem.id) ^ "\",\n" ^
@@ -652,7 +731,7 @@ module SaveJSON = struct
     "\t\t\t\"semester gpa\": " ^ (gpa_to_string sem.sem_gpa) ^ ",\n" ^
     "\t\t\t\"courses\": [\n" ^ 
     (Str.replace_first reg "}\n" 
-       (List.fold_left (fun acc course -> acc ^ (json_of_course course)) 
+       (List.fold_left (fun acc course -> acc ^ (json_of_course course sch)) 
           "" (sem.courses))) ^
     "\t\t\t]\n\t\t},\n"
 
@@ -674,12 +753,11 @@ module SaveJSON = struct
     "\t\"cumul gpa\": "  ^ (gpa_to_string sch.cumul_gpa) ^ ",\n" ^
     "\t\"sch credits\": "  ^ (string_of_int sch.sch_credits) ^ ",\n" ^
     "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
-    "\t\"major\": \"" ^ sch.major ^ "\",\n" ^
     "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
     "\t\"school\": \"" ^ sch.school ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
     (Str.replace_first reg "}\n" 
-       (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem)) 
+       (List.fold_left (fun acc sem -> acc ^ (json_of_sem sem sch)) 
           "" (sch.semesters))) ^
     "\t]\n}\n"
 

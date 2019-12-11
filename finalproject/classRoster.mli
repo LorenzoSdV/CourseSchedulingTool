@@ -36,7 +36,7 @@ val get_breadth_status : string -> sem_id -> bool
     Raises: [UnkownCourse nm] if course name isn not a valid course. 
             [InvalidURL] if information can't be obtained from class roster
     for any reason. *)
-val has_distribution_categroy : string -> sem_id -> bool
+val has_distribution_category : string -> sem_id -> bool
 
 (** [string_of_url url] is the source HTML at URL [url].
     Raises: [InvalidURL] if [url] is not a valid URL or ocurl cannot
