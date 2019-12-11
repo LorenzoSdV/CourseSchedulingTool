@@ -143,6 +143,7 @@ let requiredCAS_check c_name =
 (** [guess_catCAS c_name sem_id] is the calculated estimate of a c_name's 
     category based on c_name in CAS. *)
 let guess_catCAS c_name sem_id =
+  let distribution = distribution_category c_name sem_id in
   if String.sub c_name 0 2 = "PE" then PE
   else if get_FWS_status c_name sem_id then FWS 
   else if practicum_check c_name then Practicum
@@ -151,6 +152,16 @@ let guess_catCAS c_name sem_id =
   else if four_thousand_plus_check c_name then FourThousandPlus
   else if technical_check c_name || c_name = "MATH2930" then Technical
   else if language_check c_name then ForeignLanguage
+  else if breadth_category c_name sem_id = "(GB)" then GB
+  else if breadth_category c_name sem_id = "(HB)" then HB
+  else if breadth_category c_name sem_id = "(GHB)" then GHB
+  else if distribution = "(CA-AS)" then CA_AS
+  else if distribution = "(HA-AS)" then HA_AS
+  else if distribution = "(KCM-AS)" then KCM_AS
+  else if distribution = "(LA-AS)" then LA_AS
+  else if distribution = "(SBA-AS)" then SBA_AS
+  else if distribution = "(PBS-AS)" then PBS_AS
+  else if distribution = "(PBSS-AS)" then PBSS_AS
   else Specialization
 
 (** [add_others sch str_lst] is [sch] after parsing [str_lst] and adding a 
