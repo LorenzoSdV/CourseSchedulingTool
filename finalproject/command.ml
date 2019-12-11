@@ -57,12 +57,13 @@ let format_sem_id str =
 (** [guess_cat c_name] is the calculated estimate of a c_name's category 
     based on c_name. *)
 let guess_cat c_name sem_id = 
-  if String.sub c_name 0 2 = "PE" then Required
-  else if get_FWS_status c_name sem_id then Required
-  else if String.sub c_name 0 5 = "ENGRI" then Required
+  if String.sub c_name 0 2 = "PE" then PE
+  else if get_FWS_status c_name sem_id then FWS
+  else if String.sub c_name 0 5 = "ENGRI" then ENGRI
   else if String.sub c_name 0 5 = "ENGRD" || c_name = "CS2110" || 
-          c_name = "CS2112" then Required
-  else if String.sub c_name ((String.length c_name) - 1) 1 = "1" then Practicum
+          c_name = "CS2112" then ENGRD
+  else if String.sub c_name ((String.length c_name) - 1) 1 = "1"
+       && String.sub c_name 0 3 = "CS4" then Practicum
   else if c_name = "CS1110" || c_name = "CS1112" || c_name = "MATH1910" ||
           c_name = "MATH1920" || c_name = "MATH2940" || c_name = "CHEM2090" ||
           c_name = "CHEM2080" || c_name = "CHEM2150" || c_name = "BTRY3080" || 
@@ -151,10 +152,8 @@ let edit_others sch str_lst =
   | "name"::new_val::[] -> edit_name sch new_val
   | "school"::school::[] -> begin
       let school' = (String.uppercase_ascii school) in
-      if (school' = "CAS" || school' = "ENG") then
-        (set_school sch school'; sch)
-      else
-        raise MalformedEdit
+      ignore(check_school school');
+      set_school sch school'; sch
     end
   | course_name::field::new_val::[] ->
     edit_course sch (String.uppercase_ascii course_name) field new_val
