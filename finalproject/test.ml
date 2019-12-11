@@ -99,6 +99,11 @@ let edit_grade1 = add_sem edit_grade (create_sem (Fall 20))
 let edit_grade2 = add_course edit_grade phys2213 (Fall 20)
 let edit_grade3 = edit_course edit_grade "PHYS2213" "grade" "B"
 
+let missing_elts = new_schedule "Sch5"
+let missing_elts1 = add_sem missing_elts (create_sem (Fall 20))
+let missing_elts2 = add_sem missing_elts (create_sem (Spring 21))
+
+
 (*let sch2 = add_sem sch fall_sem
   let cs3110 = create_course "CS3110" 4 (Letter "B") "CScore"
   let cs2800 = create_course "CS2800" 3 (Letter "C") "CScore"

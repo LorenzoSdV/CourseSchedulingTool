@@ -57,10 +57,6 @@ exception InvalidFileForSave
 (** Raised when Add command is given a semester that has not been added. *)
 exception SemesterDoesNotExist
 
-(** [save_handler sch str_lst] is [sch] after parsing [str_lst] and saving
-    schedule to file based on args in [str_lst]. *)
-val save_handler : schedule -> string list -> schedule
-
 (** [parse_command sch cmd_str] parses [cmd_str] to be an action performed on
     [sch] to produce a new schedule. The first word (i.e., consecutive sequence 
     of non-space characters) of [str] becomes the verb. The rest of the words,
