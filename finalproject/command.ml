@@ -54,9 +54,9 @@ let format_sem_id str =
   let id = String.uppercase_ascii(String.sub str 0 2) in
   if id = "SP" || id = "FA" then true else false
 
-(** [guess_deg c_name] is the calculated estimate of a c_name's category 
+(** [guess_cat c_name] is the calculated estimate of a c_name's category 
     based on c_name. *)
-let guess_deg c_name = 
+let guess_cat c_name = 
   if String.sub c_name 0 2 = "PE" then "PE"
   else if String.sub c_name 0 5 = "ENGRI" then "ENGRI"
   else if String.sub c_name 0 5 = "ENGRD" || c_name = "CS2110" || 
@@ -84,8 +84,9 @@ let guess_deg c_name =
           || String.sub c_name 0 5 = "CHEM3" || String.sub c_name 0 5 = "CHEM4"
           || String.sub c_name 0 5 = "CHEM5" || String.sub c_name 0 4 = "BIO3"
           || String.sub c_name 0 4 = "BIO4" || String.sub c_name 0 4 = "BIO5"
-          || String.sub c_name 0 3 = "CS3" || c_name = "ENGRD2700" 
-          || c_name = "MATH2930"
+          || String.sub c_name 0 3 = "CS3" || c_name = "ENGRD2700" || 
+          String.sub c_name 0 4 = "ECE3" || String.sub c_name 0 4 = "ECE4"
+          || String.sub c_name 0 4 = "ECE5" || c_name = "MATH2930"
   then "TECH"
   else 
   if not(Str.string_match 
@@ -104,23 +105,23 @@ let add_others sch str_lst =
   | course_name::grade::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
-    let guessed_deg = guess_deg name in
-    print_endline ("Category Estimation: " ^ guessed_deg);
+    let guessed_cat = guess_cat name in
+    print_endline ("Category Estimation: " ^ guessed_cat);
     add_course sch 
       (create_course name 
          (get_course_creds name 
             (sem_id_parse sem_id)) 
-         (Schedule.gradify grade) (guess_deg name)) 
+         (Schedule.gradify grade) (guessed_cat)) 
       (sem_id_parse sem_id)
   | course_name::credits::grade::sem_id::[] 
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
     (sem_exists (sem_ids_to_string sch) sem_id); 
     let name = String.uppercase_ascii course_name in
-    let guessed_deg = guess_deg name in
-    print_endline ("Category Estimation: " ^ guessed_deg);
+    let guessed_cat = guess_cat name in
+    print_endline ("Category Estimation: " ^ guessed_cat);
     add_course sch (create_course name
                       (int_of_string credits)
-                      (Schedule.gradify grade) guessed_deg)
+                      (Schedule.gradify grade) guessed_cat)
       (sem_id_parse sem_id)
   | course_name::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
@@ -310,4 +311,3 @@ let parse_command sch cmd_str =
   | fst::others -> 
     let new_sch = match_helper fst others in
     autosave new_sch; new_sch
-

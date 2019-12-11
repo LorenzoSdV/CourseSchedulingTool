@@ -180,7 +180,7 @@ let string_of_category cat =
   | Required -> "Required"
   | Core -> "Core"
   | FourThousandPlus -> "4000+"
-  | Technical -> "Technical ELective"
+  | Technical -> "Technical Elective"
   | Specialization -> "External Specialization"
   | Liberal -> "Liberal Studies"
   | AdvisorApproved -> "Advisor Approved Elective"
@@ -570,13 +570,28 @@ module LoadJSON = struct
     | "Incomplete" -> Incomplete
     | _ -> Letter grade
 
+  (** [form_category cat] is the category represented by [category]. *)
+  let form_category cat =
+    match cat with
+    | "Required" -> Required
+    | "Core" -> Core
+    | "4000+" -> FourThousandPlus
+    | "Technical Elective" -> Technical
+    | "External Specialization" -> Specialization
+    | "Liberal Studies" -> Liberal
+    | "Advisor Approved Elective" -> AdvisorApproved
+    | "Major Approved Elective" -> MajorApproved
+    | "Practicum/Project" -> Practicum
+    | "Extra Course" -> Extra
+    | _ -> raise (UnknownCategory cat)
+
   (** [parse_course json] is a course generated from info found by 
       parsing [json]. *)
   let parse_course json = {
     name = json |> Yj.member "name" |> Yj.to_string;
     credits = json |> Yj.member "course credits" |> Yj.to_int;
     grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
-    category = json |> Yj.member "category" |> Yj.to_string |> categorify;
+    category = json |> Yj.member "category" |> Yj.to_string |> form_category;
   }
 
   (** [parse_semester json] is a semester generated from info found by 
