@@ -193,7 +193,7 @@ let btry3080 = create_course "BTRY3080" 4 (Letter "A") Required
     Schedule module tests
 *)
 
-let sch = new_schedule "Sch1"
+let sch = new_schedule "Sch1" "ENG"
 let _ = add_sem sch fall19
 let _ = add_sem sch sp20
 let _ = add_course sch cs2800 (Fall 19)
@@ -201,7 +201,7 @@ let _ = add_course sch cs4820 (Spring 20)
 let _ = add_course sch cs3110 (Fall 19)
 let _ = add_course sch phys2213 (Spring 20)
 
-let sch_rem_sem = new_schedule "Sch2"
+let sch_rem_sem = new_schedule "Sch2" "ENG"
 let _ = add_sem sch_rem_sem (create_sem (Fall 19))
 let _ = add_sem sch_rem_sem (create_sem (Spring 20))
 let _ = remove_sem sch_rem_sem (Fall 19)
@@ -210,37 +210,37 @@ let _ = add_course sch_rem_sem cs3110 (Spring 20)
 let _ = add_course sch_rem_sem cs4820 (Spring 20)
 let _ = remove_course sch_rem_sem "CS2800"
 
-let edit_creds_sch = new_schedule "Sch3"
+let edit_creds_sch = new_schedule "Sch3" "ENG"
 let _ = add_sem edit_creds_sch (create_sem (Fall 20))
 let _ = add_course edit_creds_sch phys2213 (Fall 20)
 let _ = edit_course edit_creds_sch "PHYS2213" "credits" "3"
 
-let edit_grade = new_schedule "Sch4"
+let edit_grade = new_schedule "Sch4" "ENG"
 let _ = add_sem edit_grade (create_sem (Fall 20))
 let _ = add_course edit_grade phys2213 (Fall 20)
 let _ = edit_course edit_grade "PHYS2213" "grade" "B"
 
-let unswapped = new_schedule "Sch5"
+let unswapped = new_schedule "Sch5" "CAS"
 let _ = add_sem unswapped (create_sem (Fall 20))
 let _ = add_sem unswapped (create_sem (Spring 21))
 let _ = add_course unswapped cs2800 (Spring 21)
 let _ = add_course unswapped cs3110 (Fall 20)
 
-let swapped = new_schedule "Sch6"
+let swapped = new_schedule "Sch6" "CAS"
 let _ = add_sem swapped (create_sem (Fall 20))
 let _ = add_sem swapped (create_sem (Spring 21))
 let _ = add_course swapped cs2800 (Spring 21)
 let _ = add_course swapped cs3110 (Fall 20)
 let _ = swap_courses "CS2800" "CS3110" swapped
 
-let unmoved = new_schedule "Sch7"
+let unmoved = new_schedule "Sch7" "CAS"
 let _ = add_sem unmoved (create_sem (Fall 20))
 let _ = add_sem unmoved (create_sem (Spring 21))
 let _ = add_course unmoved cs2800 (Spring 21)
 let _ = add_course unmoved cs3110 (Fall 20)
 let _ = add_course unmoved cs4820 (Spring 21)
 
-let moved = new_schedule "Sch8"
+let moved = new_schedule "Sch8" "CAS"
 let _ = add_sem moved (create_sem (Fall 20))
 let _ = add_sem moved (create_sem (Spring 21))
 let _ = add_course moved cs2800 (Spring 21)
