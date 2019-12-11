@@ -25,8 +25,7 @@ exception SemesterDoesNotExist
 (** [is_valid_coursename str] is [true] if [str] has the correct format of a 
     Cornell class. *)
 let is_valid_coursename str =
-  if (Str.string_match (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") str 0) 
-  then true else false 
+  (Str.string_match (Str.regexp "^[A-Z][A-Z]+[0-9][0-9][0-9][0-9]$") str 0) 
 
 (** [sem_id_parse semid] is [sem_id] where [semid] is the string 
     representation of [sem_id]. 
@@ -52,11 +51,11 @@ let rec sem_exists sem_id_lst sem_id =
     of a semester id. *)
 let format_sem_id str =
   let id = String.uppercase_ascii(String.sub str 0 2) in
-  if id = "SP" || id = "FA" then true else false
+  (id = "SP" || id = "FA")
 
-(** [guess_cat c_name] is the calculated estimate of a c_name's category 
-    based on c_name. *)
-let guess_cat c_name sem_id = 
+(** [guess_catENG c_name sem_id] is the calculated estimate of a c_name's category 
+    based on c_name in ENG. *)
+let guess_catENG c_name sem_id = 
   if String.sub c_name 0 2 = "PE" then PE
   else if get_FWS_status c_name sem_id then FWS
   else if String.sub c_name 0 5 = "ENGRI" then ENGRI
@@ -84,16 +83,31 @@ let guess_cat c_name sem_id =
           || String.sub c_name 0 5 = "ECON5" || String.sub c_name 0 5 = "MATH3" 
           || String.sub c_name 0 5 = "MATH4" || String.sub c_name 0 5 = "MATH5"
           || String.sub c_name 0 5 = "CHEM3" || String.sub c_name 0 5 = "CHEM4"
-          || String.sub c_name 0 5 = "CHEM5" || String.sub c_name 0 4 = "BIO3"
-          || String.sub c_name 0 4 = "BIO4" || String.sub c_name 0 4 = "BIO5"
-          || String.sub c_name 0 3 = "CS3" || c_name = "ENGRD2700" 
-          || c_name = "MATH2930"
+          || String.sub c_name 0 5 = "CHEM5" || String.sub c_name 0 6 = "BIOEE3"
+          || String.sub c_name 0 6 = "BIOEE4" 
+          || String.sub c_name 0 6 = "BIOEE5" || String.sub c_name 0 3 = "CS3" 
+          || c_name = "ENGRD2700" || c_name = "MATH2930"
   then Technical
   else 
   if not(Str.string_match 
            (Str.regexp "^[A-Z][A-Z]+[0-2][0-9][0-9][0-9]$") c_name 0)
   then Specialization
   else Liberal
+
+(** [guess_catCAS c_name sem_id] is the calculated estimate of a c_name's category 
+    based on c_name in CAS. *)
+let guess_catCAS c_name sem_id =
+  if String.sub c_name 0 2 = "PE" then PE
+  else if get_FWS_status c_name sem_id then FWS 
+  else if String.sub c_name ((String.length c_name) - 1) 1 = "1"
+       && String.sub c_name 0 3 = "CS4" then Practicum else Core
+(* else if c_name = "CS1110" || c_name = "CS1112" || c_name = "MATH1910" ||
+        c_name = "MATH1920" || c_name = "MATH2940" || c_name = "CHEM2090" ||
+        c_name = "CHEM2080" || c_name = "CHEM2150" || c_name = "BTRY3080" || 
+        c_name = "ECON3130" || c_name = "MATH2930" || c_name = "MATH4710" || 
+        c_name = "PHYS2214" || c_name = "PHYS2218" || c_name = "PHYS1112" ||
+        c_name = "PHYS116" || c_name = "PHYS2213" || c_name = "PHYS2217" 
+   then Required *)
 
 (** [add_others sch str_lst] is [sch] after parsing [str_lst] and adding a 
     new course if [str_lst] is properly formatted. 
@@ -102,45 +116,56 @@ let add_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedAdd
   | sem_id::[] when format_sem_id sem_id -> 
-    add_sem sch (create_sem (sem_id_parse sem_id))
+    let sch' = add_sem sch (create_sem (sem_id_parse sem_id)) in
+    print_endline("Added " ^ String.uppercase_ascii sem_id); sch'
   | course_name::grade::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
-    let guessed_cat = guess_cat name (sem_id_parse sem_id) in
-    print_endline ("Category Estimation: " ^ (string_of_category guessed_cat));
-    add_course sch 
-      (create_course name 
-         (get_course_creds name 
-            (sem_id_parse sem_id)) 
-         (Schedule.gradify grade) (guessed_cat)) 
-      (sem_id_parse sem_id)
+    let guessed_cat = if get_school sch = "ENG" 
+      then guess_catENG name (sem_id_parse sem_id) 
+      else guess_catCAS name (sem_id_parse sem_id) in
+    let sch' = add_course sch 
+        (create_course name 
+           (get_course_creds name 
+              (sem_id_parse sem_id)) 
+           (Schedule.gradify grade) (guessed_cat)) 
+        (sem_id_parse sem_id) 
+    in print_endline("Category Estimation: " ^ 
+                     (string_of_category guessed_cat sch));
+    print_endline("Added " ^ name); sch' 
   | course_name::credits::grade::sem_id::[] 
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
     (sem_exists (sem_ids_to_string sch) sem_id); 
     let name = String.uppercase_ascii course_name in
     let guessed_cat = guess_cat name (sem_id_parse sem_id) in
-    print_endline ("Category Estimation: " ^ (string_of_category guessed_cat));
-    add_course sch (create_course name
-                      (int_of_string credits)
-                      (Schedule.gradify grade) guessed_cat)
-      (sem_id_parse sem_id)
+
+    let sch' = add_course sch (create_course name
+                                 (int_of_string credits)
+                                 (Schedule.gradify grade) guessed_cat)
+        (sem_id_parse sem_id)
+    in print_endline ("Category Estimation: " ^ 
+                      (string_of_category guessed_cat sch)); 
+    print_endline("Added " ^ name); sch'
   | course_name::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
-    add_course sch 
-      (create_course name 
-         (get_course_creds name 
-            (sem_id_parse sem_id)) 
-         (gradify grade) (String.uppercase_ascii category |> categorify)) 
-      (sem_id_parse sem_id)
+    let sch' = add_course sch 
+        (create_course name 
+           (get_course_creds name 
+              (sem_id_parse sem_id)) 
+           (gradify grade) (String.uppercase_ascii category |> categorify sch)) 
+        (sem_id_parse sem_id)
+    in print_endline("Added " ^ name); sch'
   | course_name::credits::grade::category::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
-    add_course sch (create_course name 
-                      (int_of_string credits) 
-                      (gradify grade) 
-                      (String.uppercase_ascii category |> categorify)) 
-      (sem_id_parse sem_id)
+    let sch' = add_course sch 
+        (create_course name 
+           (int_of_string credits) 
+           (gradify grade) 
+           (String.uppercase_ascii category |> categorify sch)) 
+        (sem_id_parse sem_id)
+    in print_endline("Added " ^ name); sch'
   | _ -> raise MalformedAdd
 
 (** [add_others sch str_lst] is [sch] after parsing [str_lst] and editing a 
@@ -166,8 +191,12 @@ let remove_others sch str_lst =
   match str_lst with
   | [] -> raise MalformedRemove
   | sem_id::[] when format_sem_id sem_id && is_valid_coursename sem_id = false-> 
-    remove_sem sch (sem_id_parse sem_id)
-  | course_name::[] -> remove_course sch (String.uppercase_ascii course_name)
+    let sch' = remove_sem sch (sem_id_parse sem_id) in 
+    print_endline("Removed " ^ String.uppercase_ascii sem_id); sch'
+  | course_name::[] -> 
+    let upper_course = String.uppercase_ascii course_name in
+    let sch' = remove_course sch upper_course in 
+    print_endline("Removed " ^ upper_course); sch'
   | _ -> raise MalformedRemove
 
 (** [is_not_json file] is [false] if [file] has the extension ".json".
@@ -187,8 +216,10 @@ let export_handler sch str_lst =
    else
      ignore (Requirements.validate sch Requirements.cas_reqs));
   match str_lst with
-  | file :: [] -> if is_not_json file
-    then (HTML.export_schedule sch file; sch) 
+  | file :: [] -> print_endline("Trying to export to " ^ file ^ "...");
+    if is_not_json file
+    then (HTML.export_schedule sch file; 
+          ANSITerminal.print_string [Bold] "\nSuccessfully exported!\n"; sch) 
     else raise InvalidFileForExport
   | _ -> raise MalformedExport
 
@@ -198,7 +229,8 @@ let export_handler sch str_lst =
     Raises: [InvalidFileForImport] if filenmae given in [str_lst] isnt valid. *)
 let import_handler sch str_lst = 
   match str_lst with
-  | file :: [] -> begin
+  | file :: [] -> print_endline("Trying to import " ^ file ^ "...");
+    begin
       let courses, sem_id = 
         try ICalParser.parse_file file 
         with Sys_error _ -> 
@@ -209,15 +241,17 @@ let import_handler sch str_lst =
         with SemesterDoesNotExist -> 
           add_sem sch (create_sem (sem_id_parse sem_id))
       in
-      List.fold_left 
-        (fun acc name -> 
-           try add_course acc 
-                 (create_course name
-                    (get_course_creds name 
-                       (sem_id_parse sem_id))
-                    (gradify "none") (guess_cat name (sem_id_parse sem_id))) 
-                 (sem_id_parse sem_id) 
-           with DuplicateCourse _ -> acc) sch' courses
+      let sch'' = List.fold_left 
+          (fun acc name -> 
+             try add_course acc 
+                   (create_course name
+                      (get_course_creds name 
+                         (sem_id_parse sem_id))
+                      (gradify "none") (guess_cat name (sem_id_parse sem_id))) 
+                   (sem_id_parse sem_id) 
+             with DuplicateCourse _ -> acc) sch' courses 
+      in ANSITerminal.print_string [Bold] "\nSuccessfully imported!\n";
+      sch''
     end
   | _ -> raise MalformedImport
 
@@ -246,8 +280,10 @@ let save_handler sch str_lst =
 let swap_others sch str_lst =
   match str_lst with
   | course1::course2::[] -> 
-    swap_courses (String.uppercase_ascii course1) 
-      (String.uppercase_ascii course2) sch
+    let upper_course1 = String.uppercase_ascii course1 in
+    let upper_course2 = String.uppercase_ascii course2 in
+    let sch' = swap_courses upper_course1 upper_course2 sch in
+    print_endline(upper_course1 ^ " swapped with " ^ upper_course2); sch'
   | _ -> raise MalformedSwap
 
 (** [move_others sch str_lst] is [sch] after parsing [str_lst] and moving course
@@ -256,7 +292,10 @@ let swap_others sch str_lst =
 let move_others sch str_lst =
   match str_lst with
   | course::sem::[] -> (sem_exists (sem_ids_to_string sch) sem); 
-    move_course (String.uppercase_ascii course) (sem_id_parse sem) sch
+    let upper_course = String.uppercase_ascii course in
+    let sch' = move_course upper_course (sem_id_parse sem) sch in
+    print_endline(upper_course ^ " moved to " ^ String.uppercase_ascii sem); 
+    sch'
   | _ -> raise MalformedMove
 
 (** [settings_handler sch str_lst] is [sch] after parsing [str_lst] and changing

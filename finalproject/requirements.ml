@@ -65,7 +65,7 @@ let check_categories sch reqs =
     match categories with 
     | [] -> acc
     | (cat,creds) :: t ->
-      let satisf = List.filter (fun c -> get_course_cat c = cat) courses in
+      let satisf = List.filter (fun c -> get_course_cat c sch = cat) courses in
       let creds_satsift = calc_credits satisf in
       if creds_satsift < creds then
         loop courses t ((cat, (creds - creds_satsift)) :: acc)
