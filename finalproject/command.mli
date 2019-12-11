@@ -57,8 +57,10 @@ exception InvalidFileForSave
 (** Raised when Add command is given a semester that has not been added. *)
 exception SemesterDoesNotExist
 
-(** [save_handler sch str_lst] is [sch] after parsing [str_lst] and saving
-    schedule to file based on args in [str_lst]. *)
+(** [save_handler sch str_lst] is [sch] after parsing [str_lst] and saving [sch]
+    as JSON file if [str_lst] is properly formatted. 
+    Raises: [MalformedSave] if [str_lst] not properly formatted.
+    Raises: [InvalidFileForSave] if filenmae given in [str_lst] isnt valid. *)
 val save_handler : schedule -> string list -> schedule
 
 (** [parse_command sch cmd_str] parses [cmd_str] to be an action performed on
