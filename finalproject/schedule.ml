@@ -4,7 +4,8 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer
 type sem_id = Spring of int | Fall of int | None
 
 type category = Required | Core | FourThousandPlus | Technical | Specialization
-              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra
+              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra 
+              | PE | ENGRI | ENGRD
 
 type course = {
   name: string;
