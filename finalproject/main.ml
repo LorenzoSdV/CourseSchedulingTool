@@ -216,7 +216,7 @@ and init_prompt () =
         List.fold_left (fun acc str -> acc ^ str ^ " ") "" sch_name in
       let new_name = 
         String.sub sch_extra_space 0 (String.length sch_extra_space - 1) in
-      if not (Str.string_match (Str.regexp "^\s") new_name 0)  
+      if (Str.string_match (Str.regexp "^\s") new_name 0)  
       then 
         begin
           print_endline("\nThe following commands are available for use. Type" 
