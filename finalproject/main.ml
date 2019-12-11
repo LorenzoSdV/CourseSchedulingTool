@@ -119,13 +119,13 @@ and prompt sch =
                       "w/withdrawn, inc/incomplete, none, transfer")
     | UnknownCategoryCAS msg ->
       exceptions sch ("Invalid/Unknown CAS Category: " ^ msg ^
-                      "\nValid CAS Categories: PE, FWS, reqs/required, core, " ^ 
+                      "\nValid CAS Categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, ENGRD, ENGRI, liberal, "^
                       "aprv/advisor, extra")
     | UnknownCategoryENG msg ->
       exceptions sch ("Invalid/Unknown ENG Category: " ^ msg ^
-                      "\nValid ENG Categories: PE, FWS, reqs/required, core, " ^ 
+                      "\nValid ENG Categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, lang/language/foreign, "^
                       "PBS, PBSS, MQR, CA, HA, KCM, LA, SBA, GB, HB, GHB, "^

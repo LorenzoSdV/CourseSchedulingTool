@@ -118,7 +118,7 @@ val check_school : string -> bool
     "Core" or "Required". 
     Raises: [UnknownCategory str] if [str] is not a valid grade 
     representation. *)
-val categorify : string -> schedule -> category
+val categorify : schedule -> string -> category
 
 (** [create_course name cred gr cat] is a new course type with name [name], 
     number of credits [cred], grade [gr], and category [cat]. *)
@@ -163,7 +163,7 @@ val get_course_name : course -> string
 val get_course_credits : course -> int
 
 (** [get_course_cat course] is the category in string form of [course]. *)
-val get_course_cat : course -> string
+val get_course_cat : course -> schedule -> string
 
 (** [get_sem sch semid] is the semester with the semester id [sem_id]
     if found in [sch]. 

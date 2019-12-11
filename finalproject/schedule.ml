@@ -104,7 +104,7 @@ let check_school school =
   | "CAS" | "ENG" -> true
   | _ -> raise (UnknownSchool school)
 
-let categorify str sch =
+let categorify sch str =
   if sch.school = "ENG" then begin
     match str with
     | "PE" -> PE
@@ -297,8 +297,8 @@ let get_course_name course =
 let get_course_credits course = 
   course.credits
 
-let get_course_cat course =
-  string_of_category course.category
+let get_course_cat course sch =
+  string_of_category course.category sch
 
 let get_sem sch semid = 
   let rec get_sem_loop sems semid' = 
@@ -359,7 +359,7 @@ let edit_course sch cname attr new_val =
       sem.sem_gpa <- gpa sem.courses;
       sch.cumul_gpa <- gpa (to_list sch); sch.is_saved <- false; sch
     | "category" -> 
-      course.category <- categorify (String.uppercase_ascii new_val) sch; 
+      course.category <- categorify sch (String.uppercase_ascii new_val); 
       sch.is_saved <- false; sch
     | _ -> raise (InvalidAttribute attr)
   with
@@ -644,31 +644,59 @@ module LoadJSON = struct
 
   (** [form_category school cat] is the category represented by [category] 
       of [school]. *)
-  let form_category school cat =
-    match cat with
-    | "Required" -> Required
-    | "Core" -> Core
-    | "4000+" -> FourThousandPlus
-    | "Technical Elective" -> Technical
-    | "External Specialization" -> Specialization
-    | "Liberal Studies" -> Liberal
-    | "Advisor Approved Elective" -> AdvisorApproved
-    | "Major Approved Elective" -> MajorApproved
-    | "Practicum/Project" -> Practicum
-    | "Extra Course" -> Extra
-    | _ -> raise (UnknownCategoryENG cat)
-
-  (** [parse_course json] is a course generated from info found by 
+  let form_category cat =
+    if "school" = "ENG" then 
+      begin
+        match cat with
+        | "PE" -> PE
+        | "FWS" -> FWS
+        | "Required" -> Required
+        | "Core" -> Core
+        | "4000+" -> FourThousandPlus
+        | "Technical Elective" -> Technical
+        | "External Specialization" -> Specialization
+        | "Liberal Studies" -> Liberal
+        | "Advisor Approved Elective" -> AdvisorApproved
+        | "Major Approved Elective" -> MajorApproved
+        | "Practicum/Project" -> Practicum
+        | "Extra Course" -> Extra
+        | _ -> raise (UnknownCategoryENG cat)
+      end
+    else 
+      begin
+        match cat with
+        | "PE" -> PE
+        | "FWS" -> FWS
+        | "Required" -> Required
+        | "Core" -> Core
+        | "4000+" -> FourThousandPlus
+        | "Technical Elective" -> Technical
+        | "External Specialization" -> Specialization
+        | "Major Approved Elective" -> MajorApproved
+        | "Practicum/Project" -> Practicum
+        | "Extra Course" -> Extra
+        | "Foreign Language" -> ForeignLanguage
+        | "PBS-AS" -> PBS_AS
+        | "PBSS-AS" -> PBSS_AS
+        | "MQR-AS" -> MQR_AS
+        | "CA-AS" -> CA_AS
+        | "HA-AS" -> HA_AS
+        | "KCM-AS" -> KCM_AS
+        | "LA-AS" -> LA_AS
+        | "SBA-AS" -> SBA_AS
+        | "GB" -> GB
+        | "HB" -> HB
+        | "GHB" -> GHB
+        | _ -> raise (UnknownCategoryCAS cat)
+      end
+  (** [parse_course fl json] is a course generated from info found by 
       parsing [json]. *)
-  let parse_course fl json = 
-    let school = Yj.to_string (Yj.member "school" (Yojson.Basic.from_file fl)) 
-    in
+  let parse_course json = 
     {
       name = json |> Yj.member "name" |> Yj.to_string;
       credits = json |> Yj.member "course credits" |> Yj.to_int;
       grade = json |> Yj.member "grade" |> Yj.to_string |> form_grade;
-      category = json |> Yj.member "category" |> Yj.to_string |> 
-                 form_category school;
+      category = json |> Yj.member "category" |> Yj.to_string |> form_category;
     }
 
   (** [parse_semester json] is a semester generated from info found by 
