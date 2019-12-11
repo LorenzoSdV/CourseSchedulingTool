@@ -101,7 +101,7 @@ val gradify : string -> grade
 (** [categorify str] is the category represented by [str] where [str] is some 
     category value represented as a string.
     Requires: [str] is a valid string rep of a category, like: 
-    "CORE" or "REQUIRED". 
+    "Core" or "Required". 
     Raises: [UnknownCategory str] if [str] is not a valid grade 
     representation. *)
 val categorify : string -> category

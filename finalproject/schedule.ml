@@ -95,9 +95,6 @@ let gradify str =
     | "TRANSFER" -> Transfer
     | _ -> raise (UnknownGrade str)
 
-(** [categorify str] is the category represented by [str]. 
-    Raises: [UnknownCategory str] if [str] is not a valid category 
-    representation. *)
 let categorify str =
   match String.uppercase_ascii str with
   | "REQ" | "REQUIRED" -> Required
