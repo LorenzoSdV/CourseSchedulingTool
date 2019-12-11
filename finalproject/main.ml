@@ -44,8 +44,7 @@ let rec save_prompt_from_quit sch =
     "You have unsaved changes. Would you like to save now before quitting?";
   match read_input () with
   | "cancel" -> prompt sch
-  | "yes" -> ignore(save_prompt_helper sch); set_save_status sch true; 
-    ANSITerminal.print_string [Bold] "\nSaved!\n";
+  | "yes" -> ignore(save_prompt_helper sch); set_save_status sch true;
     start_prompt ()
   | "no" -> Stdlib.exit 0
   | _ -> 
@@ -62,7 +61,6 @@ and save_prompt_from_close sch =
   match read_input () with
   | "cancel" -> prompt sch
   | "yes" -> ignore(save_prompt_helper sch); set_save_status sch true; 
-    ANSITerminal.print_string [Bold] "\nSaved!\n"; 
     start_prompt ()
   | "no" -> start_prompt ()
   | _ -> 
@@ -100,14 +98,14 @@ and prompt sch =
       exceptions sch ("Invalid/Unknown Grade: " ^ msg ^ 
                       "\nValid grades: <letter_grade>, s/sat, u/unsat, "^
                       "w/withdrawn, inc/incomplete, none, transfer")
-    | UnknownCategoryCAS msg ->
-      exceptions sch ("Invalid/Unknown CAS Category: " ^ msg ^
+    | UnknownCategoryENG msg ->
+      exceptions sch ("Invalid/Unknown ENG Category: " ^ msg ^
                       "\nValid CAS Categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, ENGRD, ENGRI, liberal, "^
                       "aprv/advisor, extra")
-    | UnknownCategoryENG msg ->
-      exceptions sch ("Invalid/Unknown ENG Category: " ^ msg ^
+    | UnknownCategoryCAS msg ->
+      exceptions sch ("Invalid/Unknown CAS Category: " ^ msg ^
                       "\nValid ENG Categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, lang/language/foreign, "^
@@ -146,7 +144,8 @@ and prompt sch =
                       ^ " (optional: <category>) <semester> | <semester>]")
     | MalformedEdit ->
       exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
-                      "name <new_name> | school <ENG | CAS> ]")
+                      "name <new_name> | school [ENG | CAS] ]" ^
+                      "\nValid fields: credits, grade, category.")
     | MalformedRemove ->
       exceptions sch "Usage: remove [<course_name> | <semester>]"
     | MalformedExport ->
@@ -205,8 +204,8 @@ and init_prompt () =
             print_endline("\nThe following commands are available for use. Type" 
                           ^ " in any command to see usage instructions.");
             ANSITerminal.(print_string [yellow] valid_commands);
-            print_endline("\nThe following are the grade options when adding a " ^
-                          "new course to the schedule.");
+            print_endline("\nThe following are the grade options when adding " ^
+                          "a new course to the schedule.");
             ANSITerminal.(print_string [yellow] 
                             ("Valid grades: <letter_grade>, s/sat, " 
                              ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
