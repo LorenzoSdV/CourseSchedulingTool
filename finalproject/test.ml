@@ -73,67 +73,61 @@ let make_list_tests
   name >:: (fun _ -> assert_equal (List.sort_uniq compare expected_output)
                (List.sort_uniq compare actual_output))   
 
-let sch = new_schedule "Sch1"
+(* 
+    Code used in all test cases:
+*)
+
 let fall19 = create_sem (Fall 19)
 let sp20 = create_sem (Spring 20)
-let sch1 = add_sem sch fall19
-let sch2 = add_sem sch sp20
+
+let cs2800 = create_course "CS2800" 3 (Letter "C") "CORE"
+let cs4820 = create_course "CS4820" 4 (Letter "C+") "CORE"
+let phys2213 = create_course "PHYS2213" 4 (Letter "A-") "REQUIRED"
+let cs3110 = create_course "CS3110" 4 (Letter "B") "CORE"
+
+(*
+    Schedule module tests
+*)
+
+let sch = new_schedule "Sch1"
+
+let _ = add_sem sch fall19
+let _ = add_sem sch sp20
+
+let _ = add_course sch cs2800 (Fall 19)
+let _ = add_course sch cs4820 (Spring 20)
+let _ = add_course sch cs3110 (Fall 19)
+let _ = add_course sch phys2213 (Spring 20)
 
 let sch_rem_sem = new_schedule "Sch2"
-let sch_add_sem1 = add_sem sch_rem_sem (create_sem (Fall 19))
-let sch_add_sem2 = add_sem sch_rem_sem (create_sem (Spring 20))
-let sch_rem_sem1 = remove_sem sch_rem_sem (Fall 19)
+let _ = add_sem sch_rem_sem (create_sem (Fall 19))
+let _ = add_sem sch_rem_sem (create_sem (Spring 20))
+let _ = remove_sem sch_rem_sem (Fall 19)
 
-let cs2800 = create_course "CS2800" 3 (Letter "C") "core"
-let cs4820 = create_course "CS4820" 4 (Letter "C+") "core"
-let phys2213 = create_course "PHYS2213" 4 (Letter "A-") "requirements"
-let cs3110 = create_course "CS3110" 4 (Letter "B") "CORE"
-let add_course1 = add_course sch cs2800 (Fall 19)
-let add_course2 = add_course sch cs4820 (Spring 20)
-let add_course3 = add_course sch cs3110 (Fall 19)
-let add_course4 = add_course sch phys2213 (Spring 20)
-
-let rem_course = add_course sch_rem_sem cs2800 (Spring 20)
-let rem_course1 = add_course sch_rem_sem cs3110 (Spring 20)
-let rem_course2  = add_course sch_rem_sem cs4820 (Spring 20)
-let rem_course3 = remove_course sch_rem_sem "CS2800"
+let _ = add_course sch_rem_sem cs2800 (Spring 20)
+let _ = add_course sch_rem_sem cs3110 (Spring 20)
+let _ = add_course sch_rem_sem cs4820 (Spring 20)
+let _ = remove_course sch_rem_sem "CS2800"
 
 let edit_creds_sch = new_schedule "Sch3"
-let edit_creds_sch1 = add_sem edit_creds_sch (create_sem (Fall 20))
-let edit_creds_sch2 = add_course edit_creds_sch phys2213 (Fall 20)
-let edit_creds_sch3 = edit_course edit_creds_sch "PHYS2213" "credits" "3"
+let _ = add_sem edit_creds_sch (create_sem (Fall 20))
+let _ = add_course edit_creds_sch phys2213 (Fall 20)
+let _ = edit_course edit_creds_sch "PHYS2213" "credits" "3"
 
 let edit_grade = new_schedule "Sch4"
-let edit_grade1 = add_sem edit_grade (create_sem (Fall 20))
-let edit_grade2 = add_course edit_grade phys2213 (Fall 20)
-let edit_grade3 = edit_course edit_grade "PHYS2213" "grade" "B"
+let _ = add_sem edit_grade (create_sem (Fall 20))
+let _ = add_course edit_grade phys2213 (Fall 20)
+let _ = edit_course edit_grade "PHYS2213" "grade" "B"
 
 let missing_elts = new_schedule "Sch5"
-let missing_elts1 = add_sem missing_elts (create_sem (Fall 20))
-let missing_elts2 = add_sem missing_elts (create_sem (Spring 21))
-
-
-(*let sch2 = add_sem sch fall_sem
-  let cs3110 = create_course "CS3110" 4 (Letter "B") "CScore"
-  let cs2800 = create_course "CS2800" 3 (Letter "C") "CScore"
-  let cs4820 = create_course "CS4820" 4 (Letter "C+") "CScore"
-  let phys2213 = create_course "PHYS2213" 4 (Letter "A-") "Engineering"
-  let sch3 = add_course sch2 cs3110 (Fall 19)
-  let sch4 = add_course sch3 cs2800 (Fall 19)
-  let sp_sem = create_sem (Spring 20)
-  let sch5 = add_sem sch sp_sem
-  let sch6 = add_course sch5 cs4820 (Spring 20)
-  let sch7 = add_course sch6 phys2213 (Spring 20)
-  let sch8 = remove_course sch7 "CS3110"
-  let sch9 = edit_course sch8 "PHYS2213" "credits" "3"
-  let sch10 = edit_course sch9 "CS2800" "credits" "4"*)
-
+let _ = add_sem missing_elts (create_sem (Fall 20))
+let _ = add_sem missing_elts (create_sem (Spring 21))
 
 let basic_schedule_tests = [
   make_list_tests "Semesters are added to schedule successfully"
-    ["FA19"; "SP20"] (sem_ids_to_string sch2);
+    ["FA19"; "SP20"] (sem_ids_to_string sch);
   make_list_tests "Semester removed from schedule successfully" ["SP20"]
-    (sem_ids_to_string sch_rem_sem1);
+    (sem_ids_to_string sch_rem_sem);
   make_int_test "Courses added to schedule successfully (number)" 
     4 (to_list sch |> List.length);
   make_string_tests "Courses added to schedule successfully (print)"
@@ -158,6 +152,10 @@ let basic_schedule_tests = [
     (get_gpa edit_grade |> gpa_to_string);
 ]
 
+(*
+    LoadJSON Tests
+*)
+
 let example_sch = LoadJSON.parse_json "example.json"
 let fa19_courses = get_sem example_sch (Fall 19) |> get_sem_courses
 let sp20_courses = get_sem example_sch (Spring 20) |> get_sem_courses
@@ -181,9 +179,29 @@ let load_schedule_tests = [
     "CS2800CS3110PHYS2213CS4820" (string_of_sch example_sch)
 ]
 
+let ical = ICalParser.parse_file "example.ics"
+
+let ical_tests = [
+
+]
+
+
+(*
+    SaveJSON Tests
+    These tests work by saving and then re-loading a schedule.
+*)
+
+
+
+
+(* 
+    END Test Cases!
+*)
+
 let test_suite = [
   basic_schedule_tests;
-  load_schedule_tests
+  load_schedule_tests;
+  ical_tests
 ]
 
 let suite = "Main Test Suite" >::: List.flatten test_suite
