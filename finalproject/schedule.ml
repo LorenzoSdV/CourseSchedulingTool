@@ -3,8 +3,8 @@ type grade = Sat | Unsat | Withdrawn | Incomplete | None | Transfer
 
 type sem_id = Spring of int | Fall of int | None
 
-type category_ENG = Required | Core | FourThousandPlus | Technical | Specialization
-                  | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra 
+type category = Required | Core | FourThousandPlus | Technical | Specialization
+              | Liberal | AdvisorApproved | MajorApproved | Practicum | Extra 
 
 type course = {
   name: string;

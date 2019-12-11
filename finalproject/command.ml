@@ -56,8 +56,9 @@ let format_sem_id str =
 
 (** [guess_cat c_name] is the calculated estimate of a c_name's category 
     based on c_name. *)
-let guess_cat c_name = 
+let guess_cat c_name sem_id = 
   if String.sub c_name 0 2 = "PE" then Required
+  else if get_FWS_status c_name sem_id then Required
   else if String.sub c_name 0 5 = "ENGRI" then Required
   else if String.sub c_name 0 5 = "ENGRD" || c_name = "CS2110" || 
           c_name = "CS2112" then Required
@@ -104,7 +105,7 @@ let add_others sch str_lst =
   | course_name::grade::sem_id::[] ->
     (sem_exists (sem_ids_to_string sch) sem_id);
     let name = String.uppercase_ascii course_name in
-    let guessed_cat = guess_cat name in
+    let guessed_cat = guess_cat name (sem_id_parse sem_id) in
     print_endline ("Category Estimation: " ^ (string_of_category guessed_cat));
     add_course sch 
       (create_course name 
@@ -116,7 +117,7 @@ let add_others sch str_lst =
     when Str.string_match (Str.regexp "^[0-9]+$") credits 0 ->
     (sem_exists (sem_ids_to_string sch) sem_id); 
     let name = String.uppercase_ascii course_name in
-    let guessed_cat = guess_cat name in
+    let guessed_cat = guess_cat name (sem_id_parse sem_id) in
     print_endline ("Category Estimation: " ^ (string_of_category guessed_cat));
     add_course sch (create_course name
                       (int_of_string credits)
