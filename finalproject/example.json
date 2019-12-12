@@ -2,7 +2,6 @@
 	"description": "Example Schedule",
 	"cumul gpa": 3.03,
 	"sch credits": 15,
-	"expected grad year": "None",
 	"school": "ENG",
 	"settings": {
 		"autosave": false,

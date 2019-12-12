@@ -39,7 +39,6 @@ type schedule = {
   mutable desc: string;
   mutable semesters: semester list;
   mutable cumul_gpa: float;
-  mutable exp_grad: sem_id;
   mutable sch_credits : int;
   mutable is_saved : bool;
   mutable settings : settings;
@@ -391,7 +390,6 @@ let new_schedule name school =
     desc = name;
     semesters = [];
     cumul_gpa = 0.;
-    exp_grad = None;
     sch_credits = 0;
     is_saved = true;
     settings = default_settings;
@@ -624,8 +622,6 @@ module LoadJSON = struct
       semesters = json |> Yj.member "semesters" |> Yj.to_list |> 
                   List.map parse_semester;
       cumul_gpa = json |> Yj.member "cumul gpa" |> Yj.to_float;
-      exp_grad = 
-        json |> Yj.member "expected grad year" |> Yj.to_string |> form_sem_id;
       sch_credits = json |> Yj.member "sch credits" |> Yj.to_int;
       is_saved = true;
       settings = json |> Yj.member "settings" |> parse_settings;
@@ -678,7 +674,6 @@ module SaveJSON = struct
     "\t\"description\": \"" ^ sch.desc ^ "\",\n" ^
     "\t\"cumul gpa\": "  ^ (gpa_to_string sch.cumul_gpa) ^ ",\n" ^
     "\t\"sch credits\": "  ^ (string_of_int sch.sch_credits) ^ ",\n" ^
-    "\t\"expected grad year\": \"" ^ (string_of_semid sch.exp_grad) ^ "\",\n" ^
     "\t\"settings\": " ^ (json_of_settings sch.settings) ^ ",\n" ^
     "\t\"school\": \"" ^ sch.school ^ "\",\n" ^
     "\t\"semesters\": [\n" ^ 
