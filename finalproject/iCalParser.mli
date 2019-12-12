@@ -4,6 +4,9 @@
    and Lorenzo Scotto di Vettimo (ls769)
 *)
 
+(** Raised when an invalid file is imported. *)
+exception InvalidFileForImport
+
 (** [parse_file file] is the tuple of course names and a string semester 
     identifier for an ical schedule [file] downlaoded from Class Roster.
 

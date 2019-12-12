@@ -17,7 +17,6 @@ exception MalformedPrint
 exception MalformedSet
 
 exception InvalidFileForExport
-exception InvalidFileForImport
 exception InvalidFileForSave
 
 exception SemesterDoesNotExist
@@ -291,7 +290,7 @@ let import_handler sch str_lst =
       let courses, sem_id = 
         try ICalParser.parse_file file 
         with Sys_error _ -> 
-          raise InvalidFileForImport 
+          raise ICalParser.InvalidFileForImport 
       in 
       let sch' = 
         try (sem_exists (sem_ids_to_string sch) sem_id); sch

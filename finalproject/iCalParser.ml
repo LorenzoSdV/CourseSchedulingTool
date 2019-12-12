@@ -1,17 +1,23 @@
 open Schedule
 
+exception InvalidFileForImport
+
 (** [file_to_list file] is a list of the lines of text from [file]. 
     Rasises: [Sys_Error] with an error message if file cannot be found. *)
 let file_to_list file =
-  let inch = open_in file in
-  let rec all_lines ch acc = 
-    try
-      all_lines ch ((input_line ch) :: acc)
-    with
-      End_of_file -> acc
-  in
-  let result = all_lines inch [] in
-  close_in inch; result
+  try
+    let inch = open_in file in
+    let rec all_lines ch acc = 
+      try
+        all_lines ch ((input_line ch) :: acc)
+      with
+        End_of_file -> acc
+    in
+    let result = all_lines inch [] in
+    close_in inch; result
+  with
+    Sys_error _ -> raise InvalidFileForImport
+
 
 (** [parse_courses data] is a list of course names in format XX#### parsed from
     [data]. Requires that [data] is the value of calling [file_to_list] on an

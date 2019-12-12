@@ -130,7 +130,7 @@ and prompt sch =
       exceptions sch "Error Retrieving Course Info from Online"
     | InvalidFileForExport ->
       exceptions sch "File path cannot be a JSON. Try again."
-    | InvalidFileForImport ->
+    | ICalParser.InvalidFileForImport ->
       exceptions sch "File must be an iCal in current directory. Try again."
     | InvalidFileForSave -> 
       exceptions sch "File path must be a JSON in current directory. Try again." 

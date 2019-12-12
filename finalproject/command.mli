@@ -48,9 +48,6 @@ exception MalformedSet
 (** Raised when Export command is given with invalid file path. *)
 exception InvalidFileForExport
 
-(** Raised when Import command is given with invalid file path. *)
-exception InvalidFileForImport
-
 (** Raised when Save command is given with invalid file path. *)
 exception InvalidFileForSave
 
