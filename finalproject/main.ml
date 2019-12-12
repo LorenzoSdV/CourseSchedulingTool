@@ -226,6 +226,7 @@ and init_prompt () =
             print_endline("\nThe following commands are available for use. Type" 
                           ^ " in any command to see usage instructions.");
             ANSITerminal.(print_string [yellow] valid_commands);
+            print_newline ();
             prompt (new_schedule sch_name school)
           end
         else 

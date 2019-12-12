@@ -158,6 +158,16 @@ edit school CAS
 
 This validation is also now included in all exported HTML files.
 
+
+We've also added a user preferences feature! You can now edit the HTML colors
+in the export file, as well as toggle an autosave feature. You can use the 
+"set" command to do so:
+```
+set autosave true
+set html_background_color blue
+set html_square_color red
+```
+
 Finally, we've also included the ability to view course details by running
 "print" followed by a course name:
 ```
