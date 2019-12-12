@@ -23,7 +23,22 @@ provide info on what other arguments are required.
 
 ## Some example commands for MS1 functionality:
 
-Initially, at the first prompt, type "new" to start a new schedule.
+Follow the instructions at the initial prompt to either create a new schedule
+or load an existing one. We have provided an example.json in the working 
+directory to load as an example. Try entering ONE of the two possible commands 
+below:
+
+```
+new TEST ENG
+load example.json
+```
+
+Once a schedule is open, you can use the "print" command at any time to view
+the semesters/courses in the schedule:
+```
+print
+```
+
 
 To create a new semester(s):
 ```
@@ -32,20 +47,15 @@ add SP20
 ```
 
 Add a new course:
-(Here, 4 is # of credits, A- is grade, "CSCore" is degree catagory, FA19 is
+(Here, 4 is # of credits, A- is grade, "Core" is degree catagory, FA19 is
  semester).
 ```
-add CS3110 4 A- CScore FA19 
+add CS3110 4 A- Core FA19 
 ```
 
 Add a new course (and have Class Roster get credits info):
 ```
-add CS3410 B CScore FA19 
-```
-
-View Current Schedule:
-```
-print
+add CS3410 B Core FA19 
 ```
 
 Edit course attribute (like credits):
@@ -64,7 +74,7 @@ Remove a semester:
 remove SP20
 ```
 
-close
+To exit:
 ```
 quit
 ```
@@ -74,26 +84,6 @@ quit
 MS2 contains all of the same functionality as MS1, but the user now has the
 ability to save a current schedule, load that schedule later, "close" the
 current schedule, and export a schedule to an HTML file for visualization.
-
-To start, again use "make run" to begin the initial prompt.
-
-To make a new schedule:
-```
-new <schedule_name>
-```
-
-Or load a previously saved schedule:
-```
-load <filepath>.json
-```
-
-**NOTE:** We have included an _example.json_ file containing a schedule
-already populated with some courses and semesters. Feel free to try loading and
-working with it!
-
-Once schedule is loaded or created, you'll be taken to the primary user prompt, 
-where the schedule name appears in green at the input line. New commands 
-available are:
 
 Saving a schedule:
 _This command saves schedule as test.json in current working directory._
@@ -134,7 +124,8 @@ import example.ics
 We've included an "example.ics" to try this command wth.
 
 _Notice_ that this command will create a new semester if the semester doesn't
-already exist automatically.
+already exist automatically. It will not overwrite any already existing courses
+in a given semester.
 
 
 We've also added the _swap_ and _move_ commands to swap two courses from 
@@ -165,6 +156,10 @@ edit school ENG
 edit school CAS
 ```
 
-By default, a new schedule uses the ENG requirements.
-
 This validation is also now included in all exported HTML files.
+
+Finally, we've also included the ability to view course details by running
+"print" followed by a course name:
+```
+print CS2800
+```
