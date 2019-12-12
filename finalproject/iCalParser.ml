@@ -5,18 +5,15 @@ exception InvalidFileForImport
 (** [file_to_list file] is a list of the lines of text from [file]. 
     Rasises: [Sys_Error] with an error message if file cannot be found. *)
 let file_to_list file =
-  try
-    let inch = open_in file in
-    let rec all_lines ch acc = 
-      try
-        all_lines ch ((input_line ch) :: acc)
-      with
-        End_of_file -> acc
-    in
-    let result = all_lines inch [] in
-    close_in inch; result
-  with
-    Sys_error _ -> raise InvalidFileForImport
+  let inch = open_in file in
+  let rec all_lines ch acc = 
+    try
+      all_lines ch ((input_line ch) :: acc)
+    with
+      End_of_file -> acc
+  in
+  let result = all_lines inch [] in
+  close_in inch; result
 
 
 (** [parse_courses data] is a list of course names in format XX#### parsed from
@@ -50,5 +47,8 @@ let parse_semid data_list =
   | _ -> failwith "Don't support summmer/winter sessions"
 
 let parse_file file = 
-  let data = file_to_list file in
-  (parse_courses data, parse_semid data)
+  try
+    let data = file_to_list file in
+    (parse_courses data, parse_semid data)
+  with
+    _ -> raise InvalidFileForImport
