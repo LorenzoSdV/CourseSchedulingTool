@@ -111,14 +111,16 @@ let categorify str =
   | "REQ" | "REQUIRED" -> Required
   | "CORE" -> Core
   | "4000+" -> FourThousandPlus
-  | "TECH" | "TECHNICAL" -> Technical
-  | "SPCL" | "EXT" -> Specialization
-  | "LIBERAL" | "MQR" | "CA" | "HA" | "KCM" | "LA" | "SBA" -> Liberal
-  | "APRV" | "ADVISOR" -> AdvisorApproved
-  | "MAJ" | "MAJOR" -> MajorApproved
+  | "TECH" | "TECHNICAL" | "TECHNICAL ELECTIVE" -> Technical
+  | "SPCL" | "EXT" | "EXTERNAL SPECIALIZATION" -> Specialization
+  | "LIBERAL STUDIES" | "LIBERAL" | "MQR" | "CA" 
+  | "HA" | "KCM" | "LA" | "SBA" -> Liberal
+  | "APRV" | "ADVISOR" | "ADVISOR-APPROVED ELECTIVE" -> AdvisorApproved
+  | "MAJ" | "MAJOR" | "MAJOR-APPROVED ELECTIVE" -> MajorApproved
   | "PROJECT" | "PROJ" | "PRACTICUM" | "PRACT" -> Practicum
-  | "EXTRA" -> Extra
-  | "LANG" | "LANGUAGE" | "FOREIGN" -> ForeignLanguage
+  | "EXTRA" | "EXTRA COURSE" -> Extra
+  | "LANG" | "LANGUAGE" | "FOREIGN" 
+  | "FOREIGN LANGUAGE" -> ForeignLanguage
   | "PBS" | "PBSS" -> PBS
   | "GB" -> GB
   | "HB" -> HB
