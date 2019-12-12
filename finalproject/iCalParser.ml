@@ -2,8 +2,7 @@ open Schedule
 
 exception InvalidFileForImport
 
-(** [file_to_list file] is a list of the lines of text from [file]. 
-    Rasises: [Sys_Error] with an error message if file cannot be found. *)
+(** [file_to_list file] is a list of the lines of text from [file].  *)
 let file_to_list file =
   let inch = open_in file in
   let rec all_lines ch acc = 

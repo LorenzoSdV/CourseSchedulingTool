@@ -11,5 +11,6 @@ exception InvalidFileForImport
     identifier for an ical schedule [file] downlaoded from Class Roster.
 
     Requires: [file] is a .ics file downloaded from Class Roster that has not 
-    been modified in any fashion. *)
+    been modified in any fashion. 
+    Raises [InvalidFileForImport] if invalid file is passed for importing. *)
 val parse_file : string -> string list * string
