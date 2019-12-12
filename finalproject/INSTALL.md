@@ -128,8 +128,10 @@ the semester online, then downloading the iCal (.ics) file. This sem can be
 imported to a schedule using:
 
 ```
-import <file>.ics
+import example.ics
 ```
+
+We've included an "example.ics" to try this command wth.
 
 _Notice_ that this command will create a new semester if the semester doesn't
 already exist automatically.
