@@ -1,6 +1,6 @@
 (**
    Metadata about this submission.
-   @author Chris O'Brian (co253), Radha (rdp89), 
+   @author Chris O'Brian (co253), Radha Patel (rdp89), 
    and Lorenzo Scotto di Vettimo (ls769)
 *)
 
