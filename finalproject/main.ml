@@ -100,19 +100,21 @@ and prompt sch =
                       "w/withdrawn, inc/incomplete, none, transfer")
     | UnknownCategoryENG msg ->
       exceptions sch ("Invalid/Unknown ENG Category: " ^ msg ^
-                      "\nValid CAS Categories: PE, FWS, req/required, core, " ^ 
+                      "\nValid ENG categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, ENGRD, ENGRI, liberal, "^
                       "aprv/advisor, extra")
     | UnknownCategoryCAS msg ->
       exceptions sch ("Invalid/Unknown CAS Category: " ^ msg ^
-                      "\nValid ENG Categories: PE, FWS, req/required, core, " ^ 
+                      "\nValid CAS categories: PE, FWS, req/required, core, " ^ 
                       "4000+, tech/technical, spcl/ext, maj/major, " ^ 
                       "project/proj/practicum/pract, lang/language/foreign, "^
                       "PBS/PBSS, MQR/CA/HA/KCM/LA/SBA/liberal, GB, HB, "^
                       "extra")
     | UnknownSetting msg ->
-      exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg)
+      exceptions sch ("Invalid/Unknown Setting Attribute: " ^ msg ^
+                      "\nValid attributes: autosave, html_bg_color, " ^
+                      "html_tile_color")
     | DuplicateCourse msg -> 
       exceptions sch ("Duplicate Course Already Exists: " ^ msg)
     | DuplicateSemester msg -> 
@@ -140,8 +142,26 @@ and prompt sch =
       exceptions sch ("Incorrect Semester Entry Format: " ^
                       "Eg; use 'fa18' for fall 2018 and 'sp22' for spring 2022")
     | MalformedAdd ->
-      exceptions sch ("Usage: add [<course_name> (optional: <credits>) <grade>"
-                      ^ " (optional: <category>) <semester> | <semester>]")
+      if get_school sch = "ENG" 
+      then
+        exceptions sch ("Usage: add [<course_name> (optional: <credits>) "^
+                        "<grade> (optional: <category>) <semester> | "^
+                        "<semester>]\nValid grades: <letter_grade>, s/sat, "^
+                        "u/unsat, w/withdrawn, inc/incomplete, none, transfer" ^
+                        "\nValid ENG categories: PE, FWS, req/required, core, "^ 
+                        "4000+, tech/technical, spcl/ext, maj/major, " ^ 
+                        "project/proj/practicum/pract, ENGRD, ENGRI, liberal, "^
+                        "aprv/advisor, extra")
+      else
+        exceptions sch ("Usage: add [<course_name> (optional: <credits>) "^
+                        "<grade> (optional: <category>) <semester> | "^
+                        "<semester>]\nValid grades: <letter_grade>, s/sat, "^
+                        "u/unsat, w/withdrawn, inc/incomplete, none, transfer" ^
+                        "\nValid CAS categories: PE, FWS, req/required, core, "^ 
+                        "4000+, tech/technical, spcl/ext, maj/major, " ^ 
+                        "project/proj/practicum/pract, lang/language/foreign, "^
+                        "PBS/PBSS, MQR/CA/HA/KCM/LA/SBA/liberal, GB, HB, "^
+                        "extra")
     | MalformedEdit ->
       exceptions sch ("Usage: edit [<course_name> <field> <new_value> | " ^ 
                       "name <new_name> | school [ENG | CAS] ]" ^
@@ -159,7 +179,9 @@ and prompt sch =
     | MalformedPrint ->
       exceptions sch "Usage: print [<> | <course_name>]"
     | MalformedSet ->
-      exceptions sch "Usage: set <attribute> <new_value>"
+      exceptions sch ("Usage: set <attribute> <new_value>" ^
+                      "\nValid attributes: autosave, html_bg_color, " ^
+                      "html_tile_color")
     | MalformedImport -> 
       exceptions sch "Usage: import <ics_file>"
     | Malformed | Empty -> 
@@ -204,12 +226,6 @@ and init_prompt () =
             print_endline("\nThe following commands are available for use. Type" 
                           ^ " in any command to see usage instructions.");
             ANSITerminal.(print_string [yellow] valid_commands);
-            print_endline("\nThe following are the grade options when adding " ^
-                          "a new course to the schedule.");
-            ANSITerminal.(print_string [yellow] 
-                            ("Valid grades: <letter_grade>, s/sat, " 
-                             ^ "u/unsat, w/withdrawn, inc/incomplete, " ^ 
-                             "none, transfer\n"));
             prompt (new_schedule sch_name school)
           end
         else 
