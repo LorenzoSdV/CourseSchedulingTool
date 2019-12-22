@@ -57,7 +57,7 @@ let format_sem_id str =
 let core_check c_name =
   c_name = "CS2800" || c_name = "CS2802" || c_name = "CS3110" || 
   c_name = "CS3410" || c_name = "CS3420" || c_name = "ECE3140" || 
-  c_name = "CS4410" || c_name = "CS4280"                     
+  c_name = "CS4410" || c_name = "CS4820"                     
 
 (** [technical_check c_name] is [true] if [c_name] is a technical elective in 
     either ENG or CAS, otherwise [false]. *)
