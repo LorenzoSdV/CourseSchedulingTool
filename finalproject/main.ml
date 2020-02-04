@@ -81,6 +81,7 @@ and prompt sch =
   | "close" -> 
     if get_save_status sch then start_prompt ()
     else save_prompt_from_close sch; init_prompt ()
+  | "clear" -> Unix.system "clear"; prompt sch
   | "" -> begin
       print_endline valid_commands;
       print_endline "Enter a command to view usage instructions.";
